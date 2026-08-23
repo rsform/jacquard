@@ -10,26 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBroadcaster;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBroadcasterOutput<S: BosStr = DefaultStr> {
-    ///Array of DIDs authorized as admins
+    /// Array of DIDs authorized as admins
     #[serde(skip_serializing_if = "Option::is_none")]
     pub admins: Option<Vec<Did<S>>>,
-    ///DID of the Streamplace broadcaster to which this server belongs
+    /// DID of the Streamplace broadcaster to which this server belongs
     pub broadcaster: Did<S>,
-    ///DID of this particular Streamplace server
+    /// DID of this particular Streamplace server
     #[serde(skip_serializing_if = "Option::is_none")]
     pub server: Option<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]

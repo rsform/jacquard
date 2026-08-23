@@ -1204,6 +1204,7 @@ impl<'c> CodeGenerator<'c> {
         let mut display_arms = Vec::new();
 
         let smol_str_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
+        let is_none_path = resolved.option_is_none_path();
 
         for error in errors {
             let variant_name = error.name.to_pascal_case();
@@ -1216,7 +1217,7 @@ impl<'c> CodeGenerator<'c> {
             variants.push(quote! {
                 #doc
                 #[serde(rename = #error_name)]
-                #variant_ident(#opt_smolstr)
+                #variant_ident(#[serde(skip_serializing_if = #is_none_path)] #opt_smolstr)
             });
 
             display_arms.push(quote! {
@@ -1241,7 +1242,11 @@ impl<'c> CodeGenerator<'c> {
                 #(#variants,)*
                 /// Catch-all for unknown error codes.
                 #[serde(untagged)]
-                Other { error: #smol_str_type, message: Option<#smol_str_type> },
+                Other {
+                    error: #smol_str_type,
+                    #[serde(skip_serializing_if = #is_none_path)]
+                    message: Option<#smol_str_type>,
+                },
             }
 
             impl core::fmt::Display for #ident {

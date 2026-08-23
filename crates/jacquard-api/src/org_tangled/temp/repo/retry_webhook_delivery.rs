@@ -10,47 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RetryWebhookDelivery<S: BosStr = DefaultStr> {
-    ///UUID of the delivery to retry.
+    /// UUID of the delivery to retry.
     pub delivery_id: S,
-    ///DID of the repository as minted by the knot.
+    /// DID of the repository as minted by the knot.
     pub repo_did: Did<S>,
-    ///Webhook ID that owns the delivery.
+    /// Webhook ID that owns the delivery.
     pub webhook_id: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RetryWebhookDeliveryError {
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(Option<SmolStr>),
+    WebhookNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "DeliveryNotFound")]
-    DeliveryNotFound(Option<SmolStr>),
+    DeliveryNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RetryWebhookDeliveryError {
@@ -106,9 +104,8 @@ impl jacquard_common::xrpc::XrpcResp for RetryWebhookDeliveryResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RetryWebhookDelivery<S> {
     const NSID: &'static str = "org.tangled.temp.repo.retryWebhookDelivery";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RetryWebhookDeliveryResponse;
 }
 
@@ -118,16 +115,15 @@ Path: `/xrpc/org.tangled.temp.repo.retryWebhookDelivery`. The request payload ty
 pub struct RetryWebhookDeliveryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RetryWebhookDeliveryRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.repo.retryWebhookDelivery";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RetryWebhookDelivery<S>;
     type Response = RetryWebhookDeliveryResponse;
 }
 
 pub mod retry_webhook_delivery_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -195,20 +191,14 @@ pub struct RetryWebhookDeliveryBuilder<
 
 impl RetryWebhookDelivery<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RetryWebhookDeliveryBuilder<
-        retry_webhook_delivery_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RetryWebhookDeliveryBuilder<retry_webhook_delivery_state::Empty, DefaultStr> {
         RetryWebhookDeliveryBuilder::new()
     }
 }
 
 impl<S: BosStr> RetryWebhookDelivery<S> {
     /// Create a new builder for this type
-    pub fn builder() -> RetryWebhookDeliveryBuilder<
-        retry_webhook_delivery_state::Empty,
-        S,
-    > {
+    pub fn builder() -> RetryWebhookDeliveryBuilder<retry_webhook_delivery_state::Empty, S> {
         RetryWebhookDeliveryBuilder::builder()
     }
 }
@@ -244,10 +234,7 @@ where
     pub fn delivery_id(
         mut self,
         value: impl Into<S>,
-    ) -> RetryWebhookDeliveryBuilder<
-        retry_webhook_delivery_state::SetDeliveryId<St>,
-        S,
-    > {
+    ) -> RetryWebhookDeliveryBuilder<retry_webhook_delivery_state::SetDeliveryId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RetryWebhookDeliveryBuilder {
             _state: PhantomData,

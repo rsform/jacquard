@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::feed::threadgate;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::feed::threadgate;
+use serde::{Deserialize, Serialize};
 /// Allow replies from actors who follow you.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FollowerRule<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -45,7 +48,10 @@ pub struct FollowerRule<S: BosStr = DefaultStr> {
 /// Allow replies from actors you follow.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FollowingRule<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -59,7 +65,10 @@ pub struct FollowingRule<S: BosStr = DefaultStr> {
 /// Allow replies from actors on a list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListRule<S: BosStr = DefaultStr> {
     pub list: AtUri<S>,
     #[serde(
@@ -81,14 +90,14 @@ pub struct ListRule<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Threadgate<S: BosStr = DefaultStr> {
-    ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
+    /// List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow: Option<Vec<ThreadgateAllowItem<S>>>,
     pub created_at: Datetime,
-    ///List of hidden reply URIs.
+    /// List of hidden reply URIs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hidden_replies: Option<Vec<AtUri<S>>>,
-    ///Reference (AT-URI) to the post record.
+    /// Reference (AT-URI) to the post record.
     pub post: AtUri<S>,
     #[serde(
         flatten,
@@ -98,7 +107,6 @@ pub struct Threadgate<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -128,7 +136,10 @@ pub struct ThreadgateGetRecordOutput<S: BosStr = DefaultStr> {
 /// Allow replies from actors mentioned in your post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MentionRule<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -274,17 +285,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_app_bsky_feed_threadgate() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.threadgate"),
@@ -293,9 +303,9 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("followerRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Allow replies from actors who follow you."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Allow replies from actors who follow you.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -307,9 +317,7 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("followingRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Allow replies from actors you follow."),
-                    ),
+                    description: Some(CowStr::new_static("Allow replies from actors you follow.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -321,9 +329,7 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Allow replies from actors on a list."),
-                    ),
+                    description: Some(CowStr::new_static("Allow replies from actors on a list.")),
                     required: Some(vec![SmolStr::new_static("list")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -421,11 +427,9 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("mentionRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Allow replies from actors mentioned in your post.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Allow replies from actors mentioned in your post.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -447,9 +451,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -460,15 +463,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_rule_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -588,9 +590,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -602,7 +603,7 @@ where
 
 pub mod threadgate_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -694,10 +695,7 @@ impl<S: BosStr> ThreadgateBuilder<threadgate_state::Empty, S> {
 
 impl<St: threadgate_state::State, S: BosStr> ThreadgateBuilder<St, S> {
     /// Set the `allow` field (optional)
-    pub fn allow(
-        mut self,
-        value: impl Into<Option<Vec<ThreadgateAllowItem<S>>>>,
-    ) -> Self {
+    pub fn allow(mut self, value: impl Into<Option<Vec<ThreadgateAllowItem<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -776,10 +774,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Threadgate<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Threadgate<S> {
         Threadgate {
             allow: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -797,8 +792,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

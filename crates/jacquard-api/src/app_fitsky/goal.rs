@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A fitness goal to track progress against
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -43,7 +43,7 @@ pub struct Goal<S: BosStr = DefaultStr> {
     pub metric: GoalMetric<S>,
     pub period: GoalPeriod<S>,
     pub start_date: Datetime,
-    ///Target value in base units (meters for distance, seconds for duration, seconds-per-km for pace, count for workouts)
+    /// Target value in base units (meters for distance, seconds for duration, seconds-per-km for pace, count for workouts)
     pub target_value: i64,
     #[serde(
         flatten,
@@ -53,7 +53,6 @@ pub struct Goal<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GoalMetric<S: BosStr = DefaultStr> {
@@ -139,7 +138,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GoalPeriod<S: BosStr = DefaultStr> {
@@ -320,9 +318,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -334,7 +331,7 @@ where
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -618,10 +615,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_goal() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.goal"),
@@ -630,20 +627,18 @@ fn lexicon_doc_app_fitsky_goal() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A fitness goal to track progress against"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A fitness goal to track progress against",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("metric"),
-                                SmolStr::new_static("targetValue"),
-                                SmolStr::new_static("period"),
-                                SmolStr::new_static("startDate"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("metric"),
+                            SmolStr::new_static("targetValue"),
+                            SmolStr::new_static("period"),
+                            SmolStr::new_static("startDate"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

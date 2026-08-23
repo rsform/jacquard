@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A user's RPG character sprite. One record per user (rkey: self).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,41 +38,41 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Sprite<S: BosStr = DefaultStr> {
-    ///Milliseconds per frame for animation playback  Defaults to `200`.
+    /// Milliseconds per frame for animation playback  Defaults to `200`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_sprite_animation_speed")]
     pub animation_speed: Option<i64>,
-    ///Number of columns per animation cycle
+    /// Number of columns per animation cycle
     #[serde(skip_serializing_if = "Option::is_none")]
     pub columns: Option<i64>,
-    ///When this record was first created
+    /// When this record was first created
     pub created_at: Datetime,
-    ///The game engine format this sprite is designed for. Determines animation interpretation.
+    /// The game engine format this sprite is designed for. Determines animation interpretation.
     pub engine: SpriteEngine<S>,
-    ///Height of a single frame in pixels (if not auto-calculated from height/rows)
+    /// Height of a single frame in pixels (if not auto-calculated from height/rows)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frame_height: Option<i64>,
-    ///Width of a single frame in pixels (if not auto-calculated from width/columns)
+    /// Width of a single frame in pixels (if not auto-calculated from width/columns)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frame_width: Option<i64>,
-    ///Total number of animation frames
+    /// Total number of animation frames
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frames: Option<i64>,
-    ///Total height of the sprite sheet in pixels
+    /// Total height of the sprite sheet in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    ///Display name for the character (optional, can differ from Bluesky display name)
+    /// Display name for the character (optional, can differ from Bluesky display name)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
+    /// Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rows: Option<i64>,
-    ///The sprite sheet image (PNG only). Max 10MB.
+    /// The sprite sheet image (PNG only). Max 10MB.
     pub sprite_sheet: BlobRef<S>,
-    ///When this record was last modified
+    /// When this record was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///Total width of the sprite sheet in pixels
+    /// Total width of the sprite sheet in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
     #[serde(
@@ -392,19 +392,16 @@ impl<S: BosStr> LexiconSchema for Sprite<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("sprite_sheet"),
@@ -443,9 +440,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -461,7 +457,7 @@ fn _default_sprite_animation_speed() -> Option<i64> {
 
 pub mod sprite_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -558,19 +554,7 @@ impl SpriteBuilder<sprite_state::Empty, DefaultStr> {
         SpriteBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -583,19 +567,7 @@ impl<S: BosStr> SpriteBuilder<sprite_state::Empty, S> {
         SpriteBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -837,10 +809,10 @@ where
 }
 
 fn lexicon_doc_actor_rpg_sprite() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("actor.rpg.sprite"),

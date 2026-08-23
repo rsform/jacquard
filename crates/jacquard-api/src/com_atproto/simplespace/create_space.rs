@@ -8,37 +8,39 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::aturi::AtSpaceUri;
-use jacquard_common::types::string::{Nsid, RecordKey, Rkey};
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::simplespace::AllowList;
 use crate::com_atproto::simplespace::ManagingAppPolicy;
 use crate::com_atproto::simplespace::MemberListPolicy;
 use crate::com_atproto::simplespace::Open;
 use crate::com_atproto::simplespace::PublicPolicy;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::aturi::AtSpaceUri;
+use jacquard_common::types::string::{Nsid, RecordKey, Rkey};
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSpace<S: BosStr = DefaultStr> {
-    ///How the authority decides whether to authorize a requesting app.
+    /// How the authority decides whether to authorize a requesting app.
     pub app_access: CreateSpaceAppAccess<S>,
-    ///How the authority decides whether to authorize a requesting user.
+    /// How the authority decides whether to authorize a requesting user.
     pub policy: CreateSpacePolicy<S>,
-    ///The space key. Used to differentiate multiple spaces of the same type under the same owner. Same syntax requirements as a record key. If not provided, one will be auto-generated (TID).
+    /// The space key. Used to differentiate multiple spaces of the same type under the same owner. Same syntax requirements as a record key. If not provided, one will be auto-generated (TID).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skey: Option<RecordKey<Rkey<S>>>,
-    ///The NSID of the space type, describing the modality of the space (e.g. app.bsky.group, app.bsky.personal).
+    /// The NSID of the space type, describing the modality of the space (e.g. app.bsky.group, app.bsky.personal).
     pub r#type: Nsid<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -49,7 +51,6 @@ pub enum CreateSpaceAppAccess<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.simplespace.defs#allowList")]
     AllowList(Box<AllowList<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,42 +64,39 @@ pub enum CreateSpacePolicy<S: BosStr = DefaultStr> {
     ManagingAppPolicy(Box<ManagingAppPolicy<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSpaceOutput<S: BosStr = DefaultStr> {
-    ///URI of the created space.
+    /// URI of the created space.
     pub uri: AtSpaceUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateSpaceError {
     /// A space with this owner, type, and skey already exists. A space that was previously deleted may be created again.
     #[serde(rename = "SpaceAlreadyExists")]
-    SpaceAlreadyExists(Option<SmolStr>),
+    SpaceAlreadyExists(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The requested policy is not one the host implements.
     #[serde(rename = "UnsupportedPolicy")]
-    UnsupportedPolicy(Option<SmolStr>),
+    UnsupportedPolicy(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The requested appAccess variant is not one the host implements. A host will not store an app access policy it cannot enforce.
     #[serde(rename = "UnsupportedAppAccess")]
-    UnsupportedAppAccess(Option<SmolStr>),
+    UnsupportedAppAccess(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateSpaceError {
@@ -149,9 +147,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateSpaceResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateSpace<S> {
     const NSID: &'static str = "com.atproto.simplespace.createSpace";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateSpaceResponse;
 }
 
@@ -161,16 +158,15 @@ Path: `/xrpc/com.atproto.simplespace.createSpace`. The request payload type is `
 pub struct CreateSpaceRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSpaceRequest {
     const PATH: &'static str = "/xrpc/com.atproto.simplespace.createSpace";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateSpace<S>;
     type Response = CreateSpaceResponse;
 }
 
 pub mod create_space_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -362,10 +358,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateSpace<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateSpace<S> {
         CreateSpace {
             app_access: self._fields.0.unwrap(),
             policy: self._fields.1.unwrap(),

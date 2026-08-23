@@ -10,52 +10,52 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeletePost<S: BosStr = DefaultStr> {
-    ///Post ID to delete.
+    /// Post ID to delete.
     pub id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeletePostOutput<S: BosStr = DefaultStr> {
-    ///Deletion success flag.
+    /// Deletion success flag.
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DeletePostError {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(Option<SmolStr>),
+    PostNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "PostNotPending")]
-    PostNotPending(Option<SmolStr>),
+    PostNotPending(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DeletePostError {
@@ -99,9 +99,8 @@ impl jacquard_common::xrpc::XrpcResp for DeletePostResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeletePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeletePostResponse;
 }
 
@@ -111,9 +110,8 @@ Path: `/xrpc/app.chronosky.schedule.deletePost`. The request payload type is `De
 pub struct DeletePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeletePost<S>;
     type Response = DeletePostResponse;
 }

@@ -8,33 +8,36 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::safelink::Event;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::safelink::Event;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryEvents<S: BosStr = DefaultStr> {
-    ///Cursor for pagination
+    /// Cursor for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Maximum number of results to return  Defaults to `50`.
+    /// Maximum number of results to return  Defaults to `50`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_events_limit")]
     pub limit: Option<i64>,
-    ///Filter by pattern type
+    /// Filter by pattern type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern_type: Option<S>,
-    ///Sort direction  Defaults to `"desc"`.
+    /// Sort direction  Defaults to `"desc"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_events_sort_direction")]
     pub sort_direction: Option<QueryEventsSortDirection<S>>,
-    ///Filter by specific URLs or domains
+    /// Filter by specific URLs or domains
     #[serde(skip_serializing_if = "Option::is_none")]
     pub urls: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -89,8 +92,7 @@ impl<S: BosStr> Serialize for QueryEventsSortDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryEventsSortDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryEventsSortDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -116,18 +118,18 @@ where
         match self {
             QueryEventsSortDirection::Asc => QueryEventsSortDirection::Asc,
             QueryEventsSortDirection::Desc => QueryEventsSortDirection::Desc,
-            QueryEventsSortDirection::Other(v) => {
-                QueryEventsSortDirection::Other(v.into_static())
-            }
+            QueryEventsSortDirection::Other(v) => QueryEventsSortDirection::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryEventsOutput<S: BosStr = DefaultStr> {
-    ///Next cursor for pagination. Only present if there are more results.
+    /// Next cursor for pagination. Only present if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub events: Vec<Event<S>>,
@@ -148,9 +150,8 @@ impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryEvents<S> {
     const NSID: &'static str = "tools.ozone.safelink.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = QueryEventsResponse;
 }
 
@@ -160,9 +161,8 @@ Path: `/xrpc/tools.ozone.safelink.queryEvents`. The request payload type is `Que
 pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = QueryEvents<S>;
     type Response = QueryEventsResponse;
 }
@@ -171,8 +171,9 @@ fn _default_query_events_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_query_events_sort_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    QueryEventsSortDirection<S>,
-> {
-    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static("desc")))
+fn _default_query_events_sort_direction<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<QueryEventsSortDirection<S>> {
+    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }

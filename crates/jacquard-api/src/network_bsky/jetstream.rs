@@ -12,6 +12,5 @@ pub mod import_timestamps;
 pub mod list_segments;
 pub mod plan_snapshot;
 
-
 #[cfg(feature = "streaming")]
 pub mod subscribe_events;

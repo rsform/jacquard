@@ -15,7 +15,6 @@ pub mod send_notification;
 pub mod start_phone_verification;
 pub mod verify_phone;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -26,24 +25,27 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::actor::ProfileView;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::actor::ProfileView;
+use serde::{Deserialize, Serialize};
 /// Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
-    ///The index of this match in the import contact input.
+    /// The index of this match in the import contact input.
     pub contact_index: i64,
-    ///Profile of the matched user.
+    /// Profile of the matched user.
     pub r#match: ProfileView<S>,
     #[serde(
         flatten,
@@ -57,11 +59,14 @@ pub struct MatchAndContactIndex<S: BosStr = DefaultStr> {
 /// A stash object to be sent via bsync representing a notification to be created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Notification<S: BosStr = DefaultStr> {
-    ///The DID of who this notification comes from.
+    /// The DID of who this notification comes from.
     pub from: Did<S>,
-    ///The DID of who this notification should go to.
+    /// The DID of who this notification should go to.
     pub to: Did<S>,
     #[serde(
         flatten,
@@ -72,13 +77,15 @@ pub struct Notification<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SyncStatus<S: BosStr = DefaultStr> {
-    ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
+    /// Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
     pub matches_count: i64,
-    ///Last date when contacts where imported.
+    /// Last date when contacts where imported.
     pub synced_at: Datetime,
     #[serde(
         flatten,
@@ -171,15 +178,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod match_and_contact_index_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -233,20 +239,14 @@ pub struct MatchAndContactIndexBuilder<
 
 impl MatchAndContactIndex<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> MatchAndContactIndexBuilder<
-        match_and_contact_index_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> MatchAndContactIndexBuilder<match_and_contact_index_state::Empty, DefaultStr> {
         MatchAndContactIndexBuilder::new()
     }
 }
 
 impl<S: BosStr> MatchAndContactIndex<S> {
     /// Create a new builder for this type
-    pub fn builder() -> MatchAndContactIndexBuilder<
-        match_and_contact_index_state::Empty,
-        S,
-    > {
+    pub fn builder() -> MatchAndContactIndexBuilder<match_and_contact_index_state::Empty, S> {
         MatchAndContactIndexBuilder::builder()
     }
 }
@@ -282,10 +282,7 @@ where
     pub fn contact_index(
         mut self,
         value: impl Into<i64>,
-    ) -> MatchAndContactIndexBuilder<
-        match_and_contact_index_state::SetContactIndex<St>,
-        S,
-    > {
+    ) -> MatchAndContactIndexBuilder<match_and_contact_index_state::SetContactIndex<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
             _state: PhantomData,
@@ -342,10 +339,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.contact.defs"),
@@ -436,12 +433,10 @@ fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("syncStatus"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("syncedAt"),
-                            SmolStr::new_static("matchesCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("syncedAt"),
+                        SmolStr::new_static("matchesCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -455,11 +450,9 @@ fn lexicon_doc_app_bsky_contact_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("syncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Last date when contacts where imported.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Last date when contacts where imported.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -482,15 +475,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -628,10 +620,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Notification<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
         Notification {
             from: self._fields.0.unwrap(),
             to: self._fields.1.unwrap(),
@@ -647,15 +636,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod sync_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -793,10 +781,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SyncStatus<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SyncStatus<S> {
         SyncStatus {
             matches_count: self._fields.0.unwrap(),
             synced_at: self._fields.1.unwrap(),

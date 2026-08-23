@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,41 +21,46 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::dev_atfs::file::File;
 use crate::dev_atfs::repo::pin_file;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PinFile<S: BosStr = DefaultStr> {
-    ///The file to pin, exactly as it would be embedded in a record. Wrapped in an object rather than being the request body itself so later additions to the call have somewhere to live. Its tags field (see dev.atfs.file), if present, is adopted: the tags on the reference become the caller's own on the resulting claim, as if the caller had supplied them itself. A reference with no tags simply yields a pin with no tags — this is the only current way to seed tags on a pin, since pinFile takes no separate tag parameter of its own.
+    /// The file to pin, exactly as it would be embedded in a record. Wrapped in an object rather than being the request body itself so later additions to the call have somewhere to live. Its tags field (see dev.atfs.file), if present, is adopted: the tags on the reference become the caller's own on the resulting claim, as if the caller had supplied them itself. A reference with no tags simply yields a pin with no tags — this is the only current way to seed tags on a pin, since pinFile takes no separate tag parameter of its own.
     pub file: File<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PinFileOutput<S: BosStr = DefaultStr> {
-    ///How many fetch attempts this pin has cost so far. Reset to zero when a failed pin is re-triggered.
+    /// How many fetch attempts this pin has cost so far. Reset to zero when a failed pin is re-triggered.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attempts: Option<i64>,
-    ///Present only when state is pinned: the CID this instance now serves the file's DAG under, and deliberately the same field name as dev.atfs.repo.uploadFile's, since it means exactly the same thing. Usually this is the reference's own ipfsRoot, fetched and kept verbatim. It differs when the instance had already committed a root for these bytes — from an earlier upload, or an earlier pin naming a different DAG shape — because that root has already been handed out in responses, embedded in dev.atfs.file records and announced to the DHT: first root wins, the pin still succeeds (recording the claim is what a pin means), and this field reports what is really being served so the caller can tell its requester the file is here but reachable under a different root than their reference names.
+    /// Present only when state is pinned: the CID this instance now serves the file's DAG under, and deliberately the same field name as dev.atfs.repo.uploadFile's, since it means exactly the same thing. Usually this is the reference's own ipfsRoot, fetched and kept verbatim. It differs when the instance had already committed a root for these bytes — from an earlier upload, or an earlier pin naming a different DAG shape — because that root has already been handed out in responses, embedded in dev.atfs.file records and announced to the DHT: first root wins, the pin still succeeds (recording the claim is what a pin means), and this field reports what is really being served so the caller can tell its requester the file is here but reachable under a different root than their reference names.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ipfs_root: Option<CidLink<S>>,
-    ///Why the most recent attempt failed, as one of a closed set of reasons rather than an error message. Present alongside seeking (a failure being retried), failed (the one that ended it), and the first response after a failed pin is re-triggered. no-source-responded: nothing served the content — the default, and deliberately no more specific, since which origin failed and how is a fact about the instance's own network rather than an answer to the caller. content-mismatch: a source served bytes that provably aren't the reference's. transfer-incomplete: a transfer ended before the declared size. size-exceeded: the reference is over this instance's limit, or a source streamed more than it declares. not-a-unixfs-file: the ipfsRoot isn't a readable UnixFS file. invalid-reference: the reference couldn't describe a pinnable file at all. storage-unavailable: this instance couldn't store bytes it did fetch. The full error text stays in the instance's own logs.
+    /// Why the most recent attempt failed, as one of a closed set of reasons rather than an error message. Present alongside seeking (a failure being retried), failed (the one that ended it), and the first response after a failed pin is re-triggered. no-source-responded: nothing served the content — the default, and deliberately no more specific, since which origin failed and how is a fact about the instance's own network rather than an answer to the caller. content-mismatch: a source served bytes that provably aren't the reference's. transfer-incomplete: a transfer ended before the declared size. size-exceeded: the reference is over this instance's limit, or a source streamed more than it declares. not-a-unixfs-file: the ipfsRoot isn't a readable UnixFS file. invalid-reference: the reference couldn't describe a pinnable file at all. storage-unavailable: this instance couldn't store bytes it did fetch. The full error text stays in the instance's own logs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_error: Option<PinFileOutputLastError<S>>,
-    ///Seconds until the next attempt starts. Deliberately relative rather than an absolute timestamp: an atfs appliance can boot with its clock reading 1970 and no network to correct it, so any absolute time it quoted would be a lie. Absent when nothing is scheduled — an attempt is running now, the pin has finished, or it has failed.
+    /// Seconds until the next attempt starts. Deliberately relative rather than an absolute timestamp: an atfs appliance can boot with its clock reading 1970 and no network to correct it, so any absolute time it quoted would be a lie. Absent when nothing is scheduled — an attempt is running now, the pin has finished, or it has failed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_attempt_in: Option<i64>,
-    ///Present only while state is fetching.
+    /// Present only while state is fetching.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<pin_file::Progress<S>>,
-    ///seeking: the node is looking for a source, or waiting out the backoff before looking again. fetching: bytes are actually arriving; seeking and fetching can bounce back and forth as sources come and go. pinned: the bytes are stored, served and announced, and the caller holds a claim on them — this is read from ground truth (content in the store, caller in its pin set), not from anything the pin request recorded. failed: the node has stopped trying (see lastError); the request rests until it is either re-triggered by another pinFile call or released by every account waiting on it. A failure the node could not prove — no providers found yet, an origin that wouldn't answer, a transfer cut short — is never reported as failed on the spot: provider records on the DHT routinely take hours to propagate, so those are retried on a backoff doubling from a minute to an hour, for roughly 48 hours of the instance's uptime (uptime, not wall time: a box that spends a day powered off spends none of it), and the state stays seeking throughout. Only a failure the node could prove — bytes that don't hash to the cid, a source holding more than the declared size, a root that isn't a readable UnixFS file, a size over this instance's limit — fails immediately, since no retry could change it.
+    /// seeking: the node is looking for a source, or waiting out the backoff before looking again. fetching: bytes are actually arriving; seeking and fetching can bounce back and forth as sources come and go. pinned: the bytes are stored, served and announced, and the caller holds a claim on them — this is read from ground truth (content in the store, caller in its pin set), not from anything the pin request recorded. failed: the node has stopped trying (see lastError); the request rests until it is either re-triggered by another pinFile call or released by every account waiting on it. A failure the node could not prove — no providers found yet, an origin that wouldn't answer, a transfer cut short — is never reported as failed on the spot: provider records on the DHT routinely take hours to propagate, so those are retried on a backoff doubling from a minute to an hour, for roughly 48 hours of the instance's uptime (uptime, not wall time: a box that spends a day powered off spends none of it), and the state stays seeking throughout. Only a failure the node could prove — bytes that don't hash to the cid, a source holding more than the declared size, a root that isn't a readable UnixFS file, a size over this instance's limit — fails immediately, since no retry could change it.
     pub state: PinFileOutputState<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -148,28 +153,18 @@ where
     type Output = PinFileOutputLastError<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            PinFileOutputLastError::NoSourceResponded => {
-                PinFileOutputLastError::NoSourceResponded
-            }
-            PinFileOutputLastError::ContentMismatch => {
-                PinFileOutputLastError::ContentMismatch
-            }
+            PinFileOutputLastError::NoSourceResponded => PinFileOutputLastError::NoSourceResponded,
+            PinFileOutputLastError::ContentMismatch => PinFileOutputLastError::ContentMismatch,
             PinFileOutputLastError::TransferIncomplete => {
                 PinFileOutputLastError::TransferIncomplete
             }
             PinFileOutputLastError::SizeExceeded => PinFileOutputLastError::SizeExceeded,
-            PinFileOutputLastError::NotAUnixfsFile => {
-                PinFileOutputLastError::NotAUnixfsFile
-            }
-            PinFileOutputLastError::InvalidReference => {
-                PinFileOutputLastError::InvalidReference
-            }
+            PinFileOutputLastError::NotAUnixfsFile => PinFileOutputLastError::NotAUnixfsFile,
+            PinFileOutputLastError::InvalidReference => PinFileOutputLastError::InvalidReference,
             PinFileOutputLastError::StorageUnavailable => {
                 PinFileOutputLastError::StorageUnavailable
             }
-            PinFileOutputLastError::Other(v) => {
-                PinFileOutputLastError::Other(v.into_static())
-            }
+            PinFileOutputLastError::Other(v) => PinFileOutputLastError::Other(v.into_static()),
         }
     }
 }
@@ -261,32 +256,27 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum PinFileError {
     /// This instance is running without its IPFS node, so it has no way to fetch anything. Uploads and retrieval are unaffected.
     #[serde(rename = "PinningUnavailable")]
-    PinningUnavailable(Option<SmolStr>),
+    PinningUnavailable(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The reference's declared size exceeds this instance's maximum blob size — checked before any fetch is attempted, the same limit dev.atfs.repo.uploadFile enforces on bytes it receives directly.
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(Option<SmolStr>),
+    BlobTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// This instance has no room to take on another pin: its data volume has reached the free space it keeps in reserve, or it is already holding as many pin requests at once as it will. No intent was registered, and pins already registered carry on. The same named error dev.atfs.repo.uploadFile answers with, for the same reason — a pin is an upload by another name — and releasing content with dev.atfs.repo.deleteFile is what makes room again.
     #[serde(rename = "InsufficientStorage")]
-    InsufficientStorage(Option<SmolStr>),
+    InsufficientStorage(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for PinFileError {
@@ -324,13 +314,15 @@ impl core::fmt::Display for PinFileError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Progress<S: BosStr = DefaultStr> {
-    ///Bytes of the file verified into the store so far by the attempt currently running. It restarts from zero on each attempt: a fetch that was cut short leaves nothing behind, so the next one starts from the beginning.
+    /// Bytes of the file verified into the store so far by the attempt currently running. It restarts from zero on each attempt: a fetch that was cut short leaves nothing behind, so the next one starts from the beginning.
     pub bytes_fetched: i64,
-    ///The file's total size, as the reference declares it — repeated here so a progress bar needs only this object.
+    /// The file's total size, as the reference declares it — repeated here so a progress bar needs only this object.
     pub size: i64,
     #[serde(
         flatten,
@@ -354,9 +346,8 @@ impl jacquard_common::xrpc::XrpcResp for PinFileResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PinFile<S> {
     const NSID: &'static str = "dev.atfs.repo.pinFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PinFileResponse;
 }
 
@@ -366,9 +357,8 @@ Path: `/xrpc/dev.atfs.repo.pinFile`. The request payload type is `PinFile<S>`; s
 pub struct PinFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PinFileRequest {
     const PATH: &'static str = "/xrpc/dev.atfs.repo.pinFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PinFile<S>;
     type Response = PinFileResponse;
 }
@@ -390,7 +380,7 @@ impl<S: BosStr> LexiconSchema for Progress<S> {
 
 pub mod pin_file_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -510,15 +500,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod progress_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -666,10 +655,10 @@ where
 }
 
 fn lexicon_doc_dev_atfs_repo_pinFile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.atfs.repo.pinFile"),
@@ -680,24 +669,22 @@ fn lexicon_doc_dev_atfs_repo_pinFile() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("file")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("file"),
-                                        LexObjectProperty::Ref(LexRef {
-                                            r#ref: CowStr::new_static("dev.atfs.file"),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("file")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("file"),
+                                    LexObjectProperty::Ref(LexRef {
+                                        r#ref: CowStr::new_static("dev.atfs.file"),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -706,12 +693,10 @@ fn lexicon_doc_dev_atfs_repo_pinFile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("progress"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("bytesFetched"),
-                            SmolStr::new_static("size")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("bytesFetched"),
+                        SmolStr::new_static("size"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

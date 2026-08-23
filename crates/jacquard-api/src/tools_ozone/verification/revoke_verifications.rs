@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,30 +21,35 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::tools_ozone::verification::revoke_verifications;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::verification::revoke_verifications;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeVerifications<S: BosStr = DefaultStr> {
-    ///Reason for revoking the verification. This is optional and can be omitted if not needed.
+    /// Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revoke_reason: Option<S>,
-    ///Array of verification record uris to revoke
+    /// Array of verification record uris to revoke
     pub uris: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeVerificationsOutput<S: BosStr = DefaultStr> {
-    ///List of verification uris that couldn't be revoked, including failure reasons
+    /// List of verification uris that couldn't be revoked, including failure reasons
     pub failed_revocations: Vec<revoke_verifications::RevokeError<S>>,
-    ///List of verification uris successfully revoked
+    /// List of verification uris successfully revoked
     pub revoked_verifications: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -53,11 +58,14 @@ pub struct RevokeVerificationsOutput<S: BosStr = DefaultStr> {
 /// Error object for failed revocations
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeError<S: BosStr = DefaultStr> {
-    ///Description of the error that occurred during revocation.
+    /// Description of the error that occurred during revocation.
     pub error: S,
-    ///The AT-URI of the verification record that failed to revoke.
+    /// The AT-URI of the verification record that failed to revoke.
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -81,9 +89,8 @@ impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<S> {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RevokeVerificationsResponse;
 }
 
@@ -93,9 +100,8 @@ Path: `/xrpc/tools.ozone.verification.revokeVerifications`. The request payload 
 pub struct RevokeVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RevokeVerifications<S>;
     type Response = RevokeVerificationsResponse;
 }
@@ -117,7 +123,7 @@ impl<S: BosStr> LexiconSchema for RevokeError<S> {
 
 pub mod revoke_verifications_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -148,10 +154,8 @@ pub mod revoke_verifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RevokeVerificationsBuilder<
-    St: revoke_verifications_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RevokeVerificationsBuilder<St: revoke_verifications_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<AtUri<S>>>),
     _type: PhantomData<fn() -> S>,
@@ -159,20 +163,14 @@ pub struct RevokeVerificationsBuilder<
 
 impl RevokeVerifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RevokeVerificationsBuilder<
-        revoke_verifications_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RevokeVerificationsBuilder<revoke_verifications_state::Empty, DefaultStr> {
         RevokeVerificationsBuilder::new()
     }
 }
 
 impl<S: BosStr> RevokeVerifications<S> {
     /// Create a new builder for this type
-    pub fn builder() -> RevokeVerificationsBuilder<
-        revoke_verifications_state::Empty,
-        S,
-    > {
+    pub fn builder() -> RevokeVerificationsBuilder<revoke_verifications_state::Empty, S> {
         RevokeVerificationsBuilder::builder()
     }
 }
@@ -199,10 +197,7 @@ impl<S: BosStr> RevokeVerificationsBuilder<revoke_verifications_state::Empty, S>
     }
 }
 
-impl<
-    St: revoke_verifications_state::State,
-    S: BosStr,
-> RevokeVerificationsBuilder<St, S> {
+impl<St: revoke_verifications_state::State, S: BosStr> RevokeVerificationsBuilder<St, S> {
     /// Set the `revokeReason` field (optional)
     pub fn revoke_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -248,10 +243,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RevokeVerifications<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RevokeVerifications<S> {
         RevokeVerifications {
             revoke_reason: self._fields.0,
             uris: self._fields.1.unwrap(),
@@ -267,15 +259,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod revoke_error_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -413,10 +404,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RevokeError<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RevokeError<S> {
         RevokeError {
             error: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -426,10 +414,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.verification.revokeVerifications"),
@@ -492,34 +480,29 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> LexiconDoc<'sta
             map.insert(
                 SmolStr::new_static("revokeError"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Error object for failed revocations"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("error")],
-                    ),
+                    description: Some(CowStr::new_static("Error object for failed revocations")),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("error"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("error"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Description of the error that occurred during revocation.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Description of the error that occurred during revocation.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The AT-URI of the verification record that failed to revoke.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The AT-URI of the verification record that failed to revoke.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

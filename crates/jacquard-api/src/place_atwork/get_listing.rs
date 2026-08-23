@@ -8,65 +8,65 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_atwork::listing::Listing;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::place_atwork::listing::Listing;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListing<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
     pub rkey: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListingOutput<S: BosStr = DefaultStr> {
-    ///CID of the listing record
+    /// CID of the listing record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
-    ///AT-URI of the listing
+    /// AT-URI of the listing
     pub uri: AtUri<S>,
-    ///The job listing record
+    /// The job listing record
     pub value: Listing<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetListingError {
     /// The requested listing does not exist
     #[serde(rename = "ListingNotFound")]
-    ListingNotFound(Option<SmolStr>),
+    ListingNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Failed to parse the listing data
     #[serde(rename = "ListingParseFailed")]
-    ListingParseFailed(Option<SmolStr>),
+    ListingParseFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Failed to fetch the listing from storage
     #[serde(rename = "ListingFetchFailed")]
-    ListingFetchFailed(Option<SmolStr>),
+    ListingFetchFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetListingError {
@@ -134,7 +134,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetListingRequest {
 
 pub mod get_listing_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_farmapps::temp::ecrop::CodeType;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_farmapps::temp::ecrop::CodeType;
+use serde::{Deserialize, Serialize};
 /// Fertilizer codelist
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,35 +38,35 @@ use crate::org_farmapps::temp::ecrop::CodeType;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Cl022<S: BosStr = DefaultStr> {
-    ///Date when added to the list
+    /// Date when added to the list
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added: Option<Datetime>,
-    ///Comment
+    /// Comment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Denominator used for all fertilizer content properties
+    /// Denominator used for all fertilizer content properties
     #[serde(skip_serializing_if = "Option::is_none")]
     pub denominator: Option<i64>,
-    ///Description / name of the fertilizer
+    /// Description / name of the fertilizer
     pub description: S,
-    ///Id off the fertilizer
+    /// Id off the fertilizer
     pub id: CodeType<S>,
-    ///<unit> Potassium oxide content of this fertilizer
+    /// <unit> Potassium oxide content of this fertilizer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub k2o: Option<i64>,
-    ///<unit> Nitrogen content of this fertilizer
+    /// <unit> Nitrogen content of this fertilizer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub n: Option<i64>,
-    ///<unit> Phosphate content of this fertilizer
+    /// <unit> Phosphate content of this fertilizer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub p2o5: Option<i64>,
-    ///Fertlizer type
+    /// Fertlizer type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<Cl022Type<S>>,
-    ///Unit
+    /// Unit
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unit: Option<S>,
-    ///Date when updated
+    /// Date when updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated: Option<Datetime>,
     #[serde(
@@ -259,9 +259,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -273,7 +272,7 @@ where
 
 pub mod cl022_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -353,7 +352,9 @@ impl Cl022Builder<cl022_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         Cl022Builder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -364,7 +365,9 @@ impl<S: BosStr> Cl022Builder<cl022_state::Empty, S> {
     pub fn builder() -> Self {
         Cl022Builder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -434,10 +437,7 @@ where
     St::Id: cl022_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<CodeType<S>>,
-    ) -> Cl022Builder<cl022_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<CodeType<S>>) -> Cl022Builder<cl022_state::SetId<St>, S> {
         self._fields.4 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
@@ -568,10 +568,10 @@ where
 }
 
 fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.farmapps.temp.agroconnect.cl022"),
@@ -584,21 +584,19 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         description: Some(CowStr::new_static("Codelist ferilizers")),
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("id"),
-                                SmolStr::new_static("description")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("id"),
+                            SmolStr::new_static("description"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("added"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Date when added to the list"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Date when added to the list",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -620,9 +618,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Description / name of the fertilizer"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Description / name of the fertilizer",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

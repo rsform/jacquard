@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record linking an atproto identity with a stream signing key
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,12 +37,12 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Key<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when this key was created.
+    /// Client-declared timestamp when this key was created.
     pub created_at: Datetime,
-    ///The name of the client that created this key.
+    /// The name of the client that created this key.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<S>,
-    ///The did:key signing key for the stream.
+    /// The did:key signing key for the stream.
     pub signing_key: S,
     #[serde(
         flatten,
@@ -141,9 +141,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -155,7 +154,7 @@ where
 
 pub mod key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -318,10 +317,10 @@ where
 }
 
 fn lexicon_doc_place_stream_key() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.key"),
@@ -330,30 +329,24 @@ fn lexicon_doc_place_stream_key() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Record linking an atproto identity with a stream signing key",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record linking an atproto identity with a stream signing key",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("signingKey"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("signingKey"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Client-declared timestamp when this key was created.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Client-declared timestamp when this key was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -361,22 +354,18 @@ fn lexicon_doc_place_stream_key() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdBy"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The name of the client that created this key.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The name of the client that created this key.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("signingKey"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The did:key signing key for the stream.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The did:key signing key for the stream.",
+                                    )),
                                     min_length: Some(57usize),
                                     max_length: Some(57usize),
                                     ..Default::default()

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Scientific publication record bridged from Octopus.ac via Octosphere. Represents a single version of an Octopus publication.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,41 +37,41 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Publication<S: BosStr = DefaultStr> {
-    ///Public Octopus URL for the publication version.
+    /// Public Octopus URL for the publication version.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_url: Option<UriValue<S>>,
-    ///List of citation strings extracted from references.
+    /// List of citation strings extracted from references.
     pub citations: Vec<S>,
-    ///Raw HTML content body.
+    /// Raw HTML content body.
     pub content_html: S,
-    ///Plain text content for compact consumption.
+    /// Plain text content for compact consumption.
     pub content_text: S,
-    ///ISO timestamp of when the publication was created in Octopus.
+    /// ISO timestamp of when the publication was created in Octopus.
     pub created_at: Datetime,
-    ///Publication version DOI URL, if present.
+    /// Publication version DOI URL, if present.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub doi: Option<UriValue<S>>,
-    ///Publication ids that link to this record.
+    /// Publication ids that link to this record.
     pub linked_from: Vec<S>,
-    ///Publication ids this record links to.
+    /// Publication ids this record links to.
     pub linked_to: Vec<S>,
-    ///Octopus publication id (UUID).
+    /// Octopus publication id (UUID).
     pub octopus_id: S,
-    ///ORCID of the publication owner (if available).
+    /// ORCID of the publication owner (if available).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub owner_orcid: Option<S>,
-    ///Publication id this peer review references, if applicable.
+    /// Publication id this peer review references, if applicable.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub peer_review_of: Option<S>,
-    ///Octopus publication type.
+    /// Octopus publication type.
     pub publication_type: PublicationPublicationType<S>,
-    ///Octopus publication status (expected LIVE).
+    /// Octopus publication status (expected LIVE).
     pub status: PublicationStatus<S>,
-    ///Publication title.
+    /// Publication title.
     pub title: S,
-    ///ISO timestamp of when the publication was last updated in Octopus.
+    /// ISO timestamp of when the publication was last updated in Octopus.
     pub updated_at: Datetime,
-    ///Octopus publication version id (UUID).
+    /// Octopus publication version id (UUID).
     pub version_id: S,
     #[serde(
         flatten,
@@ -148,8 +148,7 @@ impl<S: BosStr> Serialize for PublicationPublicationType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PublicationPublicationType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PublicationPublicationType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -176,9 +175,7 @@ where
             PublicationPublicationType::ResearchProblem => {
                 PublicationPublicationType::ResearchProblem
             }
-            PublicationPublicationType::Hypothesis => {
-                PublicationPublicationType::Hypothesis
-            }
+            PublicationPublicationType::Hypothesis => PublicationPublicationType::Hypothesis,
             PublicationPublicationType::Protocol => PublicationPublicationType::Protocol,
             PublicationPublicationType::Analysis => PublicationPublicationType::Analysis,
             PublicationPublicationType::Interpretation => {
@@ -188,9 +185,7 @@ where
                 PublicationPublicationType::RealWorldApplication
             }
             PublicationPublicationType::Data => PublicationPublicationType::Data,
-            PublicationPublicationType::PeerReview => {
-                PublicationPublicationType::PeerReview
-            }
+            PublicationPublicationType::PeerReview => PublicationPublicationType::PeerReview,
             PublicationPublicationType::Other(v) => {
                 PublicationPublicationType::Other(v.into_static())
             }
@@ -358,9 +353,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -372,7 +366,7 @@ where
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -688,22 +682,8 @@ impl PublicationBuilder<publication_state::Empty, DefaultStr> {
         PublicationBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -716,22 +696,8 @@ impl<S: BosStr> PublicationBuilder<publication_state::Empty, S> {
         PublicationBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -1057,10 +1023,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Publication<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
         Publication {
             canonical_url: self._fields.0,
             citations: self._fields.1.unwrap(),
@@ -1084,10 +1047,10 @@ where
 }
 
 fn lexicon_doc_social_octosphere_publication() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.octosphere.publication"),

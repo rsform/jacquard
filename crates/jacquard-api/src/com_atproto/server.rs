@@ -32,30 +32,32 @@ pub mod reset_password;
 pub mod revoke_app_password;
 pub mod update_email;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::server;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::server;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InviteCode<S: BosStr = DefaultStr> {
     pub available: i64,
     pub code: S,
@@ -73,9 +75,11 @@ pub struct InviteCode<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InviteCodeUse<S: BosStr = DefaultStr> {
     pub used_at: Datetime,
     pub used_by: Did<S>,
@@ -125,15 +129,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod invite_code_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -474,10 +477,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> InviteCode<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InviteCode<S> {
         InviteCode {
             available: self._fields.0.unwrap(),
             code: self._fields.1.unwrap(),
@@ -492,10 +492,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.server.defs"),
@@ -504,16 +504,15 @@ fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("inviteCode"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("code"),
-                            SmolStr::new_static("available"),
-                            SmolStr::new_static("disabled"),
-                            SmolStr::new_static("forAccount"),
-                            SmolStr::new_static("createdBy"),
-                            SmolStr::new_static("createdAt"), SmolStr::new_static("uses")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("code"),
+                        SmolStr::new_static("available"),
+                        SmolStr::new_static("disabled"),
+                        SmolStr::new_static("forAccount"),
+                        SmolStr::new_static("createdBy"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("uses"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -525,7 +524,9 @@ fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("code"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -536,7 +537,9 @@ fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("createdBy"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("disabled"),
@@ -546,7 +549,9 @@ fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("forAccount"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uses"),
@@ -566,11 +571,10 @@ fn lexicon_doc_com_atproto_server_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("inviteCodeUse"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("usedBy"), SmolStr::new_static("usedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("usedBy"),
+                        SmolStr::new_static("usedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -606,15 +610,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod invite_code_use_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -657,10 +660,7 @@ pub mod invite_code_use_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct InviteCodeUseBuilder<
-    St: invite_code_use_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct InviteCodeUseBuilder<St: invite_code_use_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -755,10 +755,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> InviteCodeUse<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InviteCodeUse<S> {
         InviteCodeUse {
             used_at: self._fields.0.unwrap(),
             used_by: self._fields.1.unwrap(),

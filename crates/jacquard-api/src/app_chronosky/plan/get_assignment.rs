@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_chronosky::plan::get_assignment;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_chronosky::plan::get_assignment;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
-    ///Active plan assignment (null if no active plan)
+    /// Active plan assignment (null if no active plan)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assignment: Option<get_assignment::PlanAssignment<S>>,
-    ///Response message
+    /// Response message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -42,20 +45,23 @@ pub struct GetAssignmentOutput<S: BosStr = DefaultStr> {
 /// Plan assignment details.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlanAssignment<S: BosStr = DefaultStr> {
-    ///Plan activation timestamp
+    /// Plan activation timestamp
     pub activated_at: Datetime,
-    ///Plan expiration timestamp
+    /// Plan expiration timestamp
     pub expires_at: Datetime,
-    ///Plan assignment ID
+    /// Plan assignment ID
     pub id: S,
     pub plan: get_assignment::PlanInfo<S>,
-    ///Plan ID
+    /// Plan ID
     pub plan_id: S,
-    ///Plan assignment status
+    /// Plan assignment status
     pub status: PlanAssignmentStatus<S>,
-    ///Ticket information (if redeemed from ticket)
+    /// Ticket information (if redeemed from ticket)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ticket: Option<get_assignment::TicketInfo<S>>,
     #[serde(
@@ -145,9 +151,7 @@ where
             PlanAssignmentStatus::Active => PlanAssignmentStatus::Active,
             PlanAssignmentStatus::Expired => PlanAssignmentStatus::Expired,
             PlanAssignmentStatus::Cancelled => PlanAssignmentStatus::Cancelled,
-            PlanAssignmentStatus::Other(v) => {
-                PlanAssignmentStatus::Other(v.into_static())
-            }
+            PlanAssignmentStatus::Other(v) => PlanAssignmentStatus::Other(v.into_static()),
         }
     }
 }
@@ -155,32 +159,35 @@ where
 /// Plan information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlanInfo<S: BosStr = DefaultStr> {
-    ///Plan description
+    /// Plan description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Plan ID
+    /// Plan ID
     pub id: S,
-    ///Maximum concurrent posts
+    /// Maximum concurrent posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_concurrent_posts: Option<i64>,
-    ///Maximum images per post
+    /// Maximum images per post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_images_per_post: Option<i64>,
-    ///Maximum posts per day
+    /// Maximum posts per day
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_posts_per_day: Option<i64>,
-    ///Maximum days to schedule in advance
+    /// Maximum days to schedule in advance
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_schedule_days: Option<i64>,
-    ///Maximum posts per thread
+    /// Maximum posts per thread
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_thread_posts: Option<i64>,
-    ///Minimum interval between posts (minutes)
+    /// Minimum interval between posts (minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_schedule_interval: Option<i64>,
-    ///Plan name
+    /// Plan name
     pub name: S,
     #[serde(
         flatten,
@@ -194,11 +201,14 @@ pub struct PlanInfo<S: BosStr = DefaultStr> {
 /// Ticket information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TicketInfo<S: BosStr = DefaultStr> {
-    ///Ticket code
+    /// Ticket code
     pub code: S,
-    ///Ticket ID
+    /// Ticket ID
     pub id: S,
     #[serde(
         flatten,
@@ -230,10 +240,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetAssignment {
     const NSID: &'static str = "app.chronosky.plan.getAssignment";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAssignmentResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -388,15 +395,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod plan_assignment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -507,10 +513,7 @@ pub mod plan_assignment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlanAssignmentBuilder<
-    St: plan_assignment_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PlanAssignmentBuilder<St: plan_assignment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -676,10 +679,7 @@ where
 
 impl<St: plan_assignment_state::State, S: BosStr> PlanAssignmentBuilder<St, S> {
     /// Set the `ticket` field (optional)
-    pub fn ticket(
-        mut self,
-        value: impl Into<Option<get_assignment::TicketInfo<S>>>,
-    ) -> Self {
+    pub fn ticket(mut self, value: impl Into<Option<get_assignment::TicketInfo<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -714,10 +714,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PlanAssignment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlanAssignment<S> {
         PlanAssignment {
             activated_at: self._fields.0.unwrap(),
             expires_at: self._fields.1.unwrap(),
@@ -732,10 +729,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.plan.getAssignment"),
@@ -752,24 +749,21 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("planAssignment"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Plan assignment details.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("planId"),
-                            SmolStr::new_static("plan"),
-                            SmolStr::new_static("activatedAt"),
-                            SmolStr::new_static("expiresAt"),
-                            SmolStr::new_static("status")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("planId"),
+                        SmolStr::new_static("plan"),
+                        SmolStr::new_static("activatedAt"),
+                        SmolStr::new_static("expiresAt"),
+                        SmolStr::new_static("status"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("activatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Plan activation timestamp"),
-                                ),
+                                description: Some(CowStr::new_static("Plan activation timestamp")),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -778,9 +772,7 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("expiresAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Plan expiration timestamp"),
-                                ),
+                                description: Some(CowStr::new_static("Plan expiration timestamp")),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -812,9 +804,7 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Plan assignment status"),
-                                ),
+                                description: Some(CowStr::new_static("Plan assignment status")),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -835,9 +825,7 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("planInfo"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Plan information.")),
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -910,9 +898,7 @@ fn lexicon_doc_app_chronosky_plan_getAssignment() -> LexiconDoc<'static> {
                 SmolStr::new_static("ticketInfo"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Ticket information.")),
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("code")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("code")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -950,9 +936,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -963,8 +948,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

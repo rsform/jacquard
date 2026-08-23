@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// Record declaring the inclusion of a single material or a set of materials in a specific collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,15 +38,15 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CollectionItem<S: BosStr = DefaultStr> {
-    ///Reference to the collection record (`org.okazu-diary.feed.collection`).
+    /// Reference to the collection record (`org.okazu-diary.feed.collection`).
     pub collection: AtUri<S>,
     pub created_at: Datetime,
-    ///Remarks on the collection item.
+    /// Remarks on the collection item.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
-    ///Reference(s) to a material or set of materials (`org.okazu-diary.material.external`) to be included in the collection.
+    /// Reference(s) to a material or set of materials (`org.okazu-diary.material.external`) to be included in the collection.
     pub subjects: Vec<AtUri<S>>,
-    ///Reference to an `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` of another collection from which this collection item is derived.
+    /// Reference to an `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` of another collection from which this collection item is derived.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub via: Option<StrongRef<S>>,
     #[serde(
@@ -168,9 +168,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -182,7 +181,7 @@ where
 
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -239,10 +238,7 @@ pub mod collection_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionItemBuilder<
-    St: collection_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionItemBuilder<St: collection_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -392,10 +388,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionItem<S> {
         CollectionItem {
             collection: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -408,10 +401,10 @@ where
 }
 
 fn lexicon_doc_org_okazu_diary_material_collectionItem() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.okazu-diary.material.collectionItem"),

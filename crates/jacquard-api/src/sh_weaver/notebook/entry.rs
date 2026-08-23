@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,15 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::Author;
 use crate::sh_weaver::notebook::ContentRating;
 use crate::sh_weaver::notebook::ContentWarnings;
 use crate::sh_weaver::notebook::Path;
 use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A notebook entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -45,13 +45,13 @@ use crate::sh_weaver::notebook::Title;
 pub struct Entry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authors: Option<Vec<Author<S>>>,
-    ///The content of the notebook entry. This should be some flavor of Markdown.
+    /// The content of the notebook entry. This should be some flavor of Markdown.
     pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_warnings: Option<ContentWarnings<S>>,
-    ///Client-declared timestamp when this was originally created.
+    /// Client-declared timestamp when this was originally created.
     pub created_at: Datetime,
-    ///The set of images and records, if any, embedded in the notebook entry.
+    /// The set of images and records, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embeds: Option<EntryEmbeds<S>>,
     pub path: Path<S>,
@@ -60,7 +60,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Tags<S>>,
     pub title: Title<S>,
-    ///Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
+    /// Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -75,7 +75,10 @@ pub struct Entry<S: BosStr = DefaultStr> {
 /// The set of images and records, if any, embedded in the notebook entry.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EntryEmbeds<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub externals: Option<crate::sh_weaver::embed::external::External<S>>,
@@ -84,9 +87,8 @@ pub struct EntryEmbeds<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub records: Option<crate::sh_weaver::embed::records::Records<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub records_with_media: Option<
-        Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<S>>,
-    >,
+    pub records_with_media:
+        Option<Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub videos: Option<crate::sh_weaver::embed::video::VideoRecord<S>>,
     #[serde(
@@ -218,9 +220,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -252,17 +253,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_sh_weaver_notebook_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.entry"),
@@ -439,7 +439,7 @@ fn lexicon_doc_sh_weaver_notebook_entry() -> LexiconDoc<'static> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -584,10 +584,7 @@ where
     St::Content: entry_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> EntryBuilder<entry_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> EntryBuilder<entry_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -599,10 +596,7 @@ where
 
 impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(
-        mut self,
-        value: impl Into<Option<ContentWarnings<S>>>,
-    ) -> Self {
+    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -651,10 +645,7 @@ where
     St::Path: entry_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(
-        mut self,
-        value: impl Into<Path<S>>,
-    ) -> EntryBuilder<entry_state::SetPath<St>, S> {
+    pub fn path(mut self, value: impl Into<Path<S>>) -> EntryBuilder<entry_state::SetPath<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,

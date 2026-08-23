@@ -10,18 +10,21 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SetDefaultBranch<S: BosStr = DefaultStr> {
     pub default_branch: S,
-    ///DID of the repository
+    /// DID of the repository
     pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -52,9 +55,8 @@ impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<S> {
     const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SetDefaultBranchResponse;
 }
 
@@ -64,16 +66,15 @@ Path: `/xrpc/sh.tangled.repo.setDefaultBranch`. The request payload type is `Set
 pub struct SetDefaultBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.setDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = SetDefaultBranch<S>;
     type Response = SetDefaultBranchResponse;
 }
 
 pub mod set_default_branch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,10 +117,7 @@ pub mod set_default_branch_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SetDefaultBranchBuilder<
-    St: set_default_branch_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SetDefaultBranchBuilder<St: set_default_branch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -127,10 +125,7 @@ pub struct SetDefaultBranchBuilder<
 
 impl SetDefaultBranch<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SetDefaultBranchBuilder<
-        set_default_branch_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> SetDefaultBranchBuilder<set_default_branch_state::Empty, DefaultStr> {
         SetDefaultBranchBuilder::new()
     }
 }
@@ -217,10 +212,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SetDefaultBranch<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SetDefaultBranch<S> {
         SetDefaultBranch {
             default_branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

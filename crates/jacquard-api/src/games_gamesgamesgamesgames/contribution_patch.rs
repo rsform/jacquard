@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A mod-approved patch representing changes to apply to an entity. Created on mod approval, deleted when the entity owner accepts and merges.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,12 +38,12 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ContributionPatch<S: BosStr = DefaultStr> {
-    ///The approved changes to overlay on the entity.
+    /// The approved changes to overlay on the entity.
     pub changes: Data<S>,
     pub contribution: StrongRef<S>,
     pub contribution_review: StrongRef<S>,
     pub created_at: Datetime,
-    ///The entity these changes apply to. Absent for newGame contributions.
+    /// The entity these changes apply to. Absent for newGame contributions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<AtUri<S>>,
     #[serde(
@@ -121,9 +121,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -135,7 +134,7 @@ where
 
 pub mod contribution_patch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,10 +207,7 @@ pub mod contribution_patch_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionPatchBuilder<
-    St: contribution_patch_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ContributionPatchBuilder<St: contribution_patch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -225,10 +221,7 @@ pub struct ContributionPatchBuilder<
 
 impl ContributionPatch<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ContributionPatchBuilder<
-        contribution_patch_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ContributionPatchBuilder<contribution_patch_state::Empty, DefaultStr> {
         ContributionPatchBuilder::new()
     }
 }
@@ -309,10 +302,7 @@ where
     pub fn contribution_review(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ContributionPatchBuilder<
-        contribution_patch_state::SetContributionReview<St>,
-        S,
-    > {
+    ) -> ContributionPatchBuilder<contribution_patch_state::SetContributionReview<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ContributionPatchBuilder {
             _state: PhantomData,
@@ -374,10 +364,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ContributionPatch<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributionPatch<S> {
         ContributionPatch {
             changes: self._fields.0.unwrap(),
             contribution: self._fields.1.unwrap(),
@@ -390,10 +377,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_contributionPatch() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.contributionPatch"),

@@ -10,31 +10,36 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Datetime};
+use jacquard_common::types::string::{AtUri, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::repo::list_secrets;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::repo::list_secrets;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListSecrets<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListSecretsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secrets: Option<Vec<list_secrets::Secret<S>>>,
@@ -42,9 +47,11 @@ pub struct ListSecretsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Secret<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
@@ -126,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Secret<S> {
 
 pub mod list_secrets_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -238,15 +245,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod secret_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -321,7 +327,12 @@ pub mod secret_state {
 /// Builder for constructing an instance of this type.
 pub struct SecretBuilder<St: secret_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -405,10 +416,7 @@ where
     St::Key: secret_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<S>,
-    ) -> SecretBuilder<secret_state::SetKey<St>, S> {
+    pub fn key(mut self, value: impl Into<S>) -> SecretBuilder<secret_state::SetKey<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SecretBuilder {
             _state: PhantomData,
@@ -468,10 +476,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_listSecrets() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.listSecrets"),
@@ -480,37 +488,34 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("repo")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("repo"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("repo")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("repo"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("secret"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("repo"), SmolStr::new_static("key"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("createdBy")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("repo"),
+                        SmolStr::new_static("key"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("createdBy"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

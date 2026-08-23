@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A tea variety tracked by the user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,10 +37,10 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tea<S: BosStr = DefaultStr> {
-    ///Broad tea category. Known values: green, yellow, white, oolong, red, black, dark, herbal, rooibos, flavored, blend, other
+    /// Broad tea category. Known values: green, yellow, white, oolong, red, black, dark, herbal, rooibos, flavored, blend, other
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<TeaCategory<S>>,
-    ///Whether the bag/pouch is finished
+    /// Whether the bag/pouch is finished
     #[serde(skip_serializing_if = "Option::is_none")]
     pub closed: Option<bool>,
     pub created_at: Datetime,
@@ -48,19 +48,19 @@ pub struct Tea<S: BosStr = DefaultStr> {
     pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub harvest_year: Option<i64>,
-    ///Optional product, vendor, or information URL for the tea
+    /// Optional product, vendor, or information URL for the tea
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<UriValue<S>>,
-    ///Name of the tea (e.g., 'Long Jing 2024 Spring', 'Da Hong Pao')
+    /// Name of the tea (e.g., 'Long Jing 2024 Spring', 'Da Hong Pao')
     pub name: S,
-    ///Region or country of origin
+    /// Region or country of origin
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_ref: Option<AtUri<S>>,
-    ///AT-URI to a social.oolong.alpha.vendor record
+    /// AT-URI to a social.oolong.alpha.vendor record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vendor_ref: Option<AtUri<S>>,
     #[serde(
@@ -344,9 +344,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -358,7 +357,7 @@ where
 
 pub mod tea_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -438,7 +437,9 @@ impl TeaBuilder<tea_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         TeaBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -449,7 +450,9 @@ impl<S: BosStr> TeaBuilder<tea_state::Empty, S> {
     pub fn builder() -> Self {
         TeaBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -650,10 +653,10 @@ where
 }
 
 fn lexicon_doc_social_oolong_alpha_tea() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.oolong.alpha.tea"),

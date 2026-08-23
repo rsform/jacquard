@@ -10,10 +10,9 @@ pub mod find_correlation;
 pub mod find_related_accounts;
 pub mod search_accounts;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +24,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SigDetail<S: BosStr = DefaultStr> {
     pub property: S,
     pub value: S,
@@ -63,17 +65,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_tools_ozone_signature_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.signature.defs"),
@@ -82,21 +83,24 @@ fn lexicon_doc_tools_ozone_signature_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sigDetail"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("property"), SmolStr::new_static("value")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("property"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("property"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },

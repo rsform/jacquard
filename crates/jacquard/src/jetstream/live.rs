@@ -259,7 +259,7 @@ where
 /// client, without compression: frames arrive as JSON text and decode
 /// directly. Frames carry no dictionary negotiation; use
 /// [`subscribe_events`] (the default) for compressed frames or
-/// [`subscribe_events_with_dictionary`] with an explicit dictionary.
+/// `subscribe_events_with_dictionary` with an explicit dictionary.
 pub async fn subscribe_events_uncompressed<W, S>(
     ws_client: &W,
     base: &Uri<String>,

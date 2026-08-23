@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,26 +24,29 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::log::yearly;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::log::yearly;
+use serde::{Deserialize, Serialize};
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
-    ///Signing algorithm (ES256)
+    /// Signing algorithm (ES256)
     pub alg: S,
-    ///Key identifier for the signing key
+    /// Key identifier for the signing key
     pub kid: S,
-    ///Unique random nonce to prevent replay
+    /// Unique random nonce to prevent replay
     pub nonce: S,
-    ///Base64-encoded ES256 signature
+    /// Base64-encoded ES256 signature
     pub sig: S,
-    ///When the record was signed
+    /// When the record was signed
     pub signed_at: Datetime,
-    ///Signature schema version
+    /// Signature schema version
     pub version: i64,
     #[serde(
         flatten,
@@ -57,21 +60,24 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
 /// Per-category counts of activity performed inside anisota, summed across the period and across devices.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InAppCounts<S: BosStr = DefaultStr> {
-    ///Likes created in anisota
+    /// Likes created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub likes: Option<i64>,
-    ///Top-level posts created in anisota
+    /// Top-level posts created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts: Option<i64>,
-    ///Quote posts created in anisota
+    /// Quote posts created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quotes: Option<i64>,
-    ///Replies created in anisota
+    /// Replies created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replies: Option<i64>,
-    ///Reposts created in anisota
+    /// Reposts created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts: Option<i64>,
     #[serde(
@@ -94,23 +100,23 @@ pub struct InAppCounts<S: BosStr = DefaultStr> {
 )]
 pub struct Yearly<S: BosStr = DefaultStr> {
     pub aggregates: yearly::YearlyAggregates<S>,
-    ///When the yearly record was first created
+    /// When the yearly record was first created
     pub created_at: Datetime,
-    ///When the yearly record was finalized (end of year)
+    /// When the yearly record was finalized (end of year)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finalized_at: Option<Datetime>,
-    ///Rolled-up in-anisota activity for the year (summed daily inApp across devices, per field). Optional and additive; the read side may instead compute this from the year's daily logs.
+    /// Rolled-up in-anisota activity for the year (summed daily inApp across devices, per field). Optional and additive; the read side may instead compute this from the year's daily logs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub in_app: Option<yearly::InAppCounts<S>>,
-    ///AT URIs of monthly log records included in this year
+    /// AT URIs of monthly log records included in this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lower_log_refs: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub patterns: Option<yearly::YearlyPatterns<S>>,
     pub signature: yearly::ChronicleSignature<S>,
-    ///Whether this year is still being updated or has been finalized
+    /// Whether this year is still being updated or has been finalized
     pub status: YearlyStatus<S>,
-    ///Year string in YYYY format (e.g. 2026)
+    /// Year string in YYYY format (e.g. 2026)
     pub year: S,
     #[serde(
         flatten,
@@ -214,33 +220,36 @@ pub struct YearlyGetRecordOutput<S: BosStr = DefaultStr> {
 /// Rolled-up counts from monthly records
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct YearlyAggregates<S: BosStr = DefaultStr> {
-    ///Total days with activity this year
+    /// Total days with activity this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub days_active: Option<i64>,
-    ///Levels gained this year
+    /// Levels gained this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub levels_gained: Option<i64>,
-    ///Total likes received this year
+    /// Total likes received this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub likes_received: Option<i64>,
-    ///Number of months with activity this year
+    /// Number of months with activity this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub months_active: Option<i64>,
-    ///Total posts created this year
+    /// Total posts created this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_created: Option<i64>,
-    ///Total posts read this year
+    /// Total posts read this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_read: Option<i64>,
-    ///Total replies received this year
+    /// Total replies received this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replies_received: Option<i64>,
-    ///New specimens photographed this year
+    /// New specimens photographed this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_photographed: Option<i64>,
-    ///Total XP gained this year
+    /// Total XP gained this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_xp_gained: Option<i64>,
     #[serde(
@@ -255,15 +264,18 @@ pub struct YearlyAggregates<S: BosStr = DefaultStr> {
 /// Activity pattern aggregation for the year based on half-hour blocks
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct YearlyPatterns<S: BosStr = DefaultStr> {
-    ///Average active blocks per day (totalActiveBlocks / daysActive, rounded)
+    /// Average active blocks per day (totalActiveBlocks / daysActive, rounded)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg_blocks_per_day: Option<i64>,
-    ///Highest activeBlockCount for any single day in the year
+    /// Highest activeBlockCount for any single day in the year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub peak_blocks: Option<i64>,
-    ///Sum of activeBlockCount across all days in the year
+    /// Sum of activeBlockCount across all days in the year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_active_blocks: Option<i64>,
     #[serde(
@@ -552,15 +564,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -671,21 +682,22 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<
-    St: chronicle_signature_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<
-        chronicle_signature_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -856,10 +868,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChronicleSignature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -873,10 +882,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.log.yearly"),
@@ -885,63 +894,58 @@ fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "ES256 cryptographic signature proving record authenticity",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
-                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
-                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "ES256 cryptographic signature proving record authenticity",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("sig"),
+                        SmolStr::new_static("alg"),
+                        SmolStr::new_static("kid"),
+                        SmolStr::new_static("signedAt"),
+                        SmolStr::new_static("nonce"),
+                        SmolStr::new_static("version"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Signing algorithm (ES256)"),
-                                ),
+                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Key identifier for the signing key"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Key identifier for the signing key",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique random nonce to prevent replay"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique random nonce to prevent replay",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Base64-encoded ES256 signature"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Base64-encoded ES256 signature",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the record was signed"),
-                                ),
+                                description: Some(CowStr::new_static("When the record was signed")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1126,9 +1130,7 @@ fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("yearlyAggregates"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Rolled-up counts from monthly records"),
-                    ),
+                    description: Some(CowStr::new_static("Rolled-up counts from monthly records")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1203,11 +1205,9 @@ fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("yearlyPatterns"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Activity pattern aggregation for the year based on half-hour blocks",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Activity pattern aggregation for the year based on half-hour blocks",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1251,9 +1251,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1264,9 +1263,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1278,7 +1276,7 @@ where
 
 pub mod yearly_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1500,10 +1498,7 @@ impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
 
 impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
     /// Set the `patterns` field (optional)
-    pub fn patterns(
-        mut self,
-        value: impl Into<Option<yearly::YearlyPatterns<S>>>,
-    ) -> Self {
+    pub fn patterns(mut self, value: impl Into<Option<yearly::YearlyPatterns<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1558,10 +1553,7 @@ where
     St::Year: yearly_state::IsUnset,
 {
     /// Set the `year` field (required)
-    pub fn year(
-        mut self,
-        value: impl Into<S>,
-    ) -> YearlyBuilder<yearly_state::SetYear<St>, S> {
+    pub fn year(mut self, value: impl Into<S>) -> YearlyBuilder<yearly_state::SetYear<St>, S> {
         self._fields.8 = Option::Some(value.into());
         YearlyBuilder {
             _state: PhantomData,
@@ -1619,9 +1611,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1632,8 +1623,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -10,17 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetRepo<S: BosStr = DefaultStr> {
     ///  Defaults to `false`.
     #[serde(default = "_default_exclude_values")]
@@ -30,40 +33,34 @@ pub struct GetRepo<S: BosStr = DefaultStr> {
     pub space: AtSpaceUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetRepoError {
     #[serde(rename = "SpaceNotFound")]
-    SpaceNotFound(Option<SmolStr>),
+    SpaceNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<SmolStr>),
+    RepoNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<SmolStr>),
+    RepoTakendown(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<SmolStr>),
+    RepoSuspended(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<SmolStr>),
+    RepoDeactivated(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetRepoError {
@@ -168,7 +165,7 @@ fn _default_exclude_values() -> Option<bool> {
 
 pub mod get_repo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

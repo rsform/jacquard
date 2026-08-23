@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A sampling or collecting event. Multiple dwc.occurrence records can reference the same event via eventRef, sharing location and protocol metadata.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,82 +37,82 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Event<S: BosStr = DefaultStr> {
-    ///Uncertainty radius in meters around the coordinates.
+    /// Uncertainty radius in meters around the coordinates.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coordinate_uncertainty_in_meters: Option<i64>,
-    ///The name of the country.
+    /// The name of the country.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country: Option<S>,
-    ///ISO 3166-1 alpha-2 country code.
+    /// ISO 3166-1 alpha-2 country code.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<S>,
-    ///Second-level administrative division.
+    /// Second-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub county: Option<S>,
-    ///Timestamp of record creation in the ATProto PDS.
+    /// Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
-    ///Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
+    /// Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub decimal_latitude: Option<S>,
-    ///Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
+    /// Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub decimal_longitude: Option<S>,
-    ///The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
+    /// The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
     pub event_date: S,
-    ///An identifier for the event. Should be globally unique or unique within the dataset.
+    /// An identifier for the event. Should be globally unique or unique within the dataset.
     pub event_id: S,
-    ///Comments or notes about the event.
+    /// Comments or notes about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_remarks: Option<S>,
-    ///The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
+    /// The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_time: Option<S>,
-    ///Notes or a reference to notes taken in the field about the event.
+    /// Notes or a reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub field_notes: Option<S>,
-    ///The spatial reference system. Recommended: 'EPSG:4326'.
+    /// The spatial reference system. Recommended: 'EPSG:4326'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub geodetic_datum: Option<S>,
-    ///A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
+    /// A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub habitat: Option<S>,
-    ///Specific locality description.
+    /// Specific locality description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locality: Option<S>,
-    ///Identifier for the location where the event occurred.
+    /// Identifier for the location where the event occurred.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_id: Option<S>,
-    ///Comments about the location.
+    /// Comments about the location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_remarks: Option<S>,
-    ///Upper limit of elevation range in meters above sea level.
+    /// Upper limit of elevation range in meters above sea level.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_elevation_in_meters: Option<i64>,
-    ///Lower limit of elevation range in meters above sea level.
+    /// Lower limit of elevation range in meters above sea level.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum_elevation_in_meters: Option<i64>,
-    ///Third-level administrative division.
+    /// Third-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub municipality: Option<S>,
-    ///An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
+    /// An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_event_id: Option<S>,
-    ///AT-URI reference to the parent app.gainforest.dwc.event record.
+    /// AT-URI reference to the parent app.gainforest.dwc.event record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_event_ref: Option<AtUri<S>>,
-    ///The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
+    /// The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sample_size_unit: Option<S>,
-    ///A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
+    /// A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sample_size_value: Option<S>,
-    ///The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
+    /// The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling_effort: Option<S>,
-    ///The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
+    /// The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling_protocol: Option<S>,
-    ///First-level administrative division.
+    /// First-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state_province: Option<S>,
     #[serde(
@@ -473,9 +473,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -487,7 +486,7 @@ where
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -598,33 +597,8 @@ impl EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -637,33 +611,8 @@ impl<S: BosStr> EventBuilder<event_state::Empty, S> {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -672,10 +621,7 @@ impl<S: BosStr> EventBuilder<event_state::Empty, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
-    pub fn coordinate_uncertainty_in_meters(
-        mut self,
-        value: impl Into<Option<i64>>,
-    ) -> Self {
+    pub fn coordinate_uncertainty_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -795,10 +741,7 @@ where
     St::EventId: event_state::IsUnset,
 {
     /// Set the `eventID` field (required)
-    pub fn event_id(
-        mut self,
-        value: impl Into<S>,
-    ) -> EventBuilder<event_state::SetEventId<St>, S> {
+    pub fn event_id(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetEventId<St>, S> {
         self._fields.8 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -1118,10 +1061,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_dwc_event() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.dwc.event"),

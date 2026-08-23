@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream. NYI
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Syndication<S: BosStr = DefaultStr> {
-    ///DID of the Streamplace broadcaster that will be replicating the livestream
+    /// DID of the Streamplace broadcaster that will be replicating the livestream
     pub broadcaster: Did<S>,
-    ///Client-declared timestamp when this syndication was created.
+    /// Client-declared timestamp when this syndication was created.
     pub created_at: Datetime,
-    ///DID of the streamer whose livestream is being replicated
+    /// DID of the streamer whose livestream is being replicated
     pub streamer: Did<S>,
     #[serde(
         flatten,
@@ -118,9 +118,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -132,7 +131,7 @@ where
 
 pub mod syndication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,10 +304,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Syndication<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Syndication<S> {
         Syndication {
             broadcaster: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -319,10 +315,10 @@ where
 }
 
 fn lexicon_doc_place_stream_broadcast_syndication() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.broadcast.syndication"),

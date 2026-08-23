@@ -10,15 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -28,7 +28,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -38,18 +38,18 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Artifact<S: BosStr = DefaultStr> {
-    ///the artifact
+    /// the artifact
     pub artifact: BlobRef<S>,
-    ///time of creation of this artifact
+    /// time of creation of this artifact
     pub created_at: Datetime,
-    ///name of the artifact
+    /// name of the artifact
     pub name: S,
-    ///repo that this artifact is being uploaded to
+    /// repo that this artifact is being uploaded to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo_did: Option<Did<S>>,
-    ///hash of the tag object that this artifact is attached to (only annotated tags are supported)
+    /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub tag: Bytes,
     #[serde(
@@ -134,19 +134,16 @@ impl<S: BosStr> LexiconSchema for Artifact<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("artifact"),
@@ -167,9 +164,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -181,7 +177,7 @@ where
 
 pub mod artifact_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -347,10 +343,7 @@ where
     St::Name: artifact_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ArtifactBuilder<artifact_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ArtifactBuilder<artifact_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
@@ -440,10 +433,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_artifact() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.artifact"),
@@ -454,26 +447,27 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("tag"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("artifact")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("tag"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("artifact"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("artifact"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("time of creation of this artifact"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "time of creation of this artifact",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -481,20 +475,16 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("name of the artifact"),
-                                    ),
+                                    description: Some(CowStr::new_static("name of the artifact")),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("repo"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "repo that this artifact is being uploaded to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "repo that this artifact is being uploaded to",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

@@ -1,5 +1,5 @@
 [package]
-name = "tokio-tungstenite-wasm"
+name = "tokio-tungstenite-wasm-jacquard"
 version = "0.6.99"
 edition = "2021"
 description = "Vendored fork of tokio-tungstenite-wasm with native upgrade-header support; see native connect_with_options"

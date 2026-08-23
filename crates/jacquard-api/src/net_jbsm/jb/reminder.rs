@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A reminder scheduled to trigger at a specific time
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Reminder<S: BosStr = DefaultStr> {
-    ///Timestamp when the reminder was created
+    /// Timestamp when the reminder was created
     pub created_at: Datetime,
-    ///Whether the reminder has been triggered  Defaults to `false`.
+    /// Whether the reminder has been triggered  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reminder_occurred")]
     pub occurred: Option<bool>,
-    ///AT-URI of the original post/message that triggered this reminder
+    /// AT-URI of the original post/message that triggered this reminder
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin_uri: Option<AtUri<S>>,
-    ///DID of the user who created the reminder
+    /// DID of the user who created the reminder
     pub requester: Did<S>,
-    ///The reminder message/content
+    /// The reminder message/content
     pub subject: S,
-    ///Timestamp when the reminder should fire
+    /// Timestamp when the reminder should fire
     pub trigger_at: Datetime,
     #[serde(
         flatten,
@@ -138,9 +138,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -156,7 +155,7 @@ fn _default_reminder_occurred() -> Option<bool> {
 
 pub mod reminder_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -415,10 +414,10 @@ where
 }
 
 fn lexicon_doc_net_jbsm_jb_reminder() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.jbsm.jb.reminder"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Enrichment data and optional user note for a bookmark
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,10 +44,10 @@ pub struct Annotation<S: BosStr = DefaultStr> {
     pub favicon: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<UriValue<S>>,
-    ///User note for this bookmark
+    /// User note for this bookmark
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
-    ///AT URI of the bookmark this annotates
+    /// AT URI of the bookmark this annotates
     pub subject: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
@@ -156,9 +156,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -170,7 +169,7 @@ where
 
 pub mod annotation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,10 +385,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Annotation<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Annotation<S> {
         Annotation {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -404,10 +400,10 @@ where
 }
 
 fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.kipclip.annotation"),
@@ -416,19 +412,15 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Enrichment data and optional user note for a bookmark",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Enrichment data and optional user note for a bookmark",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("subject"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -463,9 +455,9 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("note"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("User note for this bookmark"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "User note for this bookmark",
+                                    )),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -473,9 +465,9 @@ fn lexicon_doc_com_kipclip_annotation() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("AT URI of the bookmark this annotates"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "AT URI of the bookmark this annotates",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

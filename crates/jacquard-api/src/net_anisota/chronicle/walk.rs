@@ -8,13 +8,12 @@
 //! Generated bindings for the `net.anisota.chronicle.walk` Lexicon namespace/module.
 pub mod camp;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,26 +27,29 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::walk;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::walk;
+use serde::{Deserialize, Serialize};
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
-    ///Signing algorithm (ES256)
+    /// Signing algorithm (ES256)
     pub alg: S,
-    ///Key identifier for the signing key
+    /// Key identifier for the signing key
     pub kid: S,
-    ///Unique random nonce to prevent replay
+    /// Unique random nonce to prevent replay
     pub nonce: S,
-    ///Base64-encoded ES256 signature
+    /// Base64-encoded ES256 signature
     pub sig: S,
-    ///When the record was signed
+    /// When the record was signed
     pub signed_at: Datetime,
-    ///Signature schema version
+    /// Signature schema version
     pub version: i64,
     #[serde(
         flatten,
@@ -61,11 +63,14 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
 /// Per-device progress bucket. Buckets are summed across devices (not max-merged) so in-app activity spread over multiple devices is fully counted.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeviceProgress<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub counts: Option<walk::HeartbeatProgress<S>>,
-    ///Random per-install device id from userScopedStorage. No fingerprinting.
+    /// Random per-install device id from userScopedStorage. No fingerprinting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub device_id: Option<S>,
     #[serde(
@@ -80,15 +85,18 @@ pub struct DeviceProgress<S: BosStr = DefaultStr> {
 /// Light state at heartbeat time
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HeartbeatLight<S: BosStr = DefaultStr> {
-    ///Current light level
+    /// Current light level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
-    ///Whether drain is actively ticking (true while exploring, false while resting or camping). Walks have no frozen state.
+    /// Whether drain is actively ticking (true while exploring, false while resting or camping). Walks have no frozen state.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub drain_active: Option<bool>,
-    ///Current drain rate as percentage
+    /// Current drain rate as percentage
     #[serde(skip_serializing_if = "Option::is_none")]
     pub drain_rate: Option<i64>,
     #[serde(
@@ -103,7 +111,10 @@ pub struct HeartbeatLight<S: BosStr = DefaultStr> {
 /// Session progress counters at heartbeat time (per-device bucket contents)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HeartbeatProgress<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_count: Option<i64>,
@@ -140,23 +151,23 @@ pub struct HeartbeatProgress<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Walk<S: BosStr = DefaultStr> {
-    ///Active exploring time in minutes (excludes camp/rest time)
+    /// Active exploring time in minutes (excludes camp/rest time)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_duration: Option<i64>,
-    ///Number of camps made during the walk
+    /// Number of camps made during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub camps_count: Option<i64>,
-    ///How the walk closed. Known values: 'user' (manual 'that's enough for now' tap), 'auto' (idle auto-close after the inactivity window), and 'lamp' (light depleted). Free string with no enum so future close reasons need no lexicon change. Unset while the walk is active.
+    /// How the walk closed. Known values: 'user' (manual 'that's enough for now' tap), 'auto' (idle auto-close after the inactivity window), and 'lamp' (light depleted). Free string with no enum so future close reasons need no lexicon change. Unset while the walk is active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub closed_by: Option<S>,
-    ///When the walk ended. For idle auto-closes this is the last tracked activity, clamped to be no earlier than startedAt.
+    /// When the walk ended. For idle auto-closes this is the last tracked activity, clamped to be no earlier than startedAt.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conditions: Option<walk::WalkConditions<S>>,
-    ///When the record was created
+    /// When the record was created
     pub created_at: Datetime,
-    ///Total walk duration in minutes
+    /// Total walk duration in minutes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -167,16 +178,16 @@ pub struct Walk<S: BosStr = DefaultStr> {
     pub heartbeat: Option<walk::WalkHeartbeat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light: Option<walk::WalkLight<S>>,
-    ///Total camp/rest time in minutes
+    /// Total camp/rest time in minutes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rest_duration: Option<i64>,
     pub signature: walk::ChronicleSignature<S>,
-    ///When the walk started (first engagement)
+    /// When the walk started (first engagement)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
-    ///Current walk status. A walk is 'active' while open and 'completed' once it closes; there is no 'abandoned' state because a walk never fails.
+    /// Current walk status. A walk is 'active' while open and 'completed' once it closes; there is no 'abandoned' state because a walk never fails.
     pub status: WalkStatus<S>,
-    ///When the record was last updated
+    /// When the record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -281,21 +292,24 @@ pub struct WalkGetRecordOutput<S: BosStr = DefaultStr> {
 /// Environmental conditions during the walk
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WalkConditions<S: BosStr = DefaultStr> {
-    ///Forest biome type
+    /// Forest biome type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub biome: Option<S>,
-    ///Time-of-day light condition at walk start
+    /// Time-of-day light condition at walk start
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light_level: Option<WalkConditionsLightLevel<S>>,
-    ///Moon phase condition (nighttime only)
+    /// Moon phase condition (nighttime only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moon_phase: Option<WalkConditionsMoonPhase<S>>,
-    ///User fatigue state at walk start
+    /// User fatigue state at walk start
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_state: Option<WalkConditionsUserState<S>>,
-    ///Weather condition during the walk
+    /// Weather condition during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weather: Option<WalkConditionsWeather<S>>,
     #[serde(
@@ -370,8 +384,7 @@ impl<S: BosStr> Serialize for WalkConditionsLightLevel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for WalkConditionsLightLevel<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkConditionsLightLevel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -402,9 +415,7 @@ where
             WalkConditionsLightLevel::Dusk => WalkConditionsLightLevel::Dusk,
             WalkConditionsLightLevel::Night => WalkConditionsLightLevel::Night,
             WalkConditionsLightLevel::Deepnight => WalkConditionsLightLevel::Deepnight,
-            WalkConditionsLightLevel::Other(v) => {
-                WalkConditionsLightLevel::Other(v.into_static())
-            }
+            WalkConditionsLightLevel::Other(v) => WalkConditionsLightLevel::Other(v.into_static()),
         }
     }
 }
@@ -483,9 +494,7 @@ where
         match self {
             WalkConditionsMoonPhase::FullMoon => WalkConditionsMoonPhase::FullMoon,
             WalkConditionsMoonPhase::NewMoon => WalkConditionsMoonPhase::NewMoon,
-            WalkConditionsMoonPhase::Other(v) => {
-                WalkConditionsMoonPhase::Other(v.into_static())
-            }
+            WalkConditionsMoonPhase::Other(v) => WalkConditionsMoonPhase::Other(v.into_static()),
         }
     }
 }
@@ -571,12 +580,8 @@ where
             WalkConditionsUserState::WellRested => WalkConditionsUserState::WellRested,
             WalkConditionsUserState::Tired => WalkConditionsUserState::Tired,
             WalkConditionsUserState::Exhausted => WalkConditionsUserState::Exhausted,
-            WalkConditionsUserState::FirstExpedition => {
-                WalkConditionsUserState::FirstExpedition
-            }
-            WalkConditionsUserState::Other(v) => {
-                WalkConditionsUserState::Other(v.into_static())
-            }
+            WalkConditionsUserState::FirstExpedition => WalkConditionsUserState::FirstExpedition,
+            WalkConditionsUserState::Other(v) => WalkConditionsUserState::Other(v.into_static()),
         }
     }
 }
@@ -667,9 +672,7 @@ where
             WalkConditionsWeather::Rainy => WalkConditionsWeather::Rainy,
             WalkConditionsWeather::Stormy => WalkConditionsWeather::Stormy,
             WalkConditionsWeather::Foggy => WalkConditionsWeather::Foggy,
-            WalkConditionsWeather::Other(v) => {
-                WalkConditionsWeather::Other(v.into_static())
-            }
+            WalkConditionsWeather::Other(v) => WalkConditionsWeather::Other(v.into_static()),
         }
     }
 }
@@ -677,15 +680,18 @@ where
 /// Cross-client activity during the walk window that did NOT happen in anisota: the PDS scan of app.bsky posts/likes/reposts in the walk window minus the in-app per-device summed totals, floored at 0 per field. Because likes and reposts carry no client marker this is a subtraction estimate, so the elsewhere panel labels it 'at least'. This block NEVER earns XP or findings; it is data for the panel only. Optional; unset when there was no elsewhere activity or the scan was unavailable.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WalkElsewhereActivity<S: BosStr = DefaultStr> {
-    ///Likes sent elsewhere during the walk window (scan minus in-app; at-least estimate)
+    /// Likes sent elsewhere during the walk window (scan minus in-app; at-least estimate)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub likes_sent: Option<i64>,
-    ///Posts created elsewhere during the walk window (scan minus in-app)
+    /// Posts created elsewhere during the walk window (scan minus in-app)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_created: Option<i64>,
-    ///Reposts sent elsewhere during the walk window (scan minus in-app; at-least estimate)
+    /// Reposts sent elsewhere during the walk window (scan minus in-app; at-least estimate)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts_sent: Option<i64>,
     #[serde(
@@ -700,30 +706,33 @@ pub struct WalkElsewhereActivity<S: BosStr = DefaultStr> {
 /// What was found/gathered during the walk
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WalkFindings<S: BosStr = DefaultStr> {
-    ///Number of items collected
+    /// Number of items collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_collected: Option<i64>,
-    ///Likes sent during the walk
+    /// Likes sent during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub likes_sent: Option<i64>,
-    ///Total moth encounters (caught + escaped)
+    /// Total moth encounters (caught + escaped)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moths_seen: Option<i64>,
-    ///Posts created during the walk
+    /// Posts created during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_created: Option<i64>,
-    ///Posts read during the walk
+    /// Posts read during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_read: Option<i64>,
-    ///Reposts sent during the walk
+    /// Reposts sent during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts_sent: Option<i64>,
-    ///Number of specimens successfully caught
+    /// Number of specimens successfully caught
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_found: Option<i64>,
-    ///XP gained from the walk
+    /// XP gained from the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained: Option<i64>,
     #[serde(
@@ -738,17 +747,20 @@ pub struct WalkFindings<S: BosStr = DefaultStr> {
 /// Periodic snapshot of walk progress for cross-device sync
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WalkHeartbeat<S: BosStr = DefaultStr> {
-    ///Timestamp of the last tracked activity. Drives the idle clock and is max-merged across devices (heartbeats themselves fire on a timer, so idle detection must key on this field, not updatedAt).
+    /// Timestamp of the last tracked activity. Drives the idle clock and is max-merged across devices (heartbeats themselves fire on a timer, so idle detection must key on this field, not updatedAt).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light: Option<walk::HeartbeatLight<S>>,
-    ///Per-device progress buckets, one entry per device that has contributed to this walk. In-app totals are the SUM across buckets, not a max-merge: per-device buckets exist deliberately so multi-device in-app activity is never undercounted (an undercount would falsely inflate the elsewhere figure).
+    /// Per-device progress buckets, one entry per device that has contributed to this walk. In-app totals are the SUM across buckets, not a max-merge: per-device buckets exist deliberately so multi-device in-app activity is never undercounted (an undercount would falsely inflate the elsewhere figure).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<Vec<walk::DeviceProgress<S>>>,
-    ///When this heartbeat was written
+    /// When this heartbeat was written
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -763,24 +775,27 @@ pub struct WalkHeartbeat<S: BosStr = DefaultStr> {
 /// Light resource tracking for the walk
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WalkLight<S: BosStr = DefaultStr> {
-    ///Light level when the walk ended (in minutes)
+    /// Light level when the walk ended (in minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_end: Option<i64>,
-    ///Light level when the walk started (in minutes)
+    /// Light level when the walk started (in minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_start: Option<i64>,
-    ///Total light consumed during the walk
+    /// Total light consumed during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consumed: Option<i64>,
-    ///Effective drain rate as a percentage (80 = 0.8x drain). Multiply by 0.01 to get the float multiplier.
+    /// Effective drain rate as a percentage (80 = 0.8x drain). Multiply by 0.01 to get the float multiplier.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub drain_rate: Option<i64>,
-    ///Total light regenerated during the walk's camps
+    /// Total light regenerated during the walk's camps
     #[serde(skip_serializing_if = "Option::is_none")]
     pub regenerated: Option<i64>,
-    ///Light status at start of the walk
+    /// Light status at start of the walk
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<WalkLightStatus<S>>,
     #[serde(
@@ -1336,15 +1351,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1455,21 +1469,22 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<
-    St: chronicle_signature_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<
-        chronicle_signature_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -1640,10 +1655,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChronicleSignature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -1657,10 +1669,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.walk"),
@@ -1669,63 +1681,58 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "ES256 cryptographic signature proving record authenticity",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
-                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
-                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "ES256 cryptographic signature proving record authenticity",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("sig"),
+                        SmolStr::new_static("alg"),
+                        SmolStr::new_static("kid"),
+                        SmolStr::new_static("signedAt"),
+                        SmolStr::new_static("nonce"),
+                        SmolStr::new_static("version"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Signing algorithm (ES256)"),
-                                ),
+                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Key identifier for the signing key"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Key identifier for the signing key",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique random nonce to prevent replay"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique random nonce to prevent replay",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Base64-encoded ES256 signature"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Base64-encoded ES256 signature",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the record was signed"),
-                                ),
+                                description: Some(CowStr::new_static("When the record was signed")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1778,9 +1785,7 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartbeatLight"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Light state at heartbeat time"),
-                    ),
+                    description: Some(CowStr::new_static("Light state at heartbeat time")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1810,11 +1815,9 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartbeatProgress"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Session progress counters at heartbeat time (per-device bucket contents)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Session progress counters at heartbeat time (per-device bucket contents)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2045,9 +2048,9 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("walkConditions"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Environmental conditions during the walk"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Environmental conditions during the walk",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2061,38 +2064,36 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lightLevel"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Time-of-day light condition at walk start",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Time-of-day light condition at walk start",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("moonPhase"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Moon phase condition (nighttime only)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Moon phase condition (nighttime only)",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userState"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("User fatigue state at walk start"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "User fatigue state at walk start",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("weather"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Weather condition during the walk"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Weather condition during the walk",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -2141,9 +2142,9 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("walkFindings"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("What was found/gathered during the walk"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "What was found/gathered during the walk",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2271,9 +2272,7 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("walkLight"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Light resource tracking for the walk"),
-                    ),
+                    description: Some(CowStr::new_static("Light resource tracking for the walk")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2314,9 +2313,9 @@ fn lexicon_doc_net_anisota_chronicle_walk() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Light status at start of the walk"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Light status at start of the walk",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -2338,9 +2337,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2351,9 +2349,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2364,9 +2361,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2377,9 +2373,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -2391,7 +2386,7 @@ where
 
 pub mod walk_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2491,22 +2486,8 @@ impl WalkBuilder<walk_state::Empty, DefaultStr> {
         WalkBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -2519,22 +2500,8 @@ impl<S: BosStr> WalkBuilder<walk_state::Empty, S> {
         WalkBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -2595,10 +2562,7 @@ impl<St: walk_state::State, S: BosStr> WalkBuilder<St, S> {
 
 impl<St: walk_state::State, S: BosStr> WalkBuilder<St, S> {
     /// Set the `conditions` field (optional)
-    pub fn conditions(
-        mut self,
-        value: impl Into<Option<walk::WalkConditions<S>>>,
-    ) -> Self {
+    pub fn conditions(mut self, value: impl Into<Option<walk::WalkConditions<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -2675,10 +2639,7 @@ impl<St: walk_state::State, S: BosStr> WalkBuilder<St, S> {
 
 impl<St: walk_state::State, S: BosStr> WalkBuilder<St, S> {
     /// Set the `heartbeat` field (optional)
-    pub fn heartbeat(
-        mut self,
-        value: impl Into<Option<walk::WalkHeartbeat<S>>>,
-    ) -> Self {
+    pub fn heartbeat(mut self, value: impl Into<Option<walk::WalkHeartbeat<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -2839,9 +2800,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2852,9 +2812,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2865,9 +2824,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2878,9 +2836,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2891,8 +2848,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

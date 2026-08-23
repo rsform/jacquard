@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::dev_atfs::file::File;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::dev_atfs::file::File;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListFiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -34,14 +37,16 @@ pub struct ListFiles<S: BosStr = DefaultStr> {
     pub tag: Option<Vec<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListFilesOutput<S: BosStr = DefaultStr> {
-    ///Present only when this page filled up to the requested limit, meaning more files may follow. Its absence marks the final page.
+    /// Present only when this page filled up to the requested limit, meaning more files may follow. Its absence marks the final page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Each entry's tags field (see dev.atfs.file) is a flat union: every tag borne by ANY of that file's claims, account-class and mirrored-server alike, with no indication of which claimant applied which — listFiles never discloses who pinned or tagged anything. Pass the `did` parameter above to scope both this listing and each entry's tags to one claimant's own claims instead.
+    /// Each entry's tags field (see dev.atfs.file) is a flat union: every tag borne by ANY of that file's claims, account-class and mirrored-server alike, with no indication of which claimant applied which — listFiles never discloses who pinned or tagged anything. Pass the `did` parameter above to scope both this listing and each entry's tags to one claimant's own claims instead.
     pub files: Vec<File<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -81,7 +86,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_files_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

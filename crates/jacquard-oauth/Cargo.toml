@@ -1,6 +1,6 @@
 [package]
 name = "jacquard-oauth"
-version = "0.12.1"
+version = "0.13.0"
 edition.workspace = true
 description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
 authors.workspace = true
@@ -21,11 +21,12 @@ websocket = ["jacquard-common/websocket"]
 streaming = ["jacquard-common/streaming", "dep:n0-future"]
 scope-check = ["dep:jacquard-lexicon"]
 reqwest-client = ["dep:reqwest", "jacquard-common/reqwest-client", "jacquard-common/std", "jacquard-identity/reqwest-client"]
+reqwest-stream = ["reqwest-client", "jacquard-common/reqwest-stream", "jacquard-identity/reqwest-stream"]
 
 [dependencies]
-jacquard-common = { version = "0.12.1", path = "../jacquard-common" }
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", default-features = false }
-jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon", default-features = false, optional = true }
+jacquard-common = { version = "0.13.0", path = "../jacquard-common" }
+jacquard-identity = { version = "0.13.0", path = "../jacquard-identity", default-features = false }
+jacquard-lexicon = { version = "0.13.0", path = "../jacquard-lexicon", default-features = false, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 smol_str = { workspace = true }

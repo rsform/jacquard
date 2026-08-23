@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_okazu_diary::material::Tag;
 use crate::org_okazu_diary::material::external;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A descriptor of a pornographic material.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -41,31 +41,31 @@ use crate::org_okazu_diary::material::external;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct External<S: BosStr = DefaultStr> {
-    ///Description of the material, typically taken from the material's HTML metadata.
+    /// Description of the material, typically taken from the material's HTML metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the material and tags are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so.
+    /// General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the material and tags are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub generic_labels: Option<SelfLabels<S>>,
-    ///User-specified self-label values for the material. While the Lexicon by its nature assumes the material to be possibly sensitive by default, these label values are intended to signal that a warning should be put on the material even for the explicit Okazu-Diary.org application users who are willing to see mature contents in general.
+    /// User-specified self-label values for the material. While the Lexicon by its nature assumes the material to be possibly sensitive by default, these label values are intended to signal that a warning should be put on the material even for the explicit Okazu-Diary.org application users who are willing to see mature contents in general.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Reference to a record representing the material, such as a Bluesky post.
+    /// Reference to a record representing the material, such as a Bluesky post.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record: Option<StrongRef<S>>,
-    ///User-specified tags for the material.
+    /// User-specified tags for the material.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<Tag<S>>>,
-    ///Link to a thumbnail of the material, typically taken from the material's HTML metadata.
+    /// Link to a thumbnail of the material, typically taken from the material's HTML metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<external::Thumb<S>>,
-    ///Title of the material, typically taken from the material's HTML `<title>` element.
+    /// Title of the material, typically taken from the material's HTML `<title>` element.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///URI of the material, typically an HTTP(S) URL. If the URL is of a Web interface for an AT resource (such as a `bsky.app` URL), the record should also include the `record` property referencing the AT resource.
+    /// URI of the material, typically an HTTP(S) URL. If the URL is of a Web interface for an AT resource (such as a `bsky.app` URL), the record should also include the `record` property referencing the AT resource.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<UriValue<S>>,
-    ///Reference to an `org.okazu-diary.feed.material` record from another repository from which this collection item is derived. Clients can use this property to offer the user to update this record if the original record have updated from the referenced version.
+    /// Reference to an `org.okazu-diary.feed.material` record from another repository from which this collection item is derived. Clients can use this property to offer the user to update this record if the original record have updated from the referenced version.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub via: Option<StrongRef<S>>,
     #[serde(
@@ -88,9 +88,11 @@ pub struct ExternalGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: External<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Thumb<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -184,9 +186,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -198,7 +199,7 @@ where
 
 pub mod external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -422,10 +423,10 @@ where
 }
 
 fn lexicon_doc_org_okazu_diary_material_external() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.okazu-diary.material.external"),
@@ -587,15 +588,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod thumb_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::community::comment::CommentView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::community::comment::CommentView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetComments<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,9 +36,11 @@ pub struct GetComments<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetCommentsOutput<S: BosStr = DefaultStr> {
     pub comments: Vec<CommentView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,26 +49,21 @@ pub struct GetCommentsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetCommentsError {
     /// Actor not found
     #[serde(rename = "NotFound")]
-    NotFound(Option<SmolStr>),
+    NotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetCommentsError {
@@ -121,7 +121,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_comments_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,7 +154,12 @@ pub mod get_comments_state {
 /// Builder for constructing an instance of this type.
 pub struct GetCommentsBuilder<St: get_comments_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<AtIdentifier<S>>, Option<S>, Option<i64>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,14 +21,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::st_lifepo::profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::st_lifepo::profile;
+use serde::{Deserialize, Serialize};
 /// A single life event entry.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LifeEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -45,16 +48,20 @@ pub struct LifeEvent<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Profile<S: BosStr = DefaultStr> {
     pub actor: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileOutput<S: BosStr = DefaultStr> {
     pub bio: S,
     pub handle: S,
@@ -113,15 +120,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod life_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -287,10 +293,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LifeEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LifeEvent<S> {
         LifeEvent {
             description: self._fields.0,
             end_date: self._fields.1,
@@ -302,10 +305,10 @@ where
 }
 
 fn lexicon_doc_st_lifepo_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("st.lifepo.profile"),
@@ -315,18 +318,18 @@ fn lexicon_doc_st_lifepo_profile() -> LexiconDoc<'static> {
                 SmolStr::new_static("lifeEvent"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A single life event entry.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("startDate")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("title"),
+                        SmolStr::new_static("startDate"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("endDate"),
@@ -344,7 +347,9 @@ fn lexicon_doc_st_lifepo_profile() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -354,26 +359,24 @@ fn lexicon_doc_st_lifepo_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("actor")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("actor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("The DID or handle of the user."),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("actor")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("actor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "The DID or handle of the user.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -385,7 +388,7 @@ fn lexicon_doc_st_lifepo_profile() -> LexiconDoc<'static> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -464,10 +467,7 @@ where
     St::Actor: profile_state::IsUnset,
 {
     /// Set the `actor` field (required)
-    pub fn actor(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProfileBuilder<profile_state::SetActor<St>, S> {
+    pub fn actor(mut self, value: impl Into<S>) -> ProfileBuilder<profile_state::SetActor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,

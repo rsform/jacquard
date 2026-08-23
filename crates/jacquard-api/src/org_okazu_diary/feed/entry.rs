@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_okazu_diary::material::Tag;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A diary entry to record a self-gratification activity.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,28 +40,28 @@ use crate::org_okazu_diary::material::Tag;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
-    ///User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).
+    /// User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).
     pub datetime: S,
-    ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.  Defaults to `false`.
+    /// If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_had_hiatus")]
     pub had_hiatus: Option<bool>,
-    ///Self-label values for this post. Effectively content warnings for the note and tags.
+    /// Self-label values for this post. Effectively content warnings for the note and tags.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Remarks on the activity.
+    /// Remarks on the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
-    ///References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
+    /// References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subjects: Option<Vec<StrongRef<S>>>,
-    ///User-specified tags for the activity.
+    /// User-specified tags for the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<Tag<S>>>,
-    ///Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
+    /// Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub via: Option<StrongRef<S>>,
-    ///Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.  Defaults to `"public"`.
+    /// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
     pub visibility: Option<EntryVisibility<S>>,
@@ -261,9 +261,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -277,15 +276,14 @@ fn _default_entry_had_hiatus() -> Option<bool> {
     Some(false)
 }
 
-fn _default_entry_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    EntryVisibility<S>,
-> {
+fn _default_entry_visibility<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<EntryVisibility<S>> {
     Some(<EntryVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -513,10 +511,10 @@ where
 }
 
 fn lexicon_doc_org_okazu_diary_feed_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.okazu-diary.feed.entry"),

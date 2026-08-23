@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,15 +37,15 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Note<S: BosStr = DefaultStr> {
-    ///client timestamp
+    /// client timestamp
     pub created_at: Datetime,
-    ///related notes
+    /// related notes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refs: Option<Vec<StrongRef<S>>>,
-    ///note tags
+    /// note tags
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///primary note content
+    /// primary note content
     pub text: S,
     #[serde(
         flatten,
@@ -146,8 +146,7 @@ impl<S: BosStr> LexiconSchema for Note<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -193,9 +192,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -207,7 +205,7 @@ where
 
 pub mod note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -252,7 +250,12 @@ pub mod note_state {
 /// Builder for constructing an instance of this type.
 pub struct NoteBuilder<St: note_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Vec<StrongRef<S>>>, Option<Vec<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<Vec<StrongRef<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -343,10 +346,7 @@ where
     St::Text: note_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<note_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetText<St>, S> {
         self._fields.3 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -385,10 +385,10 @@ where
 }
 
 fn lexicon_doc_net_shwilliam_hyphae_note() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.shwilliam.hyphae.note"),
@@ -399,12 +399,10 @@ fn lexicon_doc_net_shwilliam_hyphae_note() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("text")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("text"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -444,9 +442,7 @@ fn lexicon_doc_net_shwilliam_hyphae_note() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("primary note content"),
-                                    ),
+                                    description: Some(CowStr::new_static("primary note content")),
                                     max_length: Some(100000usize),
                                     max_graphemes: Some(10000usize),
                                     ..Default::default()

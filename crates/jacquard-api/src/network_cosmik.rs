@@ -13,7 +13,6 @@ pub mod collection_link_removal;
 pub mod connection;
 pub mod follow;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
@@ -26,16 +25,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// Represents the provenance or source of a record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Provenance<S: BosStr = DefaultStr> {
-    ///Strong reference to the card that led to this record.
+    /// Strong reference to the card that led to this record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub via: Option<StrongRef<S>>,
     #[serde(
@@ -69,17 +71,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_network_cosmik_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.defs"),
@@ -88,11 +89,9 @@ fn lexicon_doc_network_cosmik_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("provenance"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Represents the provenance or source of a record.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Represents the provenance or source of a record.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

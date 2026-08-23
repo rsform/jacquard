@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A named tag pointing to a specific manifest digest
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tag<S: BosStr = DefaultStr> {
-    ///AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
+    /// AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifest: Option<AtUri<S>>,
-    ///DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.
+    /// DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifest_digest: Option<S>,
-    ///OCI media type of the manifest (e.g., 'application/vnd.oci.image.manifest.v1+json' or 'application/vnd.oci.image.index.v1+json')
+    /// OCI media type of the manifest (e.g., 'application/vnd.oci.image.manifest.v1+json' or 'application/vnd.oci.image.index.v1+json')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media_type: Option<S>,
-    ///Repository name (e.g., 'myapp'). Scoped to user's DID.
+    /// Repository name (e.g., 'myapp'). Scoped to user's DID.
     pub repository: S,
-    ///Tag name (e.g., 'latest', 'v1.0.0', '12-slim')
+    /// Tag name (e.g., 'latest', 'v1.0.0', '12-slim')
     pub tag: S,
-    ///Timestamp of last tag update
+    /// Timestamp of last tag update
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -170,9 +170,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -184,7 +183,7 @@ where
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -396,10 +395,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_tag() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.tag"),

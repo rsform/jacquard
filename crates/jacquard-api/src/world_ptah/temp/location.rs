@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::world_ptah::temp::location;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::world_ptah::temp::location;
+use serde::{Deserialize, Serialize};
 /// Flexible properties for any kind of world geography. All fields optional — worlds define what matters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LocationProperties<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub climate: Option<S>,
@@ -60,34 +63,34 @@ pub struct LocationProperties<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Location<S: BosStr = DefaultStr> {
-    ///Permanent link to the creator. Provenance travels.
+    /// Permanent link to the creator. Provenance travels.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authorship_record: Option<Did<S>>,
-    ///The canonical standing of this location within its world.
+    /// The canonical standing of this location within its world.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_status: Option<LocationCanonicalStatus<S>>,
-    ///Timestamp of location creation.
+    /// Timestamp of location creation.
     pub created_at: Datetime,
-    ///Who named and defined this place.
+    /// Who named and defined this place.
     pub creator_did: Did<S>,
-    ///How deep in the geographic hierarchy this location sits. World-level is 0, continent is 1, country is 2, city is 3, and so on. Any rendering layer can read this single number and decide how much geographic context it needs without traversing the full parent chain.
+    /// How deep in the geographic hierarchy this location sits. World-level is 0, continent is 1, country is 2, city is 3, and so on. Any rendering layer can read this single number and decide how much geographic context it needs without traversing the full parent chain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depth_index: Option<i64>,
-    ///What kind of place this is, in plain language.
+    /// What kind of place this is, in plain language.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The geographic or spatial classification. Open-ended so any kind of world geography works.
+    /// The geographic or spatial classification. Open-ended so any kind of world geography works.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_type: Option<LocationLocationType<S>>,
-    ///What this place is called.
+    /// What this place is called.
     pub name: S,
-    ///If this location exists inside a larger location — a tavern inside a city, a room inside a building. Lets geography nest infinitely. Places come into existence as people need them.
+    /// If this location exists inside a larger location — a tavern inside a city, a room inside a building. Lets geography nest infinitely. Places come into existence as people need them.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_location: Option<AtUri<S>>,
-    ///Flexible fields — climate, population, controlling faction, notable history. Whatever the world requires.
+    /// Flexible fields — climate, population, controlling faction, notable history. Whatever the world requires.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub properties: Option<location::LocationProperties<S>>,
-    ///The AT URI of the world this location exists in.
+    /// The AT URI of the world this location exists in.
     pub world_reference: AtUri<S>,
     #[serde(
         flatten,
@@ -111,30 +114,18 @@ pub enum LocationCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> LocationCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => {
-                "world.ptah.temp.defs#canonicalStatusOfficial"
-            }
-            Self::CanonicalStatusCommunity => {
-                "world.ptah.temp.defs#canonicalStatusCommunity"
-            }
-            Self::CanonicalStatusApocryphal => {
-                "world.ptah.temp.defs#canonicalStatusApocryphal"
-            }
+            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
+            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
+            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => {
-                Self::CanonicalStatusOfficial
-            }
-            "world.ptah.temp.defs#canonicalStatusCommunity" => {
-                Self::CanonicalStatusCommunity
-            }
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
-                Self::CanonicalStatusApocryphal
-            }
+            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
+            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
             _ => Self::Other(s),
         }
     }
@@ -194,9 +185,7 @@ where
             LocationCanonicalStatus::CanonicalStatusApocryphal => {
                 LocationCanonicalStatus::CanonicalStatusApocryphal
             }
-            LocationCanonicalStatus::Other(v) => {
-                LocationCanonicalStatus::Other(v.into_static())
-            }
+            LocationCanonicalStatus::Other(v) => LocationCanonicalStatus::Other(v.into_static()),
         }
     }
 }
@@ -295,9 +284,7 @@ where
             LocationLocationType::Landmark => LocationLocationType::Landmark,
             LocationLocationType::Vessel => LocationLocationType::Vessel,
             LocationLocationType::AbstractSpace => LocationLocationType::AbstractSpace,
-            LocationLocationType::Other(v) => {
-                LocationLocationType::Other(v.into_static())
-            }
+            LocationLocationType::Other(v) => LocationLocationType::Other(v.into_static()),
         }
     }
 }
@@ -548,17 +535,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_world_ptah_temp_location() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.location"),
@@ -771,9 +757,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -785,7 +770,7 @@ where
 
 pub mod location_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -895,7 +880,9 @@ impl LocationBuilder<location_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         LocationBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -906,7 +893,9 @@ impl<S: BosStr> LocationBuilder<location_state::Empty, S> {
     pub fn builder() -> Self {
         LocationBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -935,10 +924,7 @@ impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(
-        mut self,
-        value: Option<LocationCanonicalStatus<S>>,
-    ) -> Self {
+    pub fn maybe_canonical_status(mut self, value: Option<LocationCanonicalStatus<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1010,18 +996,12 @@ impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
 
 impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `locationType` field (optional)
-    pub fn location_type(
-        mut self,
-        value: impl Into<Option<LocationLocationType<S>>>,
-    ) -> Self {
+    pub fn location_type(mut self, value: impl Into<Option<LocationLocationType<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `locationType` field to an Option value (optional)
-    pub fn maybe_location_type(
-        mut self,
-        value: Option<LocationLocationType<S>>,
-    ) -> Self {
+    pub fn maybe_location_type(mut self, value: Option<LocationLocationType<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1033,10 +1013,7 @@ where
     St::Name: location_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> LocationBuilder<location_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> LocationBuilder<location_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         LocationBuilder {
             _state: PhantomData,
@@ -1061,18 +1038,12 @@ impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
 
 impl<St: location_state::State, S: BosStr> LocationBuilder<St, S> {
     /// Set the `properties` field (optional)
-    pub fn properties(
-        mut self,
-        value: impl Into<Option<location::LocationProperties<S>>>,
-    ) -> Self {
+    pub fn properties(mut self, value: impl Into<Option<location::LocationProperties<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `properties` field to an Option value (optional)
-    pub fn maybe_properties(
-        mut self,
-        value: Option<location::LocationProperties<S>>,
-    ) -> Self {
+    pub fn maybe_properties(mut self, value: Option<location::LocationProperties<S>>) -> Self {
         self._fields.9 = value;
         self
     }

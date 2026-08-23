@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,16 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::community_lexicon::preference::ai;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::community_lexicon::preference::ai;
+use serde::{Deserialize, Serialize};
 /// Scopes preferences to a specific record collection in the user's repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionScope<S: BosStr = DefaultStr> {
-    ///NSID of the collection this override applies to.
+    /// NSID of the collection this override applies to.
     pub collection: Nsid<S>,
     #[serde(
         flatten,
@@ -47,9 +50,12 @@ pub struct CollectionScope<S: BosStr = DefaultStr> {
 /// Scopes preferences to a specific AI consumer.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EntityScope<S: BosStr = DefaultStr> {
-    ///DID or domain of the entity this override applies to.
+    /// DID or domain of the entity this override applies to.
     pub entity: S,
     #[serde(
         flatten,
@@ -63,7 +69,10 @@ pub struct EntityScope<S: BosStr = DefaultStr> {
 /// Account-wide default. The record at key 'self' should carry this scope.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GlobalScope<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -74,7 +83,6 @@ pub struct GlobalScope<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
@@ -84,9 +92,9 @@ pub struct GlobalScope<S: BosStr = DefaultStr> {
 )]
 pub struct Ai<S: BosStr = DefaultStr> {
     pub preferences: ai::PreferenceSet<S>,
-    ///What this record's preferences apply to.
+    /// What this record's preferences apply to.
     pub scope: AiScope<S>,
-    ///Timestamp of the most recent change to this record.
+    /// Timestamp of the most recent change to this record.
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -96,7 +104,6 @@ pub struct Ai<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -121,13 +128,15 @@ pub struct AiGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Ai<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Preference<S: BosStr = DefaultStr> {
-    ///Whether this usage is permitted (true) or denied (false).
+    /// Whether this usage is permitted (true) or denied (false).
     pub allow: bool,
-    ///When this specific preference was last changed.
+    /// When this specific preference was last changed.
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -141,18 +150,21 @@ pub struct Preference<S: BosStr = DefaultStr> {
 /// A set of AI usage preferences. Omitted fields mean undefined (no declared preference).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PreferenceSet<S: BosStr = DefaultStr> {
-    ///Use for vector embeddings or semantic indexing.
+    /// Use for vector embeddings or semantic indexing.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embedding: Option<ai::Preference<S>>,
-    ///Use at inference time for retrieval, RAG, or context injection.
+    /// Use at inference time for retrieval, RAG, or context injection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inference: Option<ai::Preference<S>>,
-    ///Use to generate synthetic content or interactions derived from user data.
+    /// Use to generate synthetic content or interactions derived from user data.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub synthetic_content: Option<ai::Preference<S>>,
-    ///Use as input for training, fine-tuning, distillation, or RLHF of ML models.
+    /// Use as input for training, fine-tuning, distillation, or RLHF of ML models.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub training: Option<ai::Preference<S>>,
     #[serde(
@@ -294,15 +306,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod collection_scope_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -333,10 +344,7 @@ pub mod collection_scope_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionScopeBuilder<
-    St: collection_scope_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionScopeBuilder<St: collection_scope_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -410,10 +418,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionScope<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionScope<S> {
         CollectionScope {
             collection: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -422,10 +427,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.preference.ai"),
@@ -463,11 +468,9 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entityScope"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Scopes preferences to a specific AI consumer.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Scopes preferences to a specific AI consumer.",
+                    )),
                     required: Some(vec![SmolStr::new_static("entity")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -475,11 +478,9 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("entity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID or domain of the entity this override applies to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID or domain of the entity this override applies to.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -491,11 +492,9 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("globalScope"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Account-wide default. The record at key 'self' should carry this scope.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Account-wide default. The record at key 'self' should carry this scope.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -509,13 +508,11 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("updatedAt"),
-                                SmolStr::new_static("scope"),
-                                SmolStr::new_static("preferences")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("updatedAt"),
+                            SmolStr::new_static("scope"),
+                            SmolStr::new_static("preferences"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -529,15 +526,13 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("scope"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "What this record's preferences apply to.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "What this record's preferences apply to.",
+                                    )),
                                     refs: vec![
                                         CowStr::new_static("#globalScope"),
                                         CowStr::new_static("#entityScope"),
-                                        CowStr::new_static("#collectionScope")
+                                        CowStr::new_static("#collectionScope"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -545,11 +540,9 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp of the most recent change to this record.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp of the most recent change to this record.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -564,12 +557,10 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("preference"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("allow"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("allow"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -582,11 +573,9 @@ fn lexicon_doc_community_lexicon_preference_ai() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When this specific preference was last changed.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When this specific preference was last changed.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -653,9 +642,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -666,9 +654,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -679,9 +666,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -693,7 +679,7 @@ where
 
 pub mod ai_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -752,7 +738,11 @@ pub mod ai_state {
 /// Builder for constructing an instance of this type.
 pub struct AiBuilder<St: ai_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<ai::PreferenceSet<S>>, Option<AiScope<S>>, Option<Datetime>),
+    _fields: (
+        Option<ai::PreferenceSet<S>>,
+        Option<AiScope<S>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -817,10 +807,7 @@ where
     St::Scope: ai_state::IsUnset,
 {
     /// Set the `scope` field (required)
-    pub fn scope(
-        mut self,
-        value: impl Into<AiScope<S>>,
-    ) -> AiBuilder<ai_state::SetScope<St>, S> {
+    pub fn scope(mut self, value: impl Into<AiScope<S>>) -> AiBuilder<ai_state::SetScope<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AiBuilder {
             _state: PhantomData,
@@ -883,15 +870,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod preference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1029,10 +1015,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Preference<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preference<S> {
         Preference {
             allow: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),
@@ -1048,8 +1031,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -10,21 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveApikeyParams<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveApikeyOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -51,14 +56,10 @@ impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
     const NSID: &'static str = "app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveApikeyResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -69,16 +70,15 @@ Path: `/xrpc/app.rocksky.apikey.removeApikey`. The request payload type is `Remo
 pub struct RemoveApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.removeApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RemoveApikey;
     type Response = RemoveApikeyResponse;
 }
 
 pub mod remove_apikey_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,10 +109,8 @@ pub mod remove_apikey_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RemoveApikeyParamsBuilder<
-    St: remove_apikey_params_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RemoveApikeyParamsBuilder<St: remove_apikey_params_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -120,10 +118,7 @@ pub struct RemoveApikeyParamsBuilder<
 
 impl RemoveApikeyParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RemoveApikeyParamsBuilder<
-        remove_apikey_params_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RemoveApikeyParamsBuilder<remove_apikey_params_state::Empty, DefaultStr> {
         RemoveApikeyParamsBuilder::new()
     }
 }

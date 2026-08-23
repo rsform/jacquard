@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::site_standard::theme::color::Rgb;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::site_standard::theme::color::Rgb;
+use serde::{Deserialize, Serialize};
 /// A simplified theme definition for publications, providing basic color customization for content display across different platforms and applications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,13 +38,13 @@ use crate::site_standard::theme::color::Rgb;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Basic<S: BosStr = DefaultStr> {
-    ///Color used for links and button backgrounds.
+    /// Color used for links and button backgrounds.
     pub accent: Rgb<S>,
-    ///Color used for button text.
+    /// Color used for button text.
     pub accent_foreground: Rgb<S>,
-    ///Color used for content background.
+    /// Color used for content background.
     pub background: Rgb<S>,
-    ///Color used for content text.
+    /// Color used for content text.
     pub foreground: Rgb<S>,
     #[serde(
         flatten,
@@ -121,9 +121,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -135,7 +134,7 @@ where
 
 pub mod basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -210,7 +209,12 @@ pub mod basic_state {
 /// Builder for constructing an instance of this type.
 pub struct BasicBuilder<St: basic_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Rgb<S>>, Option<Rgb<S>>, Option<Rgb<S>>, Option<Rgb<S>>),
+    _fields: (
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+        Option<Rgb<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -357,10 +361,10 @@ where
 }
 
 fn lexicon_doc_site_standard_theme_basic() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("site.standard.theme.basic"),

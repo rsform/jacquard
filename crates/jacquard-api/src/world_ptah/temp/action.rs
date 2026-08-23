@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// An entry in a ship's log. Something happened. Someone did it. The Opening of the Mouth ceremony — Ptah opens the mouth and the statue breathes, speaks, acts. The action record is the breath.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,32 +37,32 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Action<S: BosStr = DefaultStr> {
-    ///What kind of action. Open-ended.
+    /// What kind of action. Open-ended.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub action_type: Option<ActionActionType<S>>,
-    ///Who performed the action — the person behind the character.
+    /// Who performed the action — the person behind the character.
     pub actor_did: Did<S>,
-    ///The AT URI of the character performing the action. Not the person — the character.
+    /// The AT URI of the character performing the action. Not the person — the character.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub character_reference: Option<AtUri<S>>,
-    ///What actually happened. The text of the action.
+    /// What actually happened. The text of the action.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
-    ///Timestamp of the action.
+    /// Timestamp of the action.
     pub created_at: Datetime,
-    ///The AT URI of the location record where this action took place.
+    /// The AT URI of the location record where this action took place.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_reference: Option<AtUri<S>>,
-    ///Optional importance scoring hook. Null by default. Populated by the AppView or by originator designation when needed. Does not change v1 behavior — all actions are structurally flat by default.
+    /// Optional importance scoring hook. Null by default. Populated by the AppView or by originator designation when needed. Does not change v1 behavior — all actions are structurally flat by default.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub narrative_weight: Option<i64>,
-    ///If this action was directed at another character or object, the AT URI of the target.
+    /// If this action was directed at another character or object, the AT URI of the target.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_reference: Option<AtUri<S>>,
-    ///The narrative visibility tier of this action.
+    /// The narrative visibility tier of this action.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visibility: Option<ActionVisibility<S>>,
-    ///The AT URI of the world this action happened in.
+    /// The AT URI of the world this action happened in.
     pub world_reference: AtUri<S>,
     #[serde(
         flatten,
@@ -366,9 +366,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -380,7 +379,7 @@ where
 
 pub mod action_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -680,10 +679,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_action() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.action"),

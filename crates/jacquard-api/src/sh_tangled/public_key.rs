@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct PublicKey<S: BosStr = DefaultStr> {
-    ///key upload timestamp
+    /// key upload timestamp
     pub created_at: Datetime,
-    ///public key contents
+    /// public key contents
     pub key: S,
-    ///human-readable name for this key
+    /// human-readable name for this key
     pub name: S,
     #[serde(
         flatten,
@@ -128,9 +128,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -142,7 +141,7 @@ where
 
 pub mod public_key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -266,10 +265,7 @@ where
     St::Key: public_key_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<S>,
-    ) -> PublicKeyBuilder<public_key_state::SetKey<St>, S> {
+    pub fn key(mut self, value: impl Into<S>) -> PublicKeyBuilder<public_key_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PublicKeyBuilder {
             _state: PhantomData,
@@ -315,10 +311,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PublicKey<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PublicKey<S> {
         PublicKey {
             created_at: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -329,10 +322,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.publicKey"),
@@ -343,21 +336,18 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("key"), SmolStr::new_static("name"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("key"),
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("key upload timestamp"),
-                                    ),
+                                    description: Some(CowStr::new_static("key upload timestamp")),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -365,9 +355,7 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("key"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("public key contents"),
-                                    ),
+                                    description: Some(CowStr::new_static("public key contents")),
                                     max_length: Some(4096usize),
                                     ..Default::default()
                                 }),
@@ -375,9 +363,9 @@ fn lexicon_doc_sh_tangled_publicKey() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("human-readable name for this key"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "human-readable name for this key",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

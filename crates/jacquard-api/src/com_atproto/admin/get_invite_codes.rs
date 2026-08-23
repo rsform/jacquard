@@ -8,14 +8,14 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::com_atproto::server::InviteCode;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::server::InviteCode;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetInviteCodesSort<S: BosStr = DefaultStr> {
@@ -94,9 +94,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetInviteCodes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -110,9 +112,11 @@ pub struct GetInviteCodes<S: BosStr = DefaultStr> {
     pub sort: Option<GetInviteCodesSort<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<InviteCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,15 +157,16 @@ fn _default_limit() -> Option<i64> {
     Some(100i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetInviteCodesSort<S>,
-> {
-    Some(<GetInviteCodesSort<S>>::from_value(S::from_static("recent")))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetInviteCodesSort<S>> {
+    Some(<GetInviteCodesSort<S>>::from_value(S::from_static(
+        "recent",
+    )))
 }
 
 pub mod get_invite_codes_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,10 +184,7 @@ pub mod get_invite_codes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetInviteCodesBuilder<
-    St: get_invite_codes_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetInviteCodesBuilder<St: get_invite_codes_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<GetInviteCodesSort<S>>),
     _type: PhantomData<fn() -> S>,

@@ -10,52 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Update<S: BosStr = DefaultStr> {
-    ///Whether other Coves instances can index and discover this community
+    /// Whether other Coves instances can index and discover this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_external_discovery: Option<bool>,
-    ///Base64-encoded avatar image data (png, jpeg, or webp)
+    /// Base64-encoded avatar image data (png, jpeg, or webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_blob: Option<S>,
-    ///MIME type of the avatar image (image/png, image/jpeg, image/webp)
+    /// MIME type of the avatar image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_mime_type: Option<S>,
-    ///Base64-encoded banner image data (png, jpeg, or webp)
+    /// Base64-encoded banner image data (png, jpeg, or webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_blob: Option<S>,
-    ///MIME type of the banner image (image/png, image/jpeg, image/webp)
+    /// MIME type of the banner image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_mime_type: Option<S>,
-    ///DID of the community to update
+    /// DID of the community to update
     pub community_did: Did<S>,
-    ///Required content warnings for this community
+    /// Required content warnings for this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_warnings: Option<Vec<UpdateContentWarnings<S>>>,
-    ///Community description
+    /// Community description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Display name for the community
+    /// Display name for the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Type of moderation system
+    /// Type of moderation system
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moderation_type: Option<UpdateModerationType<S>>,
-    ///Community visibility level
+    /// Community visibility level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visibility: Option<UpdateVisibility<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateContentWarnings<S: BosStr = DefaultStr> {
@@ -133,9 +135,7 @@ where
             UpdateContentWarnings::Nsfw => UpdateContentWarnings::Nsfw,
             UpdateContentWarnings::Violence => UpdateContentWarnings::Violence,
             UpdateContentWarnings::Spoilers => UpdateContentWarnings::Spoilers,
-            UpdateContentWarnings::Other(v) => {
-                UpdateContentWarnings::Other(v.into_static())
-            }
+            UpdateContentWarnings::Other(v) => UpdateContentWarnings::Other(v.into_static()),
         }
     }
 }
@@ -214,9 +214,7 @@ where
         match self {
             UpdateModerationType::Moderator => UpdateModerationType::Moderator,
             UpdateModerationType::Sortition => UpdateModerationType::Sortition,
-            UpdateModerationType::Other(v) => {
-                UpdateModerationType::Other(v.into_static())
-            }
+            UpdateModerationType::Other(v) => UpdateModerationType::Other(v.into_static()),
         }
     }
 }
@@ -304,41 +302,38 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateOutput<S: BosStr = DefaultStr> {
-    ///CID of the updated community profile
+    /// CID of the updated community profile
     pub cid: Cid<S>,
-    ///AT-URI of the updated community profile
+    /// AT-URI of the updated community profile
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateError {
     /// Community not found
     #[serde(rename = "NotFound")]
-    NotFound(Option<SmolStr>),
+    NotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User is not authorized to update this community
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateError {
@@ -382,9 +377,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Update<S> {
     const NSID: &'static str = "social.coves.community.update";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateResponse;
 }
 
@@ -394,16 +388,15 @@ Path: `/xrpc/social.coves.community.update`. The request payload type is `Update
 pub struct UpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.update";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Update<S>;
     type Response = UpdateResponse;
 }
 
 pub mod update_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -471,7 +464,9 @@ impl UpdateBuilder<update_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         UpdateBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -482,7 +477,9 @@ impl<S: BosStr> UpdateBuilder<update_state::Empty, S> {
     pub fn builder() -> Self {
         UpdateBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -582,10 +579,7 @@ impl<St: update_state::State, S: BosStr> UpdateBuilder<St, S> {
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(
-        mut self,
-        value: Option<Vec<UpdateContentWarnings<S>>>,
-    ) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<Vec<UpdateContentWarnings<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -619,18 +613,12 @@ impl<St: update_state::State, S: BosStr> UpdateBuilder<St, S> {
 
 impl<St: update_state::State, S: BosStr> UpdateBuilder<St, S> {
     /// Set the `moderationType` field (optional)
-    pub fn moderation_type(
-        mut self,
-        value: impl Into<Option<UpdateModerationType<S>>>,
-    ) -> Self {
+    pub fn moderation_type(mut self, value: impl Into<Option<UpdateModerationType<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `moderationType` field to an Option value (optional)
-    pub fn maybe_moderation_type(
-        mut self,
-        value: Option<UpdateModerationType<S>>,
-    ) -> Self {
+    pub fn maybe_moderation_type(mut self, value: Option<UpdateModerationType<S>>) -> Self {
         self._fields.9 = value;
         self
     }

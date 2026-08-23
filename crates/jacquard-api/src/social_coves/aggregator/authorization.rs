@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Authorization for an aggregator to post to a community with specific configuration. Published in the community's repository by moderators. The record key MUST be the authorized aggregator's DID, guaranteeing at most one authorization per (community, aggregator) pair. Similar to social.coves.actor.subscription.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,23 +37,23 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Authorization<S: BosStr = DefaultStr> {
-    ///DID of the authorized aggregator
+    /// DID of the authorized aggregator
     pub aggregator_did: Did<S>,
-    ///DID of the community granting access (must match repo DID)
+    /// DID of the community granting access (must match repo DID)
     pub community_did: Did<S>,
-    ///Aggregator-specific configuration. Must conform to the aggregator's configSchema.
+    /// Aggregator-specific configuration. Must conform to the aggregator's configSchema.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Data<S>>,
     pub created_at: Datetime,
-    ///DID of moderator who authorized this aggregator
+    /// DID of moderator who authorized this aggregator
     pub created_by: Did<S>,
-    ///When this authorization was disabled (if enabled=false)
+    /// When this authorization was disabled (if enabled=false)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled_at: Option<Datetime>,
-    ///DID of moderator who disabled this aggregator
+    /// DID of moderator who disabled this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled_by: Option<Did<S>>,
-    ///Whether this aggregator is currently active. Can be toggled without deleting the record.
+    /// Whether this aggregator is currently active. Can be toggled without deleting the record.
     pub enabled: bool,
     #[serde(
         flatten,
@@ -130,9 +130,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -144,7 +143,7 @@ where
 
 pub mod authorization_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -444,10 +443,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Authorization<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Authorization<S> {
         Authorization {
             aggregator_did: self._fields.0.unwrap(),
             community_did: self._fields.1.unwrap(),
@@ -463,10 +459,10 @@ where
 }
 
 fn lexicon_doc_social_coves_aggregator_authorization() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.aggregator.authorization"),

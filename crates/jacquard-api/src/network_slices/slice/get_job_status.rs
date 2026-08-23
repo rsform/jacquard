@@ -10,44 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Nsid, Datetime};
+use jacquard_common::types::string::{Datetime, Nsid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_slices::slice::get_job_status;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_job_status;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct JobStatus<S: BosStr = DefaultStr> {
-    ///When the job completed
+    /// When the job completed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<Datetime>,
-    ///When the job was created
+    /// When the job was created
     pub created_at: Datetime,
-    ///Error message if job failed
+    /// Error message if job failed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
-    ///UUID of the job
+    /// UUID of the job
     pub job_id: S,
-    ///Job result if completed successfully
+    /// Job result if completed successfully
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result: Option<get_job_status::SyncJobResult<S>>,
-    ///Number of times the job has been retried
+    /// Number of times the job has been retried
     pub retry_count: i64,
-    ///When the job started executing
+    /// When the job started executing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
-    ///Current status of the job
+    /// Current status of the job
     pub status: JobStatusStatus<S>,
     #[serde(
         flatten,
@@ -145,16 +148,20 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetJobStatus<S: BosStr = DefaultStr> {
     pub job_id: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetJobStatusOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -162,19 +169,21 @@ pub struct GetJobStatusOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SyncJobResult<S: BosStr = DefaultStr> {
-    ///List of collection NSIDs that were synced
+    /// List of collection NSIDs that were synced
     pub collections_synced: Vec<Nsid<S>>,
-    ///Human-readable message about the job completion
+    /// Human-readable message about the job completion
     pub message: S,
-    ///Number of repositories processed
+    /// Number of repositories processed
     pub repos_processed: i64,
-    ///Whether the sync job completed successfully
+    /// Whether the sync job completed successfully
     pub success: bool,
-    ///Total number of records synced
+    /// Total number of records synced
     pub total_records: i64,
     #[serde(
         flatten,
@@ -250,15 +259,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod job_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -448,18 +456,12 @@ where
 
 impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `result` field (optional)
-    pub fn result(
-        mut self,
-        value: impl Into<Option<get_job_status::SyncJobResult<S>>>,
-    ) -> Self {
+    pub fn result(mut self, value: impl Into<Option<get_job_status::SyncJobResult<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `result` field to an Option value (optional)
-    pub fn maybe_result(
-        mut self,
-        value: Option<get_job_status::SyncJobResult<S>>,
-    ) -> Self {
+    pub fn maybe_result(mut self, value: Option<get_job_status::SyncJobResult<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -539,10 +541,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> JobStatus<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JobStatus<S> {
         JobStatus {
             completed_at: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -558,10 +557,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getJobStatus"),
@@ -570,22 +569,19 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("jobStatus"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("jobId"), SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("retryCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("jobId"),
+                        SmolStr::new_static("status"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("retryCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("completedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the job completed"),
-                                ),
+                                description: Some(CowStr::new_static("When the job completed")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -593,9 +589,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the job was created"),
-                                ),
+                                description: Some(CowStr::new_static("When the job was created")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -603,9 +597,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("error"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Error message if job failed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Error message if job failed",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -632,9 +626,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("startedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the job started executing"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the job started executing",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -642,9 +636,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Current status of the job"),
-                                ),
+                                description: Some(CowStr::new_static("Current status of the job")),
                                 ..Default::default()
                             }),
                         );
@@ -656,52 +648,44 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("jobId")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("jobId"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("UUID of the sync job"),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("jobId")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("jobId"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("UUID of the sync job")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("syncJobResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("success"),
-                            SmolStr::new_static("totalRecords"),
-                            SmolStr::new_static("collectionsSynced"),
-                            SmolStr::new_static("reposProcessed"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("success"),
+                        SmolStr::new_static("totalRecords"),
+                        SmolStr::new_static("collectionsSynced"),
+                        SmolStr::new_static("reposProcessed"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("collectionsSynced"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "List of collection NSIDs that were synced",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "List of collection NSIDs that were synced",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Nsid),
                                     ..Default::default()
@@ -712,11 +696,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Human-readable message about the job completion",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Human-readable message about the job completion",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -751,7 +733,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> LexiconDoc<'static> {
 
 pub mod get_job_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -863,15 +845,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod sync_job_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -962,12 +943,15 @@ pub mod sync_job_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SyncJobResultBuilder<
-    St: sync_job_result_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SyncJobResultBuilder<St: sync_job_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<Nsid<S>>>, Option<S>, Option<i64>, Option<bool>, Option<i64>),
+    _fields: (
+        Option<Vec<Nsid<S>>>,
+        Option<S>,
+        Option<i64>,
+        Option<bool>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1123,10 +1107,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SyncJobResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SyncJobResult<S> {
         SyncJobResult {
             collections_synced: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

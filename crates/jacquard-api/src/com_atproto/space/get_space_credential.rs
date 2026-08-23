@@ -10,69 +10,69 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSpaceCredential<S: BosStr = DefaultStr> {
-    ///Optional client attestation JWT establishing the app's identity. Required only when the space gates on app identity.
+    /// Optional client attestation JWT establishing the app's identity. Required only when the space gates on app identity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_attestation: Option<S>,
-    ///Reference to the space.
+    /// Reference to the space.
     pub space: AtSpaceUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSpaceCredentialOutput<S: BosStr = DefaultStr> {
-    ///A signed JWT space credential, bound through its cnf.jkt claim to the key that signed the request's DPoP proof.
+    /// A signed JWT space credential, bound through its cnf.jkt claim to the key that signed the request's DPoP proof.
     pub credential: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetSpaceCredentialError {
     #[serde(rename = "SpaceNotFound")]
-    SpaceNotFound(Option<SmolStr>),
+    SpaceNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "SpaceDeleted")]
-    SpaceDeleted(Option<SmolStr>),
+    SpaceDeleted(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Refused on the basis of the requesting user.
     #[serde(rename = "UserNotAuthorized")]
-    UserNotAuthorized(Option<SmolStr>),
+    UserNotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Refused on the basis of the requesting app.
     #[serde(rename = "AppNotAuthorized")]
-    AppNotAuthorized(Option<SmolStr>),
+    AppNotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Refused without attributing the refusal to the user or the app. Authorities that do not wish to disclose which perimeter failed may return this in place of UserNotAuthorized or AppNotAuthorized.
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidDelegationToken")]
-    InvalidDelegationToken(Option<SmolStr>),
+    InvalidDelegationToken(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidClientAttestation")]
-    InvalidClientAttestation(Option<SmolStr>),
+    InvalidClientAttestation(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetSpaceCredentialError {
@@ -151,9 +151,8 @@ impl jacquard_common::xrpc::XrpcResp for GetSpaceCredentialResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSpaceCredential<S> {
     const NSID: &'static str = "com.atproto.space.getSpaceCredential";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetSpaceCredentialResponse;
 }
 
@@ -163,16 +162,15 @@ Path: `/xrpc/com.atproto.space.getSpaceCredential`. The request payload type is 
 pub struct GetSpaceCredentialRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSpaceCredentialRequest {
     const PATH: &'static str = "/xrpc/com.atproto.space.getSpaceCredential";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = GetSpaceCredential<S>;
     type Response = GetSpaceCredentialResponse;
 }
 
 pub mod get_space_credential_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -203,10 +201,8 @@ pub mod get_space_credential_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSpaceCredentialBuilder<
-    St: get_space_credential_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetSpaceCredentialBuilder<St: get_space_credential_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtSpaceUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -214,10 +210,7 @@ pub struct GetSpaceCredentialBuilder<
 
 impl GetSpaceCredential<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetSpaceCredentialBuilder<
-        get_space_credential_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetSpaceCredentialBuilder<get_space_credential_state::Empty, DefaultStr> {
         GetSpaceCredentialBuilder::new()
     }
 }
@@ -297,10 +290,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GetSpaceCredential<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GetSpaceCredential<S> {
         GetSpaceCredential {
             client_attestation: self._fields.0,
             space: self._fields.1.unwrap(),

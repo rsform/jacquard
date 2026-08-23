@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A single site section for spores.garden. Each section is a record in a collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,37 +37,37 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Section<S: BosStr = DefaultStr> {
-    ///Collection NSID to display (for type=collection)
+    /// Collection NSID to display (for type=collection)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection: Option<S>,
-    ///Content for block sections
+    /// Content for block sections
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
-    ///Content format
+    /// Content format
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<SectionFormat<S>>,
-    ///If true, hides the section header in display mode
+    /// If true, hides the section header in display mode
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_header: Option<bool>,
-    ///Layout to use for rendering
+    /// Layout to use for rendering
     #[serde(skip_serializing_if = "Option::is_none")]
     pub layout: Option<SectionLayout<S>>,
-    ///Maximum records to display
+    /// Maximum records to display
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Specific record URIs to display (for type=records)
+    /// Specific record URIs to display (for type=records)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub records: Option<Vec<AtUri<S>>>,
-    ///AT-URI of the referenced record (for content/profile sections)
+    /// AT-URI of the referenced record (for content/profile sections)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<AtUri<S>>,
-    ///Record key within the collection to display (e.g. 'self' for profile)
+    /// Record key within the collection to display (e.g. 'self' for profile)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rkey: Option<S>,
-    ///Section title
+    /// Section title
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///Section type
+    /// Section type
     pub r#type: SectionType<S>,
     #[serde(
         flatten,
@@ -491,9 +491,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -505,7 +504,7 @@ where
 
 pub mod section_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -573,7 +572,9 @@ impl SectionBuilder<section_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SectionBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -584,7 +585,9 @@ impl<S: BosStr> SectionBuilder<section_state::Empty, S> {
     pub fn builder() -> Self {
         SectionBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -781,10 +784,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_section() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.section"),

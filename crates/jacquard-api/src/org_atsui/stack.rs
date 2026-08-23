@@ -8,41 +8,44 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::at_inlay::Response;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Stack<S: BosStr = DefaultStr> {
-    ///Cross-axis alignment of children.  Defaults to `"stretch"`.
+    /// Cross-axis alignment of children.  Defaults to `"stretch"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_stack_align")]
     pub align: Option<StackAlign<S>>,
     pub children: Data<S>,
-    ///Space between children.  Defaults to `"medium"`.
+    /// Space between children.  Defaults to `"medium"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_stack_gap")]
     pub gap: Option<StackGap<S>>,
-    ///Whether this container has inset padding. The theme controls the amount.
+    /// Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
-    ///Main-axis distribution of children.  Defaults to `"start"`.
+    /// Main-axis distribution of children.  Defaults to `"start"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_stack_justify")]
     pub justify: Option<StackJustify<S>>,
-    ///Whether the container has an opaque background.
+    /// Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opaque: Option<bool>,
-    ///Whether to show a visual separator between children.
+    /// Whether to show a visual separator between children.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub separator: Option<bool>,
-    ///Whether the container sticks to the top of the scroll area.
+    /// Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -310,9 +313,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StackOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -333,9 +338,8 @@ impl jacquard_common::xrpc::XrpcResp for StackResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stack<S> {
     const NSID: &'static str = "org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StackResponse;
 }
 
@@ -345,34 +349,27 @@ Path: `/xrpc/org.atsui.Stack`. The request payload type is `Stack<S>`; send that
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Stack<S>;
     type Response = StackResponse;
 }
 
-fn _default_stack_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    StackAlign<S>,
-> {
+fn _default_stack_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<StackAlign<S>> {
     Some(<StackAlign<S>>::from_value(S::from_static("stretch")))
 }
 
-fn _default_stack_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    StackGap<S>,
-> {
+fn _default_stack_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<StackGap<S>> {
     Some(<StackGap<S>>::from_value(S::from_static("medium")))
 }
 
-fn _default_stack_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    StackJustify<S>,
-> {
+fn _default_stack_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<StackJustify<S>> {
     Some(<StackJustify<S>>::from_value(S::from_static("start")))
 }
 
 pub mod stack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

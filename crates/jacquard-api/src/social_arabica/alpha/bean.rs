@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A coffee bean variety tracked by the user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,44 +37,44 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Bean<S: BosStr = DefaultStr> {
-    ///Whether the bag is closed/finished (default: false)
+    /// Whether the bag is closed/finished (default: false)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub closed: Option<bool>,
-    ///Timestamp when the bean record was created
+    /// Timestamp when the bean record was created
     pub created_at: Datetime,
-    ///Public roaster description or tasting notes for the beans
+    /// Public roaster description or tasting notes for the beans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Optional product, vendor, or information URL for the beans
+    /// Optional product, vendor, or information URL for the beans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<UriValue<S>>,
-    ///Name of the coffee bean (e.g., 'Ethiopian Yirgacheffe', 'Morning Blend')
+    /// Name of the coffee bean (e.g., 'Ethiopian Yirgacheffe', 'Morning Blend')
     pub name: S,
-    ///Personal notes about the beans
+    /// Personal notes about the beans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<S>,
-    ///Geographic origin of the beans (e.g., 'Ethiopia', 'Colombia')
+    /// Geographic origin of the beans (e.g., 'Ethiopia', 'Colombia')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin: Option<S>,
-    ///Processing method (e.g., 'Washed', 'Natural', 'Honey')
+    /// Processing method (e.g., 'Washed', 'Natural', 'Honey')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub process: Option<S>,
-    ///User rating of the bean (1-10 scale, optional)
+    /// User rating of the bean (1-10 scale, optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
-    ///Optional date when the beans were roasted (YYYY-MM-DD)
+    /// Optional date when the beans were roasted (YYYY-MM-DD)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub roast_date: Option<S>,
-    ///Roast level (e.g., 'Light', 'Medium', 'Dark')
+    /// Roast level (e.g., 'Light', 'Medium', 'Dark')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub roast_level: Option<S>,
-    ///AT-URI reference to the roaster record (e.g., at://did:plc:abc/social.arabica.alpha.roaster/3jxy...)
+    /// AT-URI reference to the roaster record (e.g., at://did:plc:abc/social.arabica.alpha.roaster/3jxy...)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub roaster_ref: Option<AtUri<S>>,
-    ///AT-URI of the record this entity was sourced from
+    /// AT-URI of the record this entity was sourced from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_ref: Option<AtUri<S>>,
-    ///Coffee variety (e.g., 'SL28', 'Typica', 'Gesha', 'Caturra')
+    /// Coffee variety (e.g., 'SL28', 'Typica', 'Gesha', 'Caturra')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub variety: Option<S>,
     #[serde(
@@ -261,9 +261,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -275,7 +274,7 @@ where
 
 pub mod bean_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -359,20 +358,7 @@ impl BeanBuilder<bean_state::Empty, DefaultStr> {
         BeanBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -385,20 +371,7 @@ impl<S: BosStr> BeanBuilder<bean_state::Empty, S> {
         BeanBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -469,10 +442,7 @@ where
     St::Name: bean_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> BeanBuilder<bean_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> BeanBuilder<bean_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         BeanBuilder {
             _state: PhantomData,
@@ -648,10 +618,10 @@ where
 }
 
 fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.arabica.alpha.bean"),

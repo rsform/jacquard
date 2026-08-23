@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::social_psky::richtext::facet::Facet;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A Picosky message containing at most 2048 graphemes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,9 +39,9 @@ use crate::social_psky::richtext::facet::Facet;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Message<S: BosStr = DefaultStr> {
-    ///Text content.
+    /// Text content.
     pub content: S,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,9 +146,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -160,7 +159,7 @@ where
 
 pub mod message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -205,7 +204,12 @@ pub mod message_state {
 /// Builder for constructing an instance of this type.
 pub struct MessageBuilder<St: message_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>, Option<AtUri<S>>),
+    _fields: (
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<StrongRef<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -338,10 +342,10 @@ where
 }
 
 fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.psky.chat.message"),
@@ -350,18 +354,15 @@ fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A Picosky message containing at most 2048 graphemes.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A Picosky message containing at most 2048 graphemes.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("content"), SmolStr::new_static("room")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("content"),
+                            SmolStr::new_static("room"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -377,11 +378,9 @@ fn lexicon_doc_social_psky_chat_message() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("facets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Annotations of text (mentions, URLs, hashtags, etc)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, etc)",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("social.psky.richtext.facet"),
                                         ..Default::default()

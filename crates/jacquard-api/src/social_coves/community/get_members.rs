@@ -10,22 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Did, Handle, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_coves::community::get_members;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::community::get_members;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetMembersSort<S: BosStr = DefaultStr> {
@@ -108,9 +108,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetMembers<S: BosStr = DefaultStr> {
     pub community: AtIdentifier<S>,
     /// (max length: 500)
@@ -126,9 +128,11 @@ pub struct GetMembers<S: BosStr = DefaultStr> {
     pub sort: Option<GetMembersSort<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetMembersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -137,13 +141,15 @@ pub struct GetMembersOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MemberView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
-    ///Number of comments in this community
+    /// Number of comments in this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment_count: Option<i64>,
     pub did: Did<S>,
@@ -154,7 +160,7 @@ pub struct MemberView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_moderator: Option<bool>,
     pub member_since: Datetime,
-    ///Number of posts in this community
+    /// Number of posts in this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -264,15 +270,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetMembersSort<S>,
-> {
-    Some(<GetMembersSort<S>>::from_value(S::from_static("reputation")))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetMembersSort<S>> {
+    Some(<GetMembersSort<S>>::from_value(S::from_static(
+        "reputation",
+    )))
 }
 
 pub mod get_members_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -431,15 +438,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod member_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -685,10 +691,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MemberView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MemberView<S> {
         MemberView {
             avatar: self._fields.0,
             comment_count: self._fields.1,
@@ -705,10 +708,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_getMembers() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.getMembers"),
@@ -717,59 +720,55 @@ fn lexicon_doc_social_coves_community_getMembers() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("community")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("community"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("DID or handle of the community"),
-                                        ),
-                                        format: Some(LexStringFormat::AtIdentifier),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        max_length: Some(500usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("sort"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        max_length: Some(64usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("community")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("community"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "DID or handle of the community",
+                                    )),
+                                    format: Some(LexStringFormat::AtIdentifier),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    max_length: Some(500usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("sort"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    max_length: Some(64usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("memberView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("memberSince")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("memberSince"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

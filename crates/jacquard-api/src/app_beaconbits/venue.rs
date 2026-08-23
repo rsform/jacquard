@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A user-created venue definition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,23 +39,23 @@ use crate::community_lexicon::location::geo::Geo;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Venue<S: BosStr = DefaultStr> {
-    ///Human-readable address
+    /// Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<S>,
-    ///Structured address using community lexicon
+    /// Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address_details: Option<Address<S>>,
-    ///Venue category (bar, cafe, restaurant, etc.)
+    /// Venue category (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
-    ///Timestamp when the venue was created
+    /// Timestamp when the venue was created
     pub created_at: Datetime,
-    ///Structured location using community lexicon
+    /// Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<Geo<S>>,
-    ///Display name of the venue
+    /// Display name of the venue
     pub name: S,
-    ///Link to underlying OpenStreetMap entity (osm://node/123)
+    /// Link to underlying OpenStreetMap entity (osm://node/123)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub osm_uri: Option<UriValue<S>>,
     #[serde(
@@ -170,9 +170,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -184,7 +183,7 @@ where
 
 pub mod venue_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -354,10 +353,7 @@ where
     St::Name: venue_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> VenueBuilder<venue_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> VenueBuilder<venue_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         VenueBuilder {
             _state: PhantomData,
@@ -415,10 +411,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.venue"),
@@ -427,26 +423,20 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A user-created venue definition"),
-                    ),
+                    description: Some(CowStr::new_static("A user-created venue definition")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("address"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Human-readable address"),
-                                    ),
+                                    description: Some(CowStr::new_static("Human-readable address")),
                                     max_graphemes: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -454,20 +444,16 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("addressDetails"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "community.lexicon.location.address",
-                                    ),
+                                    r#ref: CowStr::new_static("community.lexicon.location.address"),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("category"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Venue category (bar, cafe, restaurant, etc.)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Venue category (bar, cafe, restaurant, etc.)",
+                                    )),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -475,9 +461,9 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when the venue was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the venue was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -492,9 +478,9 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Display name of the venue"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name of the venue",
+                                    )),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -502,11 +488,9 @@ fn lexicon_doc_app_beaconbits_venue() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("osmUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Link to underlying OpenStreetMap entity (osm://node/123)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Link to underlying OpenStreetMap entity (osm://node/123)",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

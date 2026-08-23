@@ -10,49 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateSiteConfig<S: BosStr = DefaultStr> {
-    ///Branch to deploy from.
+    /// Branch to deploy from.
     pub branch: S,
-    ///Directory within the repository to deploy (e.g. '/' or '/docs').
+    /// Directory within the repository to deploy (e.g. '/' or '/docs').
     pub dir: S,
-    ///Whether this repo should serve as the index (root) for the claimed domain.
+    /// Whether this repo should serve as the index (root) for the claimed domain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_index: Option<bool>,
-    ///DID of the repository as minted by the knot.
+    /// DID of the repository as minted by the knot.
     pub repo_did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateSiteConfigError {
     /// The account does not have an active domain claim.
     #[serde(rename = "NoDomainClaim")]
-    NoDomainClaim(Option<SmolStr>),
+    NoDomainClaim(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateSiteConfigError {
@@ -101,9 +99,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSiteConfigResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateSiteConfig<S> {
     const NSID: &'static str = "org.tangled.temp.repo.updateSiteConfig";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateSiteConfigResponse;
 }
 
@@ -113,16 +110,15 @@ Path: `/xrpc/org.tangled.temp.repo.updateSiteConfig`. The request payload type i
 pub struct UpdateSiteConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSiteConfigRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.repo.updateSiteConfig";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateSiteConfig<S>;
     type Response = UpdateSiteConfigResponse;
 }
 
 pub mod update_site_config_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,10 +175,7 @@ pub mod update_site_config_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateSiteConfigBuilder<
-    St: update_site_config_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct UpdateSiteConfigBuilder<St: update_site_config_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<bool>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -190,10 +183,7 @@ pub struct UpdateSiteConfigBuilder<
 
 impl UpdateSiteConfig<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateSiteConfigBuilder<
-        update_site_config_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> UpdateSiteConfigBuilder<update_site_config_state::Empty, DefaultStr> {
         UpdateSiteConfigBuilder::new()
     }
 }
@@ -315,10 +305,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateSiteConfig<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateSiteConfig<S> {
         UpdateSiteConfig {
             branch: self._fields.0.unwrap(),
             dir: self._fields.1.unwrap(),

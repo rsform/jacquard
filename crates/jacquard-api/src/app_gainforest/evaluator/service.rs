@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,25 +24,28 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_gainforest::evaluator::MethodInfo;
 use crate::app_gainforest::evaluator::service;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Definition of a single evaluation type produced by this evaluator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
-    ///The evaluation type identifier (must match an entry in evaluationTypes).
+    /// The evaluation type identifier (must match an entry in evaluationTypes).
     pub identifier: S,
-    ///Human-readable names and descriptions in various languages.
+    /// Human-readable names and descriptions in various languages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locales: Option<Vec<service::EvaluationTypeLocale<S>>>,
-    ///Default method info for this evaluation type (can be overridden per-evaluation).
+    /// Default method info for this evaluation type (can be overridden per-evaluation).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<MethodInfo<S>>,
-    ///The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
+    /// The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
     pub result_type: S,
     #[serde(
         flatten,
@@ -56,13 +59,16 @@ pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
 /// Localized name and description for an evaluation type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
-    ///Longer description of what this evaluation type does.
+    /// Longer description of what this evaluation type does.
     pub description: S,
-    ///Language code (BCP-47, e.g., 'en', 'pt-BR').
+    /// Language code (BCP-47, e.g., 'en', 'pt-BR').
     pub lang: S,
-    ///Short human-readable name for this evaluation type.
+    /// Short human-readable name for this evaluation type.
     pub name: S,
     #[serde(
         flatten,
@@ -76,17 +82,20 @@ pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
 /// Policies declaring what this evaluator does and how it operates.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EvaluatorPolicies<S: BosStr = DefaultStr> {
-    ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
+    /// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access_model: Option<EvaluatorPoliciesAccessModel<S>>,
-    ///Detailed definitions for each evaluation type, including human-readable descriptions.
+    /// Detailed definitions for each evaluation type, including human-readable descriptions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation_type_definitions: Option<Vec<service::EvaluationTypeDefinition<S>>>,
-    ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
+    /// List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
     pub evaluation_types: Vec<S>,
-    ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
+    /// NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_collections: Option<Vec<S>>,
     #[serde(
@@ -146,8 +155,7 @@ impl<S: BosStr> Serialize for EvaluatorPoliciesAccessModel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for EvaluatorPoliciesAccessModel<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EvaluatorPoliciesAccessModel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -192,9 +200,9 @@ where
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Service<S: BosStr = DefaultStr> {
-    ///Timestamp of when this evaluator service was declared.
+    /// Timestamp of when this evaluator service was declared.
     pub created_at: Datetime,
-    ///The evaluator's policies including supported evaluation types and access model.
+    /// The evaluator's policies including supported evaluation types and access model.
     pub policies: service::EvaluatorPolicies<S>,
     #[serde(
         flatten,
@@ -396,8 +404,7 @@ impl<S: BosStr> LexiconSchema for EvaluatorPolicies<S> {
         if let Some(values) = &self.subject_collections {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 128usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("subject_collections"),
@@ -461,17 +468,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.evaluator.service"),
@@ -551,28 +557,23 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("evaluationTypeLocale"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Localized name and description for an evaluation type.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("lang"), SmolStr::new_static("name"),
-                            SmolStr::new_static("description")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Localized name and description for an evaluation type.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("lang"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("description"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Longer description of what this evaluation type does.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Longer description of what this evaluation type does.",
+                                )),
                                 max_graphemes: Some(2048usize),
                                 ..Default::default()
                             }),
@@ -580,11 +581,9 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lang"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Language code (BCP-47, e.g., 'en', 'pt-BR').",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Language code (BCP-47, e.g., 'en', 'pt-BR').",
+                                )),
                                 max_graphemes: Some(16usize),
                                 ..Default::default()
                             }),
@@ -592,11 +591,9 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Short human-readable name for this evaluation type.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Short human-readable name for this evaluation type.",
+                                )),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -741,9 +738,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -754,15 +750,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod evaluator_policies_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -793,10 +788,7 @@ pub mod evaluator_policies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EvaluatorPoliciesBuilder<
-    St: evaluator_policies_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct EvaluatorPoliciesBuilder<St: evaluator_policies_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<EvaluatorPoliciesAccessModel<S>>,
@@ -809,10 +801,7 @@ pub struct EvaluatorPoliciesBuilder<
 
 impl EvaluatorPolicies<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EvaluatorPoliciesBuilder<
-        evaluator_policies_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> EvaluatorPoliciesBuilder<evaluator_policies_state::Empty, DefaultStr> {
         EvaluatorPoliciesBuilder::new()
     }
 }
@@ -856,10 +845,7 @@ impl<St: evaluator_policies_state::State, S: BosStr> EvaluatorPoliciesBuilder<St
         self
     }
     /// Set the `accessModel` field to an Option value (optional)
-    pub fn maybe_access_model(
-        mut self,
-        value: Option<EvaluatorPoliciesAccessModel<S>>,
-    ) -> Self {
+    pub fn maybe_access_model(mut self, value: Option<EvaluatorPoliciesAccessModel<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -932,10 +918,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> EvaluatorPolicies<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EvaluatorPolicies<S> {
         EvaluatorPolicies {
             access_model: self._fields.0,
             evaluation_type_definitions: self._fields.1,
@@ -953,9 +936,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -967,7 +949,7 @@ where
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

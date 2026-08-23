@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,15 +19,18 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Marks where members-only content begins and declares which publication members can read past it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MembersOnlyDelimiter<S: BosStr = DefaultStr> {
-    ///Whether access is available to all subscribers, all paid members, or selected paid tiers.
+    /// Whether access is available to all subscribers, all paid members, or selected paid tiers.
     pub audience: MembersOnlyDelimiterAudience<S>,
-    ///Paid tier ids that grant access when audience is tiers. An empty selection grants no membership access.
+    /// Paid tier ids that grant access when audience is tiers. An empty selection grants no membership access.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tier_ids: Option<Vec<S>>,
     #[serde(
@@ -90,8 +93,7 @@ impl<S: BosStr> Serialize for MembersOnlyDelimiterAudience<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for MembersOnlyDelimiterAudience<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MembersOnlyDelimiterAudience<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -115,9 +117,7 @@ where
     type Output = MembersOnlyDelimiterAudience<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            MembersOnlyDelimiterAudience::Subscribers => {
-                MembersOnlyDelimiterAudience::Subscribers
-            }
+            MembersOnlyDelimiterAudience::Subscribers => MembersOnlyDelimiterAudience::Subscribers,
             MembersOnlyDelimiterAudience::Paid => MembersOnlyDelimiterAudience::Paid,
             MembersOnlyDelimiterAudience::Tiers => MembersOnlyDelimiterAudience::Tiers,
             MembersOnlyDelimiterAudience::Other(v) => {
@@ -149,17 +149,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_pub_leaflet_blocks_membersOnlyDelimiter() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.membersOnlyDelimiter"),

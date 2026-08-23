@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,29 +24,32 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::spell::custom;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::spell::custom;
+use serde::{Deserialize, Serialize};
 /// One 'if' clause: a variable compared against a value with an operator. Composite conditions (variable 'activitySum' / 'engagementSum') additionally carry a timeframe and a set of metrics to sum. Words-seen conditions (variable 'wordsSeen') additionally carry the word set to watch for and a counting scope. Each condition also carries an undeclared 'value' property — the thing being compared against. Its shape depends on the variable's type (a number, a 'HH:MM' string, a boolean, a two-element ['HH:MM','HH:MM'] array for time 'between', an integer 0-6 for dayOfWeek, a moon-phase / route / modal / date key string, or a { uri, name } object for a feed), so it is deliberately left out of the schema and validated client-side; lexicon 'unknown' means 'any object', which would reject the scalar cases.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Condition<S: BosStr = DefaultStr> {
-    ///Composite conditions only: which metric keys to sum (e.g. 'postsRead', 'postsCreated', 'repliesSent', 'likesReceived'). See spellService COMPOSITE_METRICS.
+    /// Composite conditions only: which metric keys to sum (e.g. 'postsRead', 'postsCreated', 'repliesSent', 'likesReceived'). See spellService COMPOSITE_METRICS.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metrics: Option<Vec<S>>,
-    ///Comparison operator. Numeric/composite use gt/gte/lt/lte/eq/neq; time uses those plus 'between'; booleans use is/isNot; enumerated types (dayOfWeek, moonPhase, route, modal, feed, handle, date) use eq/neq.
+    /// Comparison operator. Numeric/composite use gt/gte/lt/lte/eq/neq; time uses those plus 'between'; booleans use is/isNot; enumerated types (dayOfWeek, moonPhase, route, modal, feed, handle, date) use eq/neq.
     pub operator: ConditionOperator<S>,
-    ///Words-seen ('wordsSeen') conditions only: the window the sighting count covers — 'today' (the calendar day, the default) or 'session' (since the app was opened).
+    /// Words-seen ('wordsSeen') conditions only: the window the sighting count covers — 'today' (the calendar day, the default) or 'session' (since the app was opened).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ConditionScope<S>>,
-    ///Composite conditions only: the window over which the chosen metrics are summed.
+    /// Composite conditions only: the window over which the chosen metrics are summed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeframe: Option<ConditionTimeframe<S>>,
-    ///The context variable to test, e.g. 'timeOfDay', 'dayOfWeek', 'currentDate', 'stamina', 'level', 'lightRemaining', 'moonPhase', 'unreadNotifications', 'sessionMinutes', 'postsReadToday', 'activitySum', 'wordsSeen', 'currentRoute', 'activeModal', 'currentFeed', 'currentProfileHandle', 'isOnExpedition'. The full catalog is defined client-side in spellService VARIABLE_GROUPS.
+    /// The context variable to test, e.g. 'timeOfDay', 'dayOfWeek', 'currentDate', 'stamina', 'level', 'lightRemaining', 'moonPhase', 'unreadNotifications', 'sessionMinutes', 'postsReadToday', 'activitySum', 'wordsSeen', 'currentRoute', 'activeModal', 'currentFeed', 'currentProfileHandle', 'isOnExpedition'. The full catalog is defined client-side in spellService VARIABLE_GROUPS.
     pub variable: S,
-    ///Words-seen ('wordsSeen') conditions only: the words to watch for, stored as trimmed lowercase strings. The condition counts posts containing any of these words as they flow through the viewer's feeds, and compares that count against 'value'.
+    /// Words-seen ('wordsSeen') conditions only: the words to watch for, stored as trimmed lowercase strings. The condition counts posts containing any of these words as they flow through the viewer's feeds, and compares that count against 'value'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub words: Option<Vec<S>>,
     #[serde(
@@ -326,11 +329,14 @@ where
 /// One 'then' clause: a typed effect on a UI surface. Continuously-applied effects flow through the live evaluation; the episodic types (showLockout, showAlert, redirect) are edge-triggered by their controllers. Each effect also carries an undeclared 'value' property — the payload, whose shape depends on target+type: an array of element/button/action/menu keys for the multi-select hide effects; a { rkey, name } layout reference or { rkey, name, keys } for hideElements; an array of word-list snapshots [{ rkey, name, words, strength, targetFeeds }] for activateList — the words are carried inline so a learned spell still works on a PDS where the referenced net.anisota.graph.wordlist record doesn't exist; or a config object for showLockout (message/scope/duration/bypass/…), showAlert (title/message/cooldownMinutes/…), redirect ({ route, cooldownMinutes }), sigilBeforePost ({ source, sigilShape }), overrideSetting ({ id, value }), or warnBefore* ({ action|element, message, gate }). toggleMode carries no value. It is left out of the schema and validated client-side because lexicon 'unknown' means 'any object', which would reject the array and string payloads.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Effect<S: BosStr = DefaultStr> {
-    ///The UI surface the effect acts on.
+    /// The UI surface the effect acts on.
     pub target: EffectTarget<S>,
-    ///The specific effect within the target. Valid types depend on the target (see spellService EFFECT_TARGETS). hideButton/showButton/setButtons are legacy observatory effects kept for backward compatibility.
+    /// The specific effect within the target. Valid types depend on the target (see spellService EFFECT_TARGETS). hideButton/showButton/setButtons are legacy observatory effects kept for backward compatibility.
     pub r#type: EffectType<S>,
     #[serde(
         flatten,
@@ -621,27 +627,27 @@ where
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Custom<S: BosStr = DefaultStr> {
-    ///How multiple conditions combine: 'all' (AND, the default) or 'any' (OR). Ignored when there are fewer than two conditions.
+    /// How multiple conditions combine: 'all' (AND, the default) or 'any' (OR). Ignored when there are fewer than two conditions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition_logic: Option<CustomConditionLogic<S>>,
-    ///The 'if' clauses evaluated against the live context. Empty or absent means the spell has no conditions — it applies whenever it is cast (a manual 'mode' spell), or, for an interval-triggered spell, fires on every tick.
+    /// The 'if' clauses evaluated against the live context. Empty or absent means the spell has no conditions — it applies whenever it is cast (a manual 'mode' spell), or, for an interval-triggered spell, fires on every tick.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conditions: Option<Vec<custom::Condition<S>>>,
-    ///When this spell was first crafted
+    /// When this spell was first crafted
     pub created_at: Datetime,
-    ///Optional description of what this spell does
+    /// Optional description of what this spell does
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The 'then' clauses — what the spell does when it applies. At least one is expected.
+    /// The 'then' clauses — what the spell does when it applies. At least one is expected.
     pub effects: Vec<custom::Effect<S>>,
-    ///Display name for this spell
+    /// Display name for this spell
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<custom::Source<S>>,
-    ///Optional interval trigger. When present the spell fires on a timer rather than continuously; its conditions (if any) then act as a gate on whether the timed firing is allowed. Absent means the spell is condition-driven (continuous).
+    /// Optional interval trigger. When present the spell fires on a timer rather than continuously; its conditions (if any) then act as a gate on whether the timed firing is allowed. Absent means the spell is condition-driven (continuous).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger: Option<custom::Trigger<S>>,
-    ///When this spell was last modified
+    /// When this spell was last modified
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -726,9 +732,7 @@ where
         match self {
             CustomConditionLogic::All => CustomConditionLogic::All,
             CustomConditionLogic::Any => CustomConditionLogic::Any,
-            CustomConditionLogic::Other(v) => {
-                CustomConditionLogic::Other(v.into_static())
-            }
+            CustomConditionLogic::Other(v) => CustomConditionLogic::Other(v.into_static()),
         }
     }
 }
@@ -747,21 +751,24 @@ pub struct CustomGetRecordOutput<S: BosStr = DefaultStr> {
 /// Provenance. An 'original' spell was crafted here; a 'learned' spell was copied from another user, carrying a backlink to its immediate parent (originalUri/originalDid) and to the top of its lineage (rootUri/rootDid), modelled on Bluesky reply parent/root refs so counts can be aggregated across re-shares. A 'preset' spell was seeded from a built-in template.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
-    ///DID of the user this spell was learned from.
+    /// DID of the user this spell was learned from.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_did: Option<Did<S>>,
-    ///AT URI of the spell this copy was learned from (its immediate parent).
+    /// AT URI of the spell this copy was learned from (its immediate parent).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_uri: Option<AtUri<S>>,
-    ///Identifier of the built-in preset a 'preset' spell was seeded from.
+    /// Identifier of the built-in preset a 'preset' spell was seeded from.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preset_id: Option<S>,
-    ///DID of the original crafter at the top of the lineage.
+    /// DID of the original crafter at the top of the lineage.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_did: Option<Did<S>>,
-    ///AT URI of the first crafter's spell — the top of the lineage — propagated to every descendant.
+    /// AT URI of the first crafter's spell — the top of the lineage — propagated to every descendant.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -774,7 +781,6 @@ pub struct Source<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SourceType<S: BosStr = DefaultStr> {
@@ -860,9 +866,12 @@ where
 /// An interval (timer) trigger. The spell fires every everyMinutes minutes rather than reacting continuously to its conditions.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Trigger<S: BosStr = DefaultStr> {
-    ///Minutes between firings (1 minute to 24 hours).
+    /// Minutes between firings (1 minute to 24 hours).
     pub every_minutes: i64,
     pub r#type: TriggerType<S>,
     #[serde(
@@ -873,7 +882,6 @@ pub struct Trigger<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TriggerType<S: BosStr = DefaultStr> {
@@ -1149,17 +1157,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_net_anisota_spell_custom() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.spell.custom"),
@@ -1552,9 +1559,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1565,9 +1571,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1579,7 +1584,7 @@ where
 
 pub mod custom_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1706,18 +1711,12 @@ impl<S: BosStr> CustomBuilder<custom_state::Empty, S> {
 
 impl<St: custom_state::State, S: BosStr> CustomBuilder<St, S> {
     /// Set the `conditionLogic` field (optional)
-    pub fn condition_logic(
-        mut self,
-        value: impl Into<Option<CustomConditionLogic<S>>>,
-    ) -> Self {
+    pub fn condition_logic(mut self, value: impl Into<Option<CustomConditionLogic<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `conditionLogic` field to an Option value (optional)
-    pub fn maybe_condition_logic(
-        mut self,
-        value: Option<CustomConditionLogic<S>>,
-    ) -> Self {
+    pub fn maybe_condition_logic(mut self, value: Option<CustomConditionLogic<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1725,10 +1724,7 @@ impl<St: custom_state::State, S: BosStr> CustomBuilder<St, S> {
 
 impl<St: custom_state::State, S: BosStr> CustomBuilder<St, S> {
     /// Set the `conditions` field (optional)
-    pub fn conditions(
-        mut self,
-        value: impl Into<Option<Vec<custom::Condition<S>>>>,
-    ) -> Self {
+    pub fn conditions(mut self, value: impl Into<Option<Vec<custom::Condition<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1796,10 +1792,7 @@ where
     St::Name: custom_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> CustomBuilder<custom_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> CustomBuilder<custom_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         CustomBuilder {
             _state: PhantomData,
@@ -1901,9 +1894,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1914,15 +1906,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod trigger_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

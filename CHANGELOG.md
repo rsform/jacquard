@@ -49,11 +49,19 @@
 - WebSocket connection options now carry headers and subprotocols together, and
   rejected upgrades expose status, headers, and a bounded body through
   `WebSocketError::HandshakeRejected` for typed recovery.
+- "message" field on xrpc errors now is properly optional and not nullable
+
+## Bug fixes
+
+- `jacquard-repo` max key length is now correct (thanks fig!)
+- `jacquard-identity` slingshot PLC source now properly uses the right slingshot API
+- fixed some unclear errors and lack of response header passthrough in success or error states, including rate limit headers.
+
 
 ## New and updated crates
 
 - Vendored `tokio-tungstenite-wasm` with a patch to its native handling to allow setting headers where supported
-- Updated reqwest version and properly gated it and its features across jacquard, with the main jacquard crate continuing to default to enabling it.
+- Updated `reqwest` version and properly gated it and its features across jacquard, with the main jacquard crate continuing to default to enabling it.
 
 ## [0.12.1] - 2026-06-26
 

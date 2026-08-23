@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_atpodcasting::AppleCategory;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_atpodcasting::AppleCategory;
+use serde::{Deserialize, Serialize};
 /// A podcast feed/show. Record key is the podcast's Podcasting 2.0 UUIDv5 GUID, enabling direct lookup from RSS feed metadata.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,30 +39,30 @@ use crate::org_atpodcasting::AppleCategory;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Podcast<S: BosStr = DefaultStr> {
-    ///Cover artwork for the podcast. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
+    /// Cover artwork for the podcast. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
     pub artwork: BlobRef<S>,
-    ///Podcast categories (max 3).
+    /// Podcast categories (max 3).
     pub categories: Vec<AppleCategory<S>>,
-    ///When the podcast record was created.
+    /// When the podcast record was created.
     pub created_at: Datetime,
-    ///A description of the podcast.
+    /// A description of the podcast.
     pub description: S,
-    ///Whether the podcast contains explicit content. Defaults to false.
+    /// Whether the podcast contains explicit content. Defaults to false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub explicit: Option<bool>,
-    ///URL of the podcast's RSS feed.
+    /// URL of the podcast's RSS feed.
     pub feed_url: UriValue<S>,
-    ///Podcasting 2.0 UUIDv5 GUID of the podcast. Must match the record key.
+    /// Podcasting 2.0 UUIDv5 GUID of the podcast. Must match the record key.
     pub guid: S,
-    ///Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
+    /// Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
     pub language: Language,
-    ///URL of the podcast's homepage or companion website.
+    /// URL of the podcast's homepage or companion website.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<UriValue<S>>,
-    ///AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.
+    /// AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moved_to: Option<AtUri<S>>,
-    ///The name of the podcast.
+    /// The name of the podcast.
     pub title: S,
     #[serde(
         flatten,
@@ -146,25 +146,20 @@ impl<S: BosStr> LexiconSchema for Podcast<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("artwork"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -225,9 +220,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -239,7 +233,7 @@ where
 
 pub mod podcast_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -433,7 +427,9 @@ impl PodcastBuilder<podcast_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         PodcastBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -444,7 +440,9 @@ impl<S: BosStr> PodcastBuilder<podcast_state::Empty, S> {
     pub fn builder() -> Self {
         PodcastBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -564,10 +562,7 @@ where
     St::Guid: podcast_state::IsUnset,
 {
     /// Set the `guid` field (required)
-    pub fn guid(
-        mut self,
-        value: impl Into<S>,
-    ) -> PodcastBuilder<podcast_state::SetGuid<St>, S> {
+    pub fn guid(mut self, value: impl Into<S>) -> PodcastBuilder<podcast_state::SetGuid<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -628,10 +623,7 @@ where
     St::Title: podcast_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> PodcastBuilder<podcast_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> PodcastBuilder<podcast_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         PodcastBuilder {
             _state: PhantomData,
@@ -690,10 +682,10 @@ where
 }
 
 fn lexicon_doc_org_atpodcasting_podcast() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atpodcasting.podcast"),

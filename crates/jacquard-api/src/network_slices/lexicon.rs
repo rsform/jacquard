@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -36,22 +36,22 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Lexicon<S: BosStr = DefaultStr> {
-    ///When the lexicon was created
+    /// When the lexicon was created
     pub created_at: Datetime,
-    ///The lexicon schema definitions as JSON
+    /// The lexicon schema definitions as JSON
     pub definitions: S,
-    ///Human-readable description of the lexicon
+    /// Human-readable description of the lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Whether this lexicon should be excluded from sync operations  Defaults to `false`.
+    /// Whether this lexicon should be excluded from sync operations  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_lexicon_excluded_from_sync")]
     pub excluded_from_sync: Option<bool>,
-    ///Namespaced identifier for the lexicon
+    /// Namespaced identifier for the lexicon
     pub nsid: S,
-    ///AT-URI reference to the slice this lexicon belongs to
+    /// AT-URI reference to the slice this lexicon belongs to
     pub slice: AtUri<S>,
-    ///When the lexicon was last updated
+    /// When the lexicon was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -150,9 +150,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -168,7 +167,7 @@ fn _default_lexicon_excluded_from_sync() -> Option<bool> {
 
 pub mod lexicon_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -361,10 +360,7 @@ where
     St::Nsid: lexicon_state::IsUnset,
 {
     /// Set the `nsid` field (required)
-    pub fn nsid(
-        mut self,
-        value: impl Into<S>,
-    ) -> LexiconBuilder<lexicon_state::SetNsid<St>, S> {
+    pub fn nsid(mut self, value: impl Into<S>) -> LexiconBuilder<lexicon_state::SetNsid<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LexiconBuilder {
             _state: PhantomData,
@@ -443,10 +439,10 @@ where
 }
 
 fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.lexicon"),
@@ -457,23 +453,21 @@ fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("nsid"),
-                                SmolStr::new_static("definitions"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("slice")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("nsid"),
+                            SmolStr::new_static("definitions"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("slice"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When the lexicon was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the lexicon was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -481,20 +475,18 @@ fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("definitions"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The lexicon schema definitions as JSON"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The lexicon schema definitions as JSON",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Human-readable description of the lexicon",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Human-readable description of the lexicon",
+                                    )),
                                     max_length: Some(500usize),
                                     ..Default::default()
                                 }),
@@ -508,9 +500,9 @@ fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("nsid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Namespaced identifier for the lexicon"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Namespaced identifier for the lexicon",
+                                    )),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -518,11 +510,9 @@ fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slice"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "AT-URI reference to the slice this lexicon belongs to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "AT-URI reference to the slice this lexicon belongs to",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -530,9 +520,9 @@ fn lexicon_doc_network_slices_lexicon() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When the lexicon was last updated"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the lexicon was last updated",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

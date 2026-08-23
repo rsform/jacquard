@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::beta::game::achievement;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::beta::game::achievement;
+use serde::{Deserialize, Serialize};
 /// Record representing an achievement unlocked by a player
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,31 +38,31 @@ use crate::net_anisota::beta::game::achievement;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Achievement<S: BosStr = DefaultStr> {
-    ///Unique identifier for the achievement (e.g., 'followers-1000', 'level-10')
+    /// Unique identifier for the achievement (e.g., 'followers-1000', 'level-10')
     pub achievement_id: S,
-    ///Category of the achievement
+    /// Category of the achievement
     pub category: AchievementCategory<S>,
-    ///Description of what was accomplished
+    /// Description of what was accomplished
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Additional achievement-specific data
+    /// Additional achievement-specific data
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Data<S>>,
-    ///Display name of the achievement
+    /// Display name of the achievement
     pub name: S,
-    ///Rarity tier of the achievement
+    /// Rarity tier of the achievement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<AchievementRarity<S>>,
     pub signature: achievement::Signature<S>,
-    ///Tier or milestone value (e.g., 1000 for followers-1000, 10 for level-10)
+    /// Tier or milestone value (e.g., 1000 for followers-1000, 10 for level-10)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tier: Option<i64>,
-    ///When the achievement was unlocked
+    /// When the achievement was unlocked
     pub unlocked_at: Datetime,
-    ///AT URI linking to the verification record on the Anisota brand PDS
+    /// AT URI linking to the verification record on the Anisota brand PDS
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verification_uri: Option<AtUri<S>>,
-    ///Experience points awarded for this achievement
+    /// Experience points awarded for this achievement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_reward: Option<i64>,
     #[serde(
@@ -266,13 +266,16 @@ pub struct AchievementGetRecordOutput<S: BosStr = DefaultStr> {
 /// Cryptographic signature proving authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Signature<S: BosStr = DefaultStr> {
-    ///DID of the signing authority (Anisota backend)
+    /// DID of the signing authority (Anisota backend)
     pub issuer: S,
-    ///Base64-encoded cryptographic signature
+    /// Base64-encoded cryptographic signature
     pub sig: S,
-    ///When the achievement was signed
+    /// When the achievement was signed
     pub signed_at: Datetime,
     #[serde(
         flatten,
@@ -403,9 +406,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -417,7 +419,7 @@ where
 
 pub mod achievement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -545,7 +547,9 @@ impl AchievementBuilder<achievement_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         AchievementBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -556,7 +560,9 @@ impl<S: BosStr> AchievementBuilder<achievement_state::Empty, S> {
     pub fn builder() -> Self {
         AchievementBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -762,10 +768,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Achievement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Achievement<S> {
         Achievement {
             achievement_id: self._fields.0.unwrap(),
             category: self._fields.1.unwrap(),
@@ -784,10 +787,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_achievement() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.achievement"),
@@ -924,46 +927,41 @@ fn lexicon_doc_net_anisota_beta_game_achievement() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Cryptographic signature proving authenticity",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("issuer"),
-                            SmolStr::new_static("signedAt"), SmolStr::new_static("sig")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Cryptographic signature proving authenticity",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("issuer"),
+                        SmolStr::new_static("signedAt"),
+                        SmolStr::new_static("sig"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("issuer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the signing authority (Anisota backend)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the signing authority (Anisota backend)",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Base64-encoded cryptographic signature"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Base64-encoded cryptographic signature",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the achievement was signed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the achievement was signed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -986,15 +984,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1118,10 +1115,7 @@ where
     St::Sig: signature_state::IsUnset,
 {
     /// Set the `sig` field (required)
-    pub fn sig(
-        mut self,
-        value: impl Into<S>,
-    ) -> SignatureBuilder<signature_state::SetSig<St>, S> {
+    pub fn sig(mut self, value: impl Into<S>) -> SignatureBuilder<signature_state::SetSig<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -1167,10 +1161,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Signature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
         Signature {
             issuer: self._fields.0.unwrap(),
             sig: self._fields.1.unwrap(),

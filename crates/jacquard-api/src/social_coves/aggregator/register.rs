@@ -10,71 +10,71 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Register<S: BosStr = DefaultStr> {
-    ///DID of the aggregator (did:plc or did:web format)
+    /// DID of the aggregator (did:plc or did:web format)
     pub did: Did<S>,
-    ///Hostname where the aggregator is hosted, without scheme (e.g., 'rss-bot.example.com'). Must serve a .well-known/atproto-did file containing the DID.
+    /// Hostname where the aggregator is hosted, without scheme (e.g., 'rss-bot.example.com'). Must serve a .well-known/atproto-did file containing the DID.
     pub domain: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RegisterOutput<S: BosStr = DefaultStr> {
-    ///DID of the registered aggregator
+    /// DID of the registered aggregator
     pub did: Did<S>,
-    ///Handle extracted from DID document
+    /// Handle extracted from DID document
     pub handle: S,
-    ///Success message with next steps
+    /// Success message with next steps
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RegisterError {
     /// DID format is invalid or not did:plc or did:web format
     #[serde(rename = "InvalidDID")]
-    InvalidDid(Option<SmolStr>),
+    InvalidDid(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Could not verify domain ownership via .well-known/atproto-did or DID mismatch
     #[serde(rename = "DomainVerificationFailed")]
-    DomainVerificationFailed(Option<SmolStr>),
+    DomainVerificationFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// This aggregator DID is already registered with this instance
     #[serde(rename = "AlreadyRegistered")]
-    AlreadyRegistered(Option<SmolStr>),
+    AlreadyRegistered(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Could not resolve DID document to extract handle and PDS URL
     #[serde(rename = "DIDResolutionFailed")]
-    DidResolutionFailed(Option<SmolStr>),
+    DidResolutionFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Internal server error occurred during registration
     #[serde(rename = "RegistrationFailed")]
-    RegistrationFailed(Option<SmolStr>),
+    RegistrationFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RegisterError {
@@ -139,9 +139,8 @@ impl jacquard_common::xrpc::XrpcResp for RegisterResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Register<S> {
     const NSID: &'static str = "social.coves.aggregator.register";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RegisterResponse;
 }
 
@@ -151,16 +150,15 @@ Path: `/xrpc/social.coves.aggregator.register`. The request payload type is `Reg
 pub struct RegisterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterRequest {
     const PATH: &'static str = "/xrpc/social.coves.aggregator.register";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Register<S>;
     type Response = RegisterResponse;
 }
 
 pub mod register_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

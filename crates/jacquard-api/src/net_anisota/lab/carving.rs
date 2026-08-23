@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A relief woodblock carving made in the Anisota Lab's Carving studio and saved to the owner's library. Each record stores the gouge paths that carved the block (a compact serialization so the carving can be reopened and edited), the chosen ink and paper colours, whether vertical mirror/symmetry was on, and an optional printed-result PNG thumbnail for display and re-export.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,21 +37,21 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Carving<S: BosStr = DefaultStr> {
-    ///When the carving was saved
+    /// When the carving was saved
     pub created_at: Datetime,
-    ///A PNG data URL thumbnail of the printed result
+    /// A PNG data URL thumbnail of the printed result
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<S>,
-    ///The ink colour the block prints in
+    /// The ink colour the block prints in
     pub ink_color: S,
-    ///Whether vertical mirror/symmetry was active while carving
+    /// Whether vertical mirror/symmetry was active while carving
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mirror: Option<bool>,
-    ///Display name for the carving
+    /// Display name for the carving
     pub name: S,
-    ///The paper colour the print sits on
+    /// The paper colour the print sits on
     pub paper_color: S,
-    ///The gouge paths. Each is an object: { tool, width, points (x and y interleaved, scaled 0..1000), erase }.
+    /// The gouge paths. Each is an object: { tool, width, points (x and y interleaved, scaled 0..1000), erase }.
     pub strokes: Vec<Data<S>>,
     #[serde(
         flatten,
@@ -195,9 +195,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -209,7 +208,7 @@ where
 
 pub mod carving_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -420,10 +419,7 @@ where
     St::Name: carving_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> CarvingBuilder<carving_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> CarvingBuilder<carving_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         CarvingBuilder {
             _state: PhantomData,
@@ -509,10 +505,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_carving() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.carving"),

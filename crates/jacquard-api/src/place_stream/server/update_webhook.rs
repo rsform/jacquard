@@ -8,53 +8,55 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::server::RewriteRule;
+use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::server::RewriteRule;
-use crate::place_stream::server::Webhook;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateWebhook<S: BosStr = DefaultStr> {
-    ///Whether this webhook should be active.
+    /// Whether this webhook should be active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
-    ///A description of what this webhook is used for.
+    /// A description of what this webhook is used for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The types of events this webhook should receive.
+    /// The types of events this webhook should receive.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub events: Option<Vec<UpdateWebhookEvents<S>>>,
-    ///The ID of the webhook to update.
+    /// The ID of the webhook to update.
     pub id: S,
-    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mute_words: Option<Vec<S>>,
-    ///A user-friendly name for this webhook.
+    /// A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Text to prepend to webhook messages.
+    /// Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prefix: Option<S>,
-    ///Text replacement rules for webhook messages.
+    /// Text replacement rules for webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rewrite: Option<Vec<RewriteRule<S>>>,
-    ///Text to append to webhook messages.
+    /// Text to append to webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub suffix: Option<S>,
-    ///The webhook URL where events will be sent.
+    /// The webhook URL where events will be sent.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateWebhookEvents<S: BosStr = DefaultStr> {
@@ -145,44 +147,41 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateWebhookOutput<S: BosStr = DefaultStr> {
     pub webhook: Webhook<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateWebhookError {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(Option<SmolStr>),
+    WebhookNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<SmolStr>),
+    Unauthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The provided webhook URL is invalid or unreachable.
     #[serde(rename = "InvalidUrl")]
-    InvalidUrl(Option<SmolStr>),
+    InvalidUrl(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// A webhook with this URL already exists for this user.
     #[serde(rename = "DuplicateWebhook")]
-    DuplicateWebhook(Option<SmolStr>),
+    DuplicateWebhook(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateWebhookError {
@@ -240,9 +239,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateWebhook<S> {
     const NSID: &'static str = "place.stream.server.updateWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateWebhookResponse;
 }
 
@@ -252,9 +250,8 @@ Path: `/xrpc/place.stream.server.updateWebhook`. The request payload type is `Up
 pub struct UpdateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.updateWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateWebhook<S>;
     type Response = UpdateWebhookResponse;
 }

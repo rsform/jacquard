@@ -3,12 +3,12 @@
 // jacquard-api binding to pin production generator output.
 extern crate alloc;
 
+use ipld_core::ipld::Ipld;
 use jacquard_codegen_tests::{macro_mode, pretty};
 use jacquard_common::types::blob::{Blob, BlobRef};
 use jacquard_common::{CowStr, DefaultStr};
 use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::ConstraintError;
-use ipld_core::ipld::Ipld;
 
 const PNG_CID: &str = "bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
 
@@ -100,9 +100,15 @@ fn generated_blob_dag_cbor_wire_contract() {
         panic!("dag-cbor blob ref must be a CID link");
     };
     assert_eq!(cid.to_string(), PNG_CID);
-    assert_eq!(primary.get("mimeType"), Some(&Ipld::String("image/png".into())));
+    assert_eq!(
+        primary.get("mimeType"),
+        Some(&Ipld::String("image/png".into()))
+    );
     assert_eq!(primary.get("size"), Some(&Ipld::Integer(1000)));
-    assert_eq!(map.get("$type"), Some(&Ipld::String("test.blobby.record".into())));
+    assert_eq!(
+        map.get("$type"),
+        Some(&Ipld::String("test.blobby.record".into()))
+    );
 
     // Typed round-trip plus byte-stable re-encode. The CBOR decode yields the
     // parsed `Ipld` CID variant while the JSON-parsed fixture uses `Str`, so
@@ -174,7 +180,10 @@ fn generated_blob_optional_omission_is_distinct_from_invalid() {
     let record: pretty::test_blobby::record::Record<DefaultStr> =
         serde_json::from_value(json).expect("parse invalid secondary");
     assert!(record.secondary.is_some());
-    assert!(record.validate().is_err(), "present invalid blob is invalid");
+    assert!(
+        record.validate().is_err(),
+        "present invalid blob is invalid"
+    );
 }
 
 #[test]
@@ -195,9 +204,11 @@ fn generated_blob_constraints_report_field_path() {
 
     // Boundary MIME accepted by pattern/exact list, wrong MIME rejected with path.
     blob_mut(&mut record.primary).size = 1000;
-    blob_mut(&mut record.primary).mime_type = jacquard_common::types::blob::MimeType::new_owned("image/jpeg");
+    blob_mut(&mut record.primary).mime_type =
+        jacquard_common::types::blob::MimeType::new_owned("image/jpeg");
     assert!(record.validate().is_ok());
-    blob_mut(&mut record.primary).mime_type = jacquard_common::types::blob::MimeType::new_owned("image/webp");
+    blob_mut(&mut record.primary).mime_type =
+        jacquard_common::types::blob::MimeType::new_owned("image/webp");
     match record.validate() {
         Err(ConstraintError::BlobMimeTypeNotAccepted { path, actual, .. }) => {
             assert_eq!(path.to_string(), ".primary");
@@ -208,7 +219,8 @@ fn generated_blob_constraints_report_field_path() {
 
     // The optional blob reports under its own field path. Its `*/*` accept
     // pattern matches every MIME type, so exercise the size constraint.
-    blob_mut(&mut record.primary).mime_type = jacquard_common::types::blob::MimeType::new_owned("image/png");
+    blob_mut(&mut record.primary).mime_type =
+        jacquard_common::types::blob::MimeType::new_owned("image/png");
     record.secondary = Some(
         serde_json::from_str(&format!(
             r#"{{"$type":"blob","ref":{{"$link":"{PNG_CID}"}},"mimeType":"text/plain","size":5000}}"#
@@ -261,7 +273,10 @@ fn real_api_blob_binding_wire_contract() {
     let reparsed: Images<DefaultStr> = serde_json::from_str(&images_json).expect("parse images");
     // serde(flatten) deserializes an absent extra_data map to Some({}), so
     // compare on the wire representation and semantic fields, not derived Eq.
-    assert_eq!(serde_json::to_string(&reparsed).expect("reserialize"), images_json);
+    assert_eq!(
+        serde_json::to_string(&reparsed).expect("reserialize"),
+        images_json
+    );
     assert_eq!(reparsed.images.len(), 1);
     assert_eq!(reparsed.images[0].alt.as_str(), "real binding contract");
     assert_eq!(reparsed.images[0].image.blob().cid().as_str(), PNG_CID);
@@ -269,7 +284,10 @@ fn real_api_blob_binding_wire_contract() {
     let bytes = serde_ipld_dagcbor::to_vec(&images).expect("encode dag-cbor");
     let decoded: Images<DefaultStr> = serde_ipld_dagcbor::from_slice(&bytes).expect("decode");
     assert_eq!(decoded.images[0].image.blob().cid().as_str(), PNG_CID);
-    assert_eq!(decoded.images[0].image.blob().mime_type.as_str(), "image/png");
+    assert_eq!(
+        decoded.images[0].image.blob().mime_type.as_str(),
+        "image/png"
+    );
     assert_eq!(
         serde_ipld_dagcbor::to_vec(&decoded).expect("re-encode"),
         bytes,

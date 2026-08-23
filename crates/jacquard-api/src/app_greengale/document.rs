@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,21 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog::BlobMetadata;
 use crate::app_greengale::blog::Ogp;
 use crate::app_greengale::blog::Theme;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Reference to external content via AT-URI. Used in site.standard.document content union.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContentRef<S: BosStr = DefaultStr> {
-    ///AT-URI pointing to the full document content
+    /// AT-URI pointing to the full document content
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -58,30 +61,30 @@ pub struct ContentRef<S: BosStr = DefaultStr> {
 pub struct Document<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blobs: Option<Vec<BlobMetadata<S>>>,
-    ///Markdown content of the document
+    /// Markdown content of the document
     pub content: S,
-    ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility.  Defaults to `false`.
+    /// Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_document_latex")]
     pub latex: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ogp: Option<Ogp<S>>,
-    ///Document path relative to the publication URL (e.g., /handle/rkey)
+    /// Document path relative to the publication URL (e.g., /handle/rkey)
     pub path: S,
-    ///Publication timestamp
+    /// Publication timestamp
     pub published_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subtitle: Option<S>,
-    ///Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.
+    /// Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub theme: Option<Theme<S>>,
-    ///Document title
+    /// Document title
     pub title: S,
-    ///Base publication URL (e.g., https://greengale.app)
+    /// Base publication URL (e.g., https://greengale.app)
     pub url: UriValue<S>,
-    ///Controls who can view this document  Defaults to `"public"`.
+    /// Controls who can view this document  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_document_visibility")]
     pub visibility: Option<DocumentVisibility<S>>,
@@ -304,8 +307,7 @@ impl<S: BosStr> LexiconSchema for Document<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 50usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -359,15 +361,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod content_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -472,10 +473,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ContentRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContentRef<S> {
         ContentRef {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -484,10 +482,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_document() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.document"),
@@ -681,9 +679,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -697,15 +694,16 @@ fn _default_document_latex() -> Option<bool> {
     Some(false)
 }
 
-fn _default_document_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    DocumentVisibility<S>,
-> {
-    Some(<DocumentVisibility<S>>::from_value(S::from_static("public")))
+fn _default_document_visibility<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<DocumentVisibility<S>> {
+    Some(<DocumentVisibility<S>>::from_value(S::from_static(
+        "public",
+    )))
 }
 
 pub mod document_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -835,18 +833,7 @@ impl DocumentBuilder<document_state::Empty, DefaultStr> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -859,18 +846,7 @@ impl<S: BosStr> DocumentBuilder<document_state::Empty, S> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -941,10 +917,7 @@ where
     St::Path: document_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(
-        mut self,
-        value: impl Into<S>,
-    ) -> DocumentBuilder<document_state::SetPath<St>, S> {
+    pub fn path(mut self, value: impl Into<S>) -> DocumentBuilder<document_state::SetPath<St>, S> {
         self._fields.4 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
@@ -1052,10 +1025,7 @@ where
 
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<DocumentVisibility<S>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<DocumentVisibility<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }

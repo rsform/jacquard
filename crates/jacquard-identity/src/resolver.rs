@@ -11,7 +11,7 @@
 #![cfg_attr(target_arch = "wasm32", allow(unused))]
 use bon::Builder;
 use bytes::Bytes;
-use http::StatusCode;
+use http::{HeaderMap, StatusCode};
 use jacquard_common::BosStr;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::BoxError;
@@ -32,7 +32,7 @@ use std::marker::Sync;
 /// - `PlcDirectory`: uses the public PLC directory (default `https://plc.directory/`).
 /// - `Slingshot`: uses Slingshot which also exposes convenience endpoints such as
 ///   `com.atproto.identity.resolveHandle` and a "mini-doc"
-///   endpoint (`com.bad-example.identity.resolveMiniDoc`).
+///   endpoint (`blue.microcosm.identity.resolveMiniDoc`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlcSource {
     /// Use the public PLC directory
@@ -81,7 +81,9 @@ pub struct DidDocResponse {
     pub buffer: Bytes,
     #[allow(missing_docs)]
     pub status: StatusCode,
-    /// Optional DID we intended to resolve; used for validation helpers
+    /// Response headers.
+    pub headers: HeaderMap,
+    /// Optional DID we intended to resolve; used for validation helpers.
     pub requested: Option<Did>,
 }
 
@@ -126,8 +128,10 @@ impl DidDocResponse {
                 .as_ref()
                 .map(|d| d.as_str())
                 .unwrap_or("unknown");
-            Err(IdentityError::http_status(self.status)
-                .with_context(format!("fetching DID document for {}", did_str)))
+            Err(
+                IdentityError::http_status(self.status, self.headers.clone())
+                    .with_context(format!("fetching DID document for {}", did_str)),
+            )
         }
     }
 
@@ -191,7 +195,7 @@ impl DidDocResponse {
                 Err(IdentityError::missing_pds_endpoint(did_str))
             }
         } else {
-            Err(IdentityError::http_status(self.status)
+            Err(IdentityError::http_status(self.status, self.headers)
                 .with_context(format!("fetching DID document for {}", did_str)))
         }
     }
@@ -628,6 +632,16 @@ pub enum IdentityErrorKind {
     )]
     HandleResolutionExhausted,
 
+    /// All DID document resolution methods exhausted
+    #[error("DID document resolution exhausted all configured methods")]
+    #[diagnostic(
+        code(jacquard::identity::did_resolution_exhausted),
+        help(
+            "the DID document may be unavailable, or configured resolution endpoints may be unavailable",
+        )
+    )]
+    DidResolutionExhausted,
+
     /// Missing PDS endpoint in DID document
     #[error("missing PDS endpoint in DID document for {0}")]
     #[diagnostic(
@@ -653,12 +667,17 @@ pub enum IdentityErrorKind {
     Timeout,
 
     /// HTTP status error
-    #[error("HTTP {0}")]
+    #[error("HTTP {status}")]
     #[diagnostic(
         code(jacquard::identity::http_status),
         help("verify well-known paths or PDS XRPC endpoints")
     )]
-    HttpStatus(StatusCode),
+    HttpStatus {
+        /// HTTP response status.
+        status: StatusCode,
+        /// HTTP response headers.
+        headers: HeaderMap,
+    },
 
     /// XRPC error
     #[error("XRPC error: {0}")]
@@ -785,6 +804,11 @@ impl IdentityError {
         Self::new(IdentityErrorKind::HandleResolutionExhausted, None)
     }
 
+    /// Create a DID document resolution exhausted error
+    pub fn did_resolution_exhausted() -> Self {
+        Self::new(IdentityErrorKind::DidResolutionExhausted, None)
+    }
+
     /// Create a missing PDS endpoint error
     pub fn missing_pds_endpoint(did: impl Into<SmolStr>) -> Self {
         Self::new(IdentityErrorKind::MissingPdsEndpoint(did.into()), None)
@@ -801,8 +825,8 @@ impl IdentityError {
     }
 
     /// Create an HTTP status error
-    pub fn http_status(status: StatusCode) -> Self {
-        Self::new(IdentityErrorKind::HttpStatus(status), None)
+    pub fn http_status(status: StatusCode, headers: HeaderMap) -> Self {
+        Self::new(IdentityErrorKind::HttpStatus { status, headers }, None)
     }
 
     /// Create an XRPC error
@@ -918,12 +942,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn did_resolution_exhausted_has_did_kind() {
+        let error = IdentityError::did_resolution_exhausted();
+
+        assert!(matches!(
+            error.kind(),
+            IdentityErrorKind::DidResolutionExhausted
+        ));
+        assert_eq!(
+            error.to_string(),
+            "DID document resolution exhausted all configured methods"
+        );
+    }
+
+    #[test]
     fn parse_validated_ok() {
         let buf = Bytes::from_static(br#"{"id":"did:plc:alice"}"#);
         let requested = Did::new_owned("did:plc:alice").unwrap();
         let resp = DidDocResponse {
             buffer: buf,
             status: StatusCode::OK,
+            headers: HeaderMap::new(),
             requested: Some(requested),
         };
         let _doc = resp.parse_validated().expect("valid");
@@ -936,6 +975,7 @@ mod tests {
         let resp = DidDocResponse {
             buffer: buf,
             status: StatusCode::OK,
+            headers: HeaderMap::new(),
             requested: Some(requested),
         };
         match resp.parse_validated() {

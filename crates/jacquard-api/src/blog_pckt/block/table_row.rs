@@ -20,16 +20,19 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::table_cell::TableCell;
 use crate::blog_pckt::block::table_header::TableHeader;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TableRow<S: BosStr = DefaultStr> {
-    ///Array of table cells or header cells
+    /// Array of table cells or header cells
     pub content: Vec<TableRowContentItem<S>>,
     #[serde(
         flatten,
@@ -39,7 +42,6 @@ pub struct TableRow<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -73,15 +75,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod table_row_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -195,10 +196,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_tableRow() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.tableRow"),
@@ -214,13 +215,13 @@ fn lexicon_doc_blog_pckt_block_tableRow() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Array of table cells or header cells"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Array of table cells or header cells",
+                                )),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("blog.pckt.block.tableCell"),
-                                        CowStr::new_static("blog.pckt.block.tableHeader")
+                                        CowStr::new_static("blog.pckt.block.tableHeader"),
                                     ],
                                     closed: Some(false),
                                     ..Default::default()

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A user-published public key.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,25 +37,25 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct UserPublicKey<S: BosStr = DefaultStr> {
-    ///Optional comment or description.
+    /// Optional comment or description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Datetime when this key was created (ISO 8601).
+    /// Datetime when this key was created (ISO 8601).
     pub created_at: Datetime,
-    ///Datetime when this key expires (ISO 8601).
+    /// Datetime when this key expires (ISO 8601).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    ///Key fingerprint.
+    /// Key fingerprint.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fingerprint: Option<S>,
-    ///Format of the public key.
+    /// Format of the public key.
     pub key_type: UserPublicKeyKeyType<S>,
-    ///Human-readable label for this key (e.g., 'work laptop', 'signing key').
+    /// Human-readable label for this key (e.g., 'work laptop', 'signing key').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<S>,
-    ///Full public key in standard text armored format.
+    /// Full public key in standard text armored format.
     pub public_key_armored: S,
-    ///Datetime when this key was retracted. Present only if the key has been retracted (ISO 8601).
+    /// Datetime when this key was retracted. Present only if the key has been retracted (ISO 8601).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retracted_at: Option<Datetime>,
     #[serde(
@@ -145,9 +145,7 @@ where
             UserPublicKeyKeyType::Pgp => UserPublicKeyKeyType::Pgp,
             UserPublicKeyKeyType::SshEd25519 => UserPublicKeyKeyType::SshEd25519,
             UserPublicKeyKeyType::SshEcdsa => UserPublicKeyKeyType::SshEcdsa,
-            UserPublicKeyKeyType::Other(v) => {
-                UserPublicKeyKeyType::Other(v.into_static())
-            }
+            UserPublicKeyKeyType::Other(v) => UserPublicKeyKeyType::Other(v.into_static()),
         }
     }
 }
@@ -278,9 +276,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -292,7 +289,7 @@ where
 
 pub mod user_public_key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -349,10 +346,7 @@ pub mod user_public_key_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UserPublicKeyBuilder<
-    St: user_public_key_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct UserPublicKeyBuilder<St: user_public_key_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -547,10 +541,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UserPublicKey<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UserPublicKey<S> {
         UserPublicKey {
             comment: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -566,10 +557,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_userPublicKey() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.userPublicKey"),

@@ -10,43 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteWebhook<S: BosStr = DefaultStr> {
-    ///Webhook ID to delete.
+    /// Webhook ID to delete.
     pub id: i64,
-    ///DID of the repository as minted by the knot.
+    /// DID of the repository as minted by the knot.
     pub repo_did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DeleteWebhookError {
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(Option<SmolStr>),
+    WebhookNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DeleteWebhookError {
@@ -95,9 +93,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<S> {
     const NSID: &'static str = "org.tangled.temp.repo.deleteWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteWebhookResponse;
 }
 
@@ -107,16 +104,15 @@ Path: `/xrpc/org.tangled.temp.repo.deleteWebhook`. The request payload type is `
 pub struct DeleteWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.repo.deleteWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeleteWebhook<S>;
     type Response = DeleteWebhookResponse;
 }
 
 pub mod delete_webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,10 +155,7 @@ pub mod delete_webhook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteWebhookBuilder<
-    St: delete_webhook_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct DeleteWebhookBuilder<St: delete_webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -257,10 +250,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DeleteWebhook<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteWebhook<S> {
         DeleteWebhook {
             id: self._fields.0.unwrap(),
             repo_did: self._fields.1.unwrap(),

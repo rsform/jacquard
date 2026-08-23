@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Binary image data. Supported formats: JPEG, PNG, WebP, GIF. Maximum size: 1MB (1,000,000 bytes).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -25,41 +25,38 @@ pub struct UploadBlob {
     pub body: Bytes,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UploadBlobOutput<S: BosStr = DefaultStr> {
-    ///Blob reference object that can be used in post embeds (app.bsky.embed.images).
+    /// Blob reference object that can be used in post embeds (app.bsky.embed.images).
     pub blob: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UploadBlobError {
     #[serde(rename = "InvalidContentType")]
-    InvalidContentType(Option<SmolStr>),
+    InvalidContentType(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(Option<SmolStr>),
+    BlobTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(Option<SmolStr>),
+    UploadFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "NoActiveSession")]
-    NoActiveSession(Option<SmolStr>),
+    NoActiveSession(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UploadBlobError {
@@ -117,22 +114,16 @@ impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     const NSID: &'static str = "app.chronosky.media.uploadBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "image/jpeg,image/png,image/webp,image/gif",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("image/jpeg,image/png,image/webp,image/gif");
     type Response = UploadBlobResponse;
-    fn encode_body(
-        &self,
-        buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.extend_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(
-        body: &'de [u8],
-    ) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -148,9 +139,8 @@ Path: `/xrpc/app.chronosky.media.uploadBlob`. The request payload type is `Uploa
 pub struct UploadBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.media.uploadBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "image/jpeg,image/png,image/webp,image/gif",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("image/jpeg,image/png,image/webp,image/gif");
     type Request<S: BosStr> = UploadBlob;
     type Response = UploadBlobResponse;
 }

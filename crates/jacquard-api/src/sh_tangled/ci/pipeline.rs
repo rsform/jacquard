@@ -10,44 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use crate::sh_tangled::ci::pipeline;
 use crate::sh_tangled::ci::trigger::Manual;
 use crate::sh_tangled::ci::trigger::PullRequest;
 use crate::sh_tangled::ci::trigger::Push;
-use crate::sh_tangled::ci::pipeline;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A CI pipeline. Record-like, but owned by the spindle rather than a PDS.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Pipeline<S: BosStr = DefaultStr> {
-    ///Commit Id this pipeline is running on
+    /// Commit Id this pipeline is running on
     pub commit: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Spindle-local pipeline id
+    /// Spindle-local pipeline id
     pub id: S,
-    ///Repository DID
+    /// Repository DID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo: Option<Did<S>>,
-    ///Repository DID that the commit was checked out from, if different from repo (e.g. a fork for a fork-based pull request)
+    /// Repository DID that the commit was checked out from, if different from repo (e.g. a fork for a fork-based pull request)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_repo: Option<Did<S>>,
-    ///Trigger event metadata
+    /// Trigger event metadata
     pub trigger: PipelineTrigger<S>,
-    ///Triggered workflows
+    /// Triggered workflows
     pub workflows: Vec<pipeline::Workflow<S>>,
     #[serde(
         flatten,
@@ -57,7 +60,6 @@ pub struct Pipeline<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -71,21 +73,23 @@ pub enum PipelineTrigger<S: BosStr = DefaultStr> {
     TriggerManual(Box<Manual<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Workflow<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Datetime>,
-    ///Spindle-local workflow id. Unique per pipeline, usually same as name.
+    /// Spindle-local workflow id. Unique per pipeline, usually same as name.
     pub id: S,
-    ///Name of the workflow
+    /// Name of the workflow
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
-    ///Workflow status
+    /// Workflow status
     pub status: WorkflowStatus<S>,
     #[serde(
         flatten,
@@ -276,15 +280,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod pipeline_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,10 +448,7 @@ where
     St::Id: pipeline_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> PipelineBuilder<pipeline_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<S>) -> PipelineBuilder<pipeline_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PipelineBuilder {
             _state: PhantomData,
@@ -559,10 +559,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_ci_pipeline() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.ci.pipeline"),
@@ -742,8 +742,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

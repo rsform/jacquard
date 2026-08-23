@@ -8,34 +8,38 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
+use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
-use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOekaki<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     pub rkey: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOekakiOutput<S: BosStr = DefaultStr> {
     pub children: Vec<HydratedOekaki<S>>,
     pub parent: GetOekakiOutputParent<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -77,7 +81,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
 
 pub mod get_oekaki_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

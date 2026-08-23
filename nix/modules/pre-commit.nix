@@ -7,7 +7,13 @@
     pre-commit.settings = {
       hooks = {
         nixpkgs-fmt.enable = true;
-        rustfmt.enable = true;
+        rustfmt = {
+          enable = true;
+          excludes = [
+            "^crates/jacquard-api/src/"
+            "^crates/jacquard-codegen-tests/src/generated/"
+          ];
+        };
       };
     };
   };

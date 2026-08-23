@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A redaction (erasure poetry) piece made in the Anisota Lab's Post Redaction Art studio, where the words of an existing post are blacked out one at a time and the words left standing become a found poem. The record keeps the surviving text, the indices of the words that were redacted (so the piece can be reopened over the same post), and an at-uri pointing back at the post the words were drawn from.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,25 +37,25 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Redaction<S: BosStr = DefaultStr> {
-    ///The handle or DID of the source post's author, kept for display and so the backlink reads even if the source can't be re-fetched
+    /// The handle or DID of the source post's author, kept for display and so the backlink reads even if the source can't be re-fetched
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<S>,
-    ///When the piece was saved
+    /// When the piece was saved
     pub created_at: Datetime,
-    ///Optional title for the piece
+    /// Optional title for the piece
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///A snapshot of the source post's full text, so the piece can still be read if the source post is later deleted or edited
+    /// A snapshot of the source post's full text, so the piece can still be read if the source post is later deleted or edited
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original: Option<S>,
-    ///Zero-based indices of the word tokens that were blacked out, so the arrangement can be reopened over the same post text
+    /// Zero-based indices of the word tokens that were blacked out, so the arrangement can be reopened over the same post text
     #[serde(skip_serializing_if = "Option::is_none")]
     pub redacted: Option<Vec<i64>>,
-    ///at-uri of the post whose words were redacted — the piece backlinks to it
+    /// at-uri of the post whose words were redacted — the piece backlinks to it
     pub source: AtUri<S>,
-    ///The found poem — the words left un-redacted, in reading order
+    /// The found poem — the words left un-redacted, in reading order
     pub text: S,
-    ///Total number of word tokens in the source post text, so the redacted indices stay meaningful
+    /// Total number of word tokens in the source post text, so the redacted indices stay meaningful
     #[serde(skip_serializing_if = "Option::is_none")]
     pub word_count: Option<i64>,
     #[serde(
@@ -221,9 +221,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -235,7 +234,7 @@ where
 
 pub mod redaction_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -487,10 +486,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Redaction<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Redaction<S> {
         Redaction {
             author: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -506,10 +502,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_redaction() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.redaction"),

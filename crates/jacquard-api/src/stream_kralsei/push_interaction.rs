@@ -10,19 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PushInteraction<S: BosStr = DefaultStr> {
-    ///The character the interaction with is
+    /// The character the interaction with is
     #[serde(skip_serializing_if = "Option::is_none")]
     pub character: Option<PushInteractionCharacter<S>>,
-    ///Type of interaction
+    /// Type of interaction
     #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction: Option<PushInteractionInteraction<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -77,8 +80,7 @@ impl<S: BosStr> Serialize for PushInteractionCharacter<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PushInteractionCharacter<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PushInteractionCharacter<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -104,9 +106,7 @@ where
         match self {
             PushInteractionCharacter::Kris => PushInteractionCharacter::Kris,
             PushInteractionCharacter::Ralsei => PushInteractionCharacter::Ralsei,
-            PushInteractionCharacter::Other(v) => {
-                PushInteractionCharacter::Other(v.into_static())
-            }
+            PushInteractionCharacter::Other(v) => PushInteractionCharacter::Other(v.into_static()),
         }
     }
 }
@@ -159,8 +159,7 @@ impl<S: BosStr> Serialize for PushInteractionInteraction<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PushInteractionInteraction<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PushInteractionInteraction<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -193,9 +192,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PushInteractionOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -215,9 +216,8 @@ impl jacquard_common::xrpc::XrpcResp for PushInteractionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PushInteraction<S> {
     const NSID: &'static str = "stream.kralsei.pushInteraction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PushInteractionResponse;
 }
 
@@ -227,9 +227,8 @@ Path: `/xrpc/stream.kralsei.pushInteraction`. The request payload type is `PushI
 pub struct PushInteractionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PushInteractionRequest {
     const PATH: &'static str = "/xrpc/stream.kralsei.pushInteraction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PushInteraction<S>;
     type Response = PushInteractionResponse;
 }

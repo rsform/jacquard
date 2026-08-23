@@ -10,17 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Ban<S: BosStr = DefaultStr> {
-    ///DID of the account to block
+    /// DID of the account to block
     pub subject: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,9 +54,8 @@ impl jacquard_common::xrpc::XrpcResp for BanResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Ban<S> {
     const NSID: &'static str = "sh.tangled.knot.ban";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = BanResponse;
 }
 
@@ -63,16 +65,15 @@ Path: `/xrpc/sh.tangled.knot.ban`. The request payload type is `Ban<S>`; send th
 pub struct BanRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BanRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.ban";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Ban<S>;
     type Response = BanResponse;
 }
 
 pub mod ban_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,10 +152,7 @@ where
     St::Subject: ban_state::IsUnset,
 {
     /// Set the `subject` field (required)
-    pub fn subject(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> BanBuilder<ban_state::SetSubject<St>, S> {
+    pub fn subject(mut self, value: impl Into<Did<S>>) -> BanBuilder<ban_state::SetSubject<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BanBuilder {
             _state: PhantomData,

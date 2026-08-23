@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CheckSignupQueueOutput<S: BosStr = DefaultStr> {
     pub activated: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,10 +52,7 @@ impl jacquard_common::xrpc::XrpcRequest for CheckSignupQueue {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CheckSignupQueueResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }

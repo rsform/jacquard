@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_asadaame5121::at_circle::RingRef;
+use serde::{Deserialize, Serialize};
 /// A request to join a webring
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,16 +39,16 @@ use crate::net_asadaame5121::at_circle::RingRef;
 )]
 pub struct Request<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///Introduction message
+    /// Introduction message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
     pub ring: RingRef<S>,
-    ///RSS feed URL of the site
+    /// RSS feed URL of the site
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rss_url: Option<UriValue<S>>,
-    ///Title of the site
+    /// Title of the site
     pub site_title: S,
-    ///URL of the site to register
+    /// URL of the site to register
     pub site_url: UriValue<S>,
     #[serde(
         flatten,
@@ -171,9 +171,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -185,7 +184,7 @@ where
 
 pub mod request_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -444,10 +443,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.request"),
@@ -459,13 +458,12 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A request to join a webring")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("ring"), SmolStr::new_static("siteUrl"),
-                                SmolStr::new_static("siteTitle"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("ring"),
+                            SmolStr::new_static("siteUrl"),
+                            SmolStr::new_static("siteTitle"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -479,9 +477,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Introduction message"),
-                                    ),
+                                    description: Some(CowStr::new_static("Introduction message")),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -499,9 +495,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("rssUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("RSS feed URL of the site"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "RSS feed URL of the site",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -518,9 +514,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("siteUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("URL of the site to register"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "URL of the site to register",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

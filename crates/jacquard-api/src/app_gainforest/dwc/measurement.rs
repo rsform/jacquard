@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A measurement, fact, characteristic, or assertion about an occurrence. Multiple measurement records can reference the same occurrence, solving the Simple DwC one-measurement-per-record limitation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,37 +37,37 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Measurement<S: BosStr = DefaultStr> {
-    ///Timestamp of record creation in the ATProto PDS.
+    /// Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
-    ///The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').
+    /// The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_accuracy: Option<S>,
-    ///Person(s) who determined the measurement. Pipe-delimited for multiple.
+    /// Person(s) who determined the measurement. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_determined_by: Option<S>,
-    ///The date the measurement was made. ISO 8601 format.
+    /// The date the measurement was made. ISO 8601 format.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_determined_date: Option<S>,
-    ///An identifier for the measurement. Should be unique within the dataset.
+    /// An identifier for the measurement. Should be unique within the dataset.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_id: Option<S>,
-    ///The description of or reference to the method used to determine the measurement (e.g., 'diameter tape at 1.3m height', 'laser rangefinder', 'Bitterlich method').
+    /// The description of or reference to the method used to determine the measurement (e.g., 'diameter tape at 1.3m height', 'laser rangefinder', 'Bitterlich method').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_method: Option<S>,
-    ///Comments or notes accompanying the measurement.
+    /// Comments or notes accompanying the measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_remarks: Option<S>,
-    ///The nature of the measurement, fact, characteristic, or assertion (e.g., 'DBH', 'tree height', 'canopy cover', 'tail length', 'body mass', 'soil pH', 'water temperature').
+    /// The nature of the measurement, fact, characteristic, or assertion (e.g., 'DBH', 'tree height', 'canopy cover', 'tail length', 'body mass', 'soil pH', 'water temperature').
     pub measurement_type: S,
-    ///The units for the measurementValue (e.g., 'cm', 'm', 'kg', 'mm', '%', 'degrees Celsius').
+    /// The units for the measurementValue (e.g., 'cm', 'm', 'kg', 'mm', '%', 'degrees Celsius').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_unit: Option<S>,
-    ///The value of the measurement, fact, characteristic, or assertion (e.g., '45.2', 'present', 'blue').
+    /// The value of the measurement, fact, characteristic, or assertion (e.g., '45.2', 'present', 'blue').
     pub measurement_value: S,
-    ///The occurrenceID of the linked occurrence record (for cross-system interoperability).
+    /// The occurrenceID of the linked occurrence record (for cross-system interoperability).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurrence_id: Option<S>,
-    ///AT-URI reference to the app.gainforest.dwc.occurrence record this measurement belongs to.
+    /// AT-URI reference to the app.gainforest.dwc.occurrence record this measurement belongs to.
     pub occurrence_ref: AtUri<S>,
     #[serde(
         flatten,
@@ -266,9 +266,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -280,7 +279,7 @@ where
 
 pub mod measurement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -392,18 +391,7 @@ impl MeasurementBuilder<measurement_state::Empty, DefaultStr> {
         MeasurementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -416,18 +404,7 @@ impl<S: BosStr> MeasurementBuilder<measurement_state::Empty, S> {
         MeasurementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -641,10 +618,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Measurement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Measurement<S> {
         Measurement {
             created_at: self._fields.0.unwrap(),
             measurement_accuracy: self._fields.1,
@@ -664,10 +638,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_dwc_measurement() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.dwc.measurement"),

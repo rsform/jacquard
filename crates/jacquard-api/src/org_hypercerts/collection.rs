@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,25 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::LargeImage;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::Uri;
-use crate::pub_leaflet::pages::linear_document::LinearDocument;
 use crate::org_hypercerts::collection;
+use crate::pub_leaflet::pages::linear_document::LinearDocument;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Item<S: BosStr = DefaultStr> {
-    ///Strong reference to an item in this collection. Items can be activities (org.hypercerts.claim.activity) and/or other collections (org.hypercerts.collection).
+    /// Strong reference to an item in this collection. Items can be activities (org.hypercerts.claim.activity) and/or other collections (org.hypercerts.collection).
     pub item_identifier: StrongRef<S>,
-    ///Optional weight for this item (positive numeric value stored as string). Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.
+    /// Optional weight for this item (positive numeric value stored as string). Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_weight: Option<S>,
     #[serde(
@@ -61,29 +64,29 @@ pub struct Item<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Collection<S: BosStr = DefaultStr> {
-    ///The collection's avatar/profile image as a URI or image blob.
+    /// The collection's avatar/profile image as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<CollectionAvatar<S>>,
-    ///Larger horizontal image to display behind the collection view.
+    /// Larger horizontal image to display behind the collection view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<CollectionBanner<S>>,
-    ///Client-declared timestamp when this record was originally created
+    /// Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
-    ///Rich-text description, represented as a Leaflet linear document.
+    /// Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<LinearDocument<S>>,
-    ///Array of items in this collection with optional weights.
+    /// Array of items in this collection with optional weights.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items: Option<Vec<collection::Item<S>>>,
-    ///A strong reference to the location where this collection's activities were performed. The record referenced must conform with the lexicon app.certified.location.
+    /// A strong reference to the location where this collection's activities were performed. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<StrongRef<S>>,
-    ///Short summary of this collection, suitable for previews and list views
+    /// Short summary of this collection, suitable for previews and list views
     #[serde(skip_serializing_if = "Option::is_none")]
     pub short_description: Option<S>,
-    ///Display name for this collection (e.g. 'Q1 2025 Impact Projects')
+    /// Display name for this collection (e.g. 'Q1 2025 Impact Projects')
     pub title: S,
-    ///The type of this collection. Possible fields can be 'favorites', 'project', or any other type of collection.
+    /// The type of this collection. Possible fields can be 'favorites', 'project', or any other type of collection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
     #[serde(
@@ -95,7 +98,6 @@ pub struct Collection<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -105,7 +107,6 @@ pub enum CollectionAvatar<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -274,15 +275,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -411,10 +411,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_collection() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.collection"),
@@ -602,9 +602,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -616,7 +615,7 @@ where
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -862,10 +861,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Collection<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Collection<S> {
         Collection {
             avatar: self._fields.0,
             banner: self._fields.1,

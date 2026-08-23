@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A colour palette for notebook theming
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,9 +38,9 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct ColourScheme<S: BosStr = DefaultStr> {
     pub colours: ColourSchemeColours<S>,
-    ///Human-readable name for the colour scheme
+    /// Human-readable name for the colour scheme
     pub name: S,
-    ///Whether this is a dark or light colour scheme
+    /// Whether this is a dark or light colour scheme
     pub variant: ColourSchemeVariant<S>,
     #[serde(
         flatten,
@@ -51,41 +51,43 @@ pub struct ColourScheme<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ColourSchemeColours<S: BosStr = DefaultStr> {
-    ///Primary background for page/frame
+    /// Primary background for page/frame
     pub base: S,
-    ///Border/divider colour
+    /// Border/divider colour
     pub border: S,
-    ///Emphasized text (bold, important)
+    /// Emphasized text (bold, important)
     pub emphasis: S,
-    ///Error state colour
+    /// Error state colour
     pub error: S,
-    ///Selection/highlight colour
+    /// Selection/highlight colour
     pub highlight: S,
-    ///Hyperlink colour
+    /// Hyperlink colour
     pub link: S,
-    ///De-emphasized text (disabled, metadata)
+    /// De-emphasized text (disabled, metadata)
     pub muted: S,
-    ///Tertiary background for popovers/dialogs
+    /// Tertiary background for popovers/dialogs
     pub overlay: S,
-    ///Primary brand/accent colour
+    /// Primary brand/accent colour
     pub primary: S,
-    ///Secondary accent colour
+    /// Secondary accent colour
     pub secondary: S,
-    ///Medium emphasis text (comments, labels)
+    /// Medium emphasis text (comments, labels)
     pub subtle: S,
-    ///Success state colour
+    /// Success state colour
     pub success: S,
-    ///Secondary background for panels/cards
+    /// Secondary background for panels/cards
     pub surface: S,
-    ///Tertiary accent colour
+    /// Tertiary accent colour
     pub tertiary: S,
-    ///Primary readable text colour
+    /// Primary readable text colour
     pub text: S,
-    ///Warning state colour
+    /// Warning state colour
     pub warning: S,
     #[serde(
         flatten,
@@ -241,9 +243,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -275,17 +276,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_sh_weaver_notebook_colourScheme() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.colourScheme"),
@@ -294,185 +294,182 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A colour palette for notebook theming"),
-                    ),
+                    description: Some(CowStr::new_static("A colour palette for notebook theming")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("variant"),
-                                SmolStr::new_static("colours")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("variant"),
+                            SmolStr::new_static("colours"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("colours"),
                                 LexObjectProperty::Object(LexObject {
-                                    required: Some(
-                                        vec![
-                                            SmolStr::new_static("base"), SmolStr::new_static("surface"),
-                                            SmolStr::new_static("overlay"), SmolStr::new_static("text"),
-                                            SmolStr::new_static("muted"), SmolStr::new_static("subtle"),
-                                            SmolStr::new_static("emphasis"),
-                                            SmolStr::new_static("primary"),
-                                            SmolStr::new_static("secondary"),
-                                            SmolStr::new_static("tertiary"),
-                                            SmolStr::new_static("error"),
-                                            SmolStr::new_static("warning"),
-                                            SmolStr::new_static("success"),
-                                            SmolStr::new_static("border"), SmolStr::new_static("link"),
-                                            SmolStr::new_static("highlight")
-                                        ],
-                                    ),
+                                    required: Some(vec![
+                                        SmolStr::new_static("base"),
+                                        SmolStr::new_static("surface"),
+                                        SmolStr::new_static("overlay"),
+                                        SmolStr::new_static("text"),
+                                        SmolStr::new_static("muted"),
+                                        SmolStr::new_static("subtle"),
+                                        SmolStr::new_static("emphasis"),
+                                        SmolStr::new_static("primary"),
+                                        SmolStr::new_static("secondary"),
+                                        SmolStr::new_static("tertiary"),
+                                        SmolStr::new_static("error"),
+                                        SmolStr::new_static("warning"),
+                                        SmolStr::new_static("success"),
+                                        SmolStr::new_static("border"),
+                                        SmolStr::new_static("link"),
+                                        SmolStr::new_static("highlight"),
+                                    ]),
                                     properties: {
                                         #[allow(unused_mut)]
                                         let mut map = BTreeMap::new();
                                         map.insert(
                                             SmolStr::new_static("base"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Primary background for page/frame"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Primary background for page/frame",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("border"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Border/divider colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Border/divider colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("emphasis"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Emphasized text (bold, important)"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Emphasized text (bold, important)",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("error"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(CowStr::new_static("Error state colour")),
+                                                description: Some(CowStr::new_static(
+                                                    "Error state colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("highlight"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Selection/highlight colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Selection/highlight colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("link"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(CowStr::new_static("Hyperlink colour")),
+                                                description: Some(CowStr::new_static(
+                                                    "Hyperlink colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("muted"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static(
-                                                        "De-emphasized text (disabled, metadata)",
-                                                    ),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "De-emphasized text (disabled, metadata)",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("overlay"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static(
-                                                        "Tertiary background for popovers/dialogs",
-                                                    ),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Tertiary background for popovers/dialogs",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("primary"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Primary brand/accent colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Primary brand/accent colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("secondary"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Secondary accent colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Secondary accent colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("subtle"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static(
-                                                        "Medium emphasis text (comments, labels)",
-                                                    ),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Medium emphasis text (comments, labels)",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("success"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Success state colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Success state colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("surface"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Secondary background for panels/cards"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Secondary background for panels/cards",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("tertiary"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Tertiary accent colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Tertiary accent colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("text"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Primary readable text colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Primary readable text colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
                                         map.insert(
                                             SmolStr::new_static("warning"),
                                             LexObjectProperty::String(LexString {
-                                                description: Some(
-                                                    CowStr::new_static("Warning state colour"),
-                                                ),
+                                                description: Some(CowStr::new_static(
+                                                    "Warning state colour",
+                                                )),
                                                 ..Default::default()
                                             }),
                                         );
@@ -484,22 +481,18 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Human-readable name for the colour scheme",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Human-readable name for the colour scheme",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("variant"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Whether this is a dark or light colour scheme",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Whether this is a dark or light colour scheme",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
@@ -518,7 +511,7 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> LexiconDoc<'static> {
 
 pub mod colour_scheme_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -577,7 +570,11 @@ pub mod colour_scheme_state {
 /// Builder for constructing an instance of this type.
 pub struct ColourSchemeBuilder<St: colour_scheme_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<ColourSchemeColours<S>>, Option<S>, Option<ColourSchemeVariant<S>>),
+    _fields: (
+        Option<ColourSchemeColours<S>>,
+        Option<S>,
+        Option<ColourSchemeVariant<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -691,10 +688,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ColourScheme<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ColourScheme<S> {
         ColourScheme {
             colours: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

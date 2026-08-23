@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A warrant where one ATProto identity vouches for the trustworthiness of another identity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Warrant<S: BosStr = DefaultStr> {
-    ///When the warrant was created
+    /// When the warrant was created
     pub created_at: Datetime,
-    ///Optional description explaining the basis for this warrant
+    /// Optional description explaining the basis for this warrant
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Optional expiration date for this warrant
+    /// Optional expiration date for this warrant
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    ///DID of the identity being warranted for
+    /// DID of the identity being warranted for
     pub subject: S,
-    ///Level of trust being warranted
+    /// Level of trust being warranted
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trust_level: Option<WarrantTrustLevel<S>>,
-    ///Type of warrant being provided
+    /// Type of warrant being provided
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warrant_type: Option<WarrantWarrantType<S>>,
     #[serde(
@@ -316,9 +316,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -330,7 +329,7 @@ where
 
 pub mod warrant_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -488,10 +487,7 @@ where
 
 impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `trustLevel` field (optional)
-    pub fn trust_level(
-        mut self,
-        value: impl Into<Option<WarrantTrustLevel<S>>>,
-    ) -> Self {
+    pub fn trust_level(mut self, value: impl Into<Option<WarrantTrustLevel<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -504,10 +500,7 @@ impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
 
 impl<St: warrant_state::State, S: BosStr> WarrantBuilder<St, S> {
     /// Set the `warrantType` field (optional)
-    pub fn warrant_type(
-        mut self,
-        value: impl Into<Option<WarrantWarrantType<S>>>,
-    ) -> Self {
+    pub fn warrant_type(mut self, value: impl Into<Option<WarrantWarrantType<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -551,10 +544,10 @@ where
 }
 
 fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("beauty.cybernetic.trustcow.warrant"),

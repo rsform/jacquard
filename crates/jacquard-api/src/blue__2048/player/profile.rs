@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue__2048::SyncStatus;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue__2048::SyncStatus;
+use serde::{Deserialize, Serialize};
 /// A declaration of a at://2048 player's profile
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,10 +39,10 @@ use crate::blue__2048::SyncStatus;
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///Does not want to show up anywhere. Keep stats to your PDS.  Defaults to `false`.
+    /// Does not want to show up anywhere. Keep stats to your PDS.  Defaults to `false`.
     #[serde(default = "_default_profile_solo_play")]
     pub solo_play: bool,
-    ///The sync status of this record with the users AT Protocol repo.
+    /// The sync status of this record with the users AT Protocol repo.
     pub sync_status: SyncStatus<S>,
     #[serde(
         flatten,
@@ -119,9 +119,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -137,7 +136,7 @@ fn _default_profile_solo_play() -> bool {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -321,10 +320,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_player_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.player.profile"),
@@ -333,20 +332,16 @@ fn lexicon_doc_blue_2048_player_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A declaration of a at://2048 player's profile",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A declaration of a at://2048 player's profile",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("soloPlay"),
-                                SmolStr::new_static("syncStatus"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("soloPlay"),
+                            SmolStr::new_static("syncStatus"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

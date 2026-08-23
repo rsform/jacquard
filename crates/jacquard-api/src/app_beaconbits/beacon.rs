@@ -8,19 +8,18 @@
 //! Generated bindings for the `app.beaconbits.beacon` Lexicon namespace/module.
 pub mod like;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -28,12 +27,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A location-based check-in record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,52 +43,52 @@ use crate::community_lexicon::location::geo::Geo;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Beacon<S: BosStr = DefaultStr> {
-    ///Structured address using community lexicon
+    /// Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address_details: Option<Address<S>>,
-    ///Chain emoji (root beacon only)
+    /// Chain emoji (root beacon only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chain_emoji: Option<S>,
-    ///Custom chain name (root beacon only)
+    /// Custom chain name (root beacon only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chain_name: Option<S>,
-    ///Timestamp when the beacon was created
+    /// Timestamp when the beacon was created
     pub created_at: Datetime,
-    ///Structured location using community lexicon
+    /// Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<Geo<S>>,
-    ///DIDs of users mentioned in the beacon
+    /// DIDs of users mentioned in the beacon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mentions: Option<Vec<Did<S>>>,
-    ///Reference to parent beacon for chaining
+    /// Reference to parent beacon for chaining
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_beacon: Option<StrongRef<S>>,
-    ///Reference to associated Bluesky post
+    /// Reference to associated Bluesky post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post: Option<StrongRef<S>>,
-    ///Star rating (1-5)
+    /// Star rating (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
-    ///ISO timestamp when beacon becomes visible (delayed reveal)
+    /// ISO timestamp when beacon becomes visible (delayed reveal)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reveal_at: Option<Datetime>,
-    ///User comment or caption
+    /// User comment or caption
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shout: Option<S>,
-    ///Reference to root post for threading
+    /// Reference to root post for threading
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_root: Option<StrongRef<S>>,
-    ///Human-readable address
+    /// Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_address: Option<S>,
-    ///Category classification (bar, cafe, restaurant, etc.)
+    /// Category classification (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_category: Option<S>,
-    ///Display name of the venue
+    /// Display name of the venue
     pub venue_name: S,
-    ///OSM URI identifier (osm://node/123 or osm://way/456)
+    /// OSM URI identifier (osm://node/123 or osm://way/456)
     pub venue_uri: S,
-    ///Visibility setting for the beacon
+    /// Visibility setting for the beacon
     pub visibility: BeaconVisibility<S>,
     #[serde(
         flatten,
@@ -370,9 +369,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -384,7 +382,7 @@ where
 
 pub mod beacon_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -501,23 +499,8 @@ impl BeaconBuilder<beacon_state::Empty, DefaultStr> {
         BeaconBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -530,23 +513,8 @@ impl<S: BosStr> BeaconBuilder<beacon_state::Empty, S> {
         BeaconBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -855,10 +823,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_beacon() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.beacon"),

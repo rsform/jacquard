@@ -620,9 +620,9 @@ where
                                 "server ignored Range resume request".to_smolstr(),
                             )));
                         }
-                        let (parts, body) = response.into_parts();
-                        validate_content_range(&parts.headers, offset, body.len())?;
-                        buffer.extend_from_slice(&body);
+                        let body = response.buffer();
+                        validate_content_range(response.headers(), offset, body.len())?;
+                        buffer.extend_from_slice(body);
                         return Ok(buffer.into());
                     }
                     Err(JetstreamError::ByteLimitExceeded { retry_after }) => {
@@ -1032,18 +1032,26 @@ mod tests {
     // ---- scripted WebSocket client -------------------------------------
 
     mod scripted_ws {
+        #[cfg(feature = "zstd")]
         use jacquard_common::deps::fluent_uri::Uri;
+        #[cfg(feature = "zstd")]
         use jacquard_common::stream::StreamError;
+        #[cfg(feature = "zstd")]
         use jacquard_common::websocket::{
             WebSocketClient, WebSocketConnectOptions, WebSocketConnection, WebSocketError,
             WsMessage, WsSink, WsStream,
         };
+        #[cfg(feature = "zstd")]
         use std::collections::VecDeque;
+        #[cfg(feature = "zstd")]
         use std::pin::Pin;
+        #[cfg(feature = "zstd")]
         use std::sync::{Arc, Mutex};
+        #[cfg(feature = "zstd")]
         use std::task::{Context, Poll};
 
         /// One connection's scripted outcome.
+        #[cfg(feature = "zstd")]
         pub enum Script {
             /// Deliver these frames, then end the stream cleanly.
             Frames(Vec<String>),
@@ -1053,20 +1061,24 @@ mod tests {
 
         /// A WebSocket client popping one [`Script`] per connection and
         /// recording the URIs it was asked to connect to.
+        #[cfg(feature = "zstd")]
         #[derive(Clone, Default)]
         pub struct ScriptedWs {
             scripts: Arc<Mutex<VecDeque<Script>>>,
             pub uris: Arc<Mutex<Vec<String>>>,
         }
 
+        #[cfg(feature = "zstd")]
         impl ScriptedWs {
             pub fn push(&self, script: Script) {
                 self.scripts.lock().expect("scripts").push_back(script);
             }
         }
 
+        #[cfg(feature = "zstd")]
         struct NoopSink;
 
+        #[cfg(feature = "zstd")]
         impl n0_future::Sink<WsMessage> for NoopSink {
             type Error = StreamError;
 
@@ -1096,6 +1108,7 @@ mod tests {
             }
         }
 
+        #[cfg(feature = "zstd")]
         impl WebSocketClient for ScriptedWs {
             type Error = WebSocketError;
 
@@ -1152,11 +1165,15 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "zstd")]
     use jacquard_common::websocket::WebSocketConnection;
-    use scripted_ws::{Script, ScriptedWs, identity_frame};
+    use scripted_ws::identity_frame;
+    #[cfg(feature = "zstd")]
+    use scripted_ws::{Script, ScriptedWs};
 
     const SEGMENT_CHECKSUM: &str = "0b5b436ea46204a1";
 
+    #[cfg(feature = "zstd")]
     fn plan_page(tip: i64, through: i64, names: &[&str]) -> String {
         let segments: Vec<String> = names
             .iter()
@@ -1174,6 +1191,7 @@ mod tests {
 
     /// Mock one planSnapshot page: requests whose `afterSeq` matches
     /// (`None` matches the field being absent) get `page_body` back.
+    #[cfg(feature = "zstd")]
     async fn mock_plan(server: &wiremock::MockServer, after_seq: Option<i64>, page_body: &str) {
         use wiremock::matchers::body_partial_json;
         let matcher = match after_seq {
@@ -1191,6 +1209,7 @@ mod tests {
             .await;
     }
 
+    #[cfg(feature = "zstd")]
     async fn mock_segment(server: &wiremock::MockServer, name: &str) {
         use wiremock::matchers::query_param;
         use wiremock::{Mock, ResponseTemplate};

@@ -8,31 +8,33 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri};
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::sh_tangled::ci::trigger::Manual;
 use crate::sh_tangled::ci::trigger::PullRequest;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TriggerPipeline<S: BosStr = DefaultStr> {
-    ///Target repository DID. Auth is checked against this repo.
+    /// Target repository DID. Auth is checked against this repo.
     pub repo: Did<S>,
-    ///Trigger metadata for this dispatch.
+    /// Trigger metadata for this dispatch.
     pub trigger: TriggerPipelineTrigger<S>,
-    ///Workflow names to run. When not provided, every dispatchable workflow is run.
+    /// Workflow names to run. When not provided, every dispatchable workflow is run.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflows: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,36 +46,33 @@ pub enum TriggerPipelineTrigger<S: BosStr = DefaultStr> {
     TriggerPullRequest(Box<PullRequest<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TriggerPipelineOutput<S: BosStr = DefaultStr> {
-    ///AT-URI of the created pipeline
+    /// AT-URI of the created pipeline
     pub pipeline: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum TriggerPipelineError {
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<SmolStr>),
+    InvalidRequest(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for TriggerPipelineError {
@@ -110,9 +109,8 @@ impl jacquard_common::xrpc::XrpcResp for TriggerPipelineResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for TriggerPipeline<S> {
     const NSID: &'static str = "sh.tangled.ci.triggerPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = TriggerPipelineResponse;
 }
 
@@ -122,16 +120,15 @@ Path: `/xrpc/sh.tangled.ci.triggerPipeline`. The request payload type is `Trigge
 pub struct TriggerPipelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TriggerPipelineRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.ci.triggerPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = TriggerPipeline<S>;
     type Response = TriggerPipelineResponse;
 }
 
 pub mod trigger_pipeline_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,12 +171,13 @@ pub mod trigger_pipeline_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TriggerPipelineBuilder<
-    St: trigger_pipeline_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct TriggerPipelineBuilder<St: trigger_pipeline_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<TriggerPipelineTrigger<S>>, Option<Vec<S>>),
+    _fields: (
+        Option<Did<S>>,
+        Option<TriggerPipelineTrigger<S>>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -286,10 +284,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TriggerPipeline<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TriggerPipeline<S> {
         TriggerPipeline {
             repo: self._fields.0.unwrap(),
             trigger: self._fields.1.unwrap(),

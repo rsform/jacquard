@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,15 +25,18 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::space_litenote::note;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::space_litenote::note;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Image<S: BosStr = DefaultStr> {
-    ///Alt text for the image.
+    /// Alt text for the image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     pub image: BlobRef<S>,
@@ -56,22 +59,22 @@ pub struct Image<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Note<S: BosStr = DefaultStr> {
-    ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
+    /// Markdown content. Local image paths are replaced with blob CIDs at publish time.
     pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Font family name available from Coollabs.
+    /// Font family name available from Coollabs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub font_family: Option<S>,
-    ///Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility.
+    /// Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub font_size: Option<i64>,
-    ///Blob references for images embedded in the markdown content.
+    /// Blob references for images embedded in the markdown content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<note::Image<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
-    ///Display theme for the note.
+    /// Display theme for the note.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub theme: Option<NoteTheme<S>>,
     pub title: S,
@@ -219,19 +222,16 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -336,15 +336,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -473,10 +472,10 @@ where
 }
 
 fn lexicon_doc_space_litenote_note() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("space.litenote.note"),
@@ -492,16 +491,16 @@ fn lexicon_doc_space_litenote_note() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alt text for the image."),
-                                ),
+                                description: Some(CowStr::new_static("Alt text for the image.")),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -622,9 +621,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -636,7 +634,7 @@ where
 
 pub mod note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -736,10 +734,7 @@ where
     St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<note_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -833,10 +828,7 @@ where
     St::Title: note_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<note_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,

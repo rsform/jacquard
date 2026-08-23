@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A book in the user's library
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,14 +37,14 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Book<S: BosStr = DefaultStr> {
-    ///Author name(s). For multiple authors, use tab-separation for cross-lexicon compatibility with buzz.bookhive.book
+    /// Author name(s). For multiple authors, use tab-separation for cross-lexicon compatibility with buzz.bookhive.book
     pub authors: S,
-    ///When this record was created
+    /// When this record was created
     pub created_at: Datetime,
-    ///AT-URIs of reading lists this book is applied to
+    /// AT-URIs of reading lists this book is applied to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lists: Option<Vec<AtUri<S>>>,
-    ///The book's title
+    /// The book's title
     pub title: S,
     #[serde(
         flatten,
@@ -156,9 +156,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -170,7 +169,7 @@ where
 
 pub mod book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -229,7 +228,12 @@ pub mod book_state {
 /// Builder for constructing an instance of this type.
 pub struct BookBuilder<St: book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Datetime>, Option<Vec<AtUri<S>>>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<Datetime>,
+        Option<Vec<AtUri<S>>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -275,10 +279,7 @@ where
     St::Authors: book_state::IsUnset,
 {
     /// Set the `authors` field (required)
-    pub fn authors(
-        mut self,
-        value: impl Into<S>,
-    ) -> BookBuilder<book_state::SetAuthors<St>, S> {
+    pub fn authors(mut self, value: impl Into<S>) -> BookBuilder<book_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -326,10 +327,7 @@ where
     St::Title: book_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> BookBuilder<book_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> BookBuilder<book_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -369,10 +367,10 @@ where
 }
 
 fn lexicon_doc_bond_biblio_book() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("bond.biblio.book"),

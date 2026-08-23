@@ -2008,9 +2008,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "r-efi 5.3.0",
  "wasip2",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2745,7 +2747,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jacquard"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "bytes",
  "clap",
@@ -2783,7 +2785,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "jacquard-common",
  "jacquard-derive",
@@ -2795,7 +2797,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-axum"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "axum",
  "axum-extra",
@@ -2847,7 +2849,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "base64 0.23.1",
  "bon",
@@ -2861,6 +2863,7 @@ dependencies = [
  "futures",
  "futures-lite",
  "getrandom 0.2.17",
+ "getrandom 0.3.4",
  "getrandom 0.4.3",
  "hashbrown 0.17.1",
  "http",
@@ -2892,7 +2895,7 @@ dependencies = [
  "spin 0.12.3",
  "thiserror 2.0.20",
  "tokio",
- "tokio-tungstenite-wasm",
+ "tokio-tungstenite-wasm-jacquard",
  "tokio-util",
  "tracing",
  "trait-variant",
@@ -2903,7 +2906,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "heck",
  "inventory",
@@ -2953,7 +2956,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "bon",
  "bytes",
@@ -2977,7 +2980,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexgen"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "clap",
  "clap_complete",
@@ -3003,7 +3006,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "bytes",
  "cid",
@@ -3031,7 +3034,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -3068,7 +3071,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-repo"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "anyhow",
  "blake3",
@@ -3269,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "lazy-collections"
-version = "0.12.1"
+version = "0.13.0"
 dependencies = [
  "buffer",
  "bytes",
@@ -5809,7 +5812,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokio-tungstenite-wasm"
+name = "tokio-tungstenite-wasm-jacquard"
 version = "0.6.99"
 dependencies = [
  "assert-impl",

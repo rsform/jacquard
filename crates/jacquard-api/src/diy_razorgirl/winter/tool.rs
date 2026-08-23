@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tool<S: BosStr = DefaultStr> {
-    ///TS/JS source, must export default async function
+    /// TS/JS source, must export default async function
     pub code: S,
     pub created_at: Datetime,
     pub description: S,
-    ///JSON Schema for tool input
+    /// JSON Schema for tool input
     pub input_schema: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_updated: Option<Datetime>,
@@ -49,7 +49,7 @@ pub struct Tool<S: BosStr = DefaultStr> {
     pub required_commands: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required_secrets: Option<Vec<S>>,
-    ///Tools this tool chains to (AT URIs or built-in names)
+    /// Tools this tool chains to (AT URIs or built-in names)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required_tools: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -166,9 +166,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -180,7 +179,7 @@ where
 
 pub mod tool_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -310,18 +309,7 @@ impl ToolBuilder<tool_state::Empty, DefaultStr> {
         ToolBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -334,18 +322,7 @@ impl<S: BosStr> ToolBuilder<tool_state::Empty, S> {
         ToolBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -358,10 +335,7 @@ where
     St::Code: tool_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(
-        mut self,
-        value: impl Into<S>,
-    ) -> ToolBuilder<tool_state::SetCode<St>, S> {
+    pub fn code(mut self, value: impl Into<S>) -> ToolBuilder<tool_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -447,10 +421,7 @@ where
     St::Name: tool_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ToolBuilder<tool_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ToolBuilder<tool_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ToolBuilder {
             _state: PhantomData,
@@ -586,10 +557,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.tool"),
@@ -600,26 +571,22 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("description"),
-                                SmolStr::new_static("code"),
-                                SmolStr::new_static("inputSchema"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("description"),
+                            SmolStr::new_static("code"),
+                            SmolStr::new_static("inputSchema"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("code"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "TS/JS source, must export default async function",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "TS/JS source, must export default async function",
+                                    )),
                                     max_length: Some(100000usize),
                                     ..Default::default()
                                 }),
@@ -679,11 +646,9 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("requiredTools"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Tools this tool chains to (AT URIs or built-in names)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Tools this tool chains to (AT URIs or built-in names)",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         ..Default::default()
                                     }),

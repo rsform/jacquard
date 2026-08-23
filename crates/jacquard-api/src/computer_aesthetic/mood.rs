@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A mood entry from Aesthetic Computer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Mood<S: BosStr = DefaultStr> {
-    ///The mood text content
+    /// The mood text content
     pub mood: S,
-    ///Reference to source database record for bidirectional sync
+    /// Reference to source database record for bidirectional sync
     pub r#ref: S,
-    ///When the mood was created (ISO 8601)
+    /// When the mood was created (ISO 8601)
     pub when: Datetime,
     #[serde(
         flatten,
@@ -129,9 +129,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -143,7 +142,7 @@ where
 
 pub mod mood_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,10 +247,7 @@ where
     St::Mood: mood_state::IsUnset,
 {
     /// Set the `mood` field (required)
-    pub fn mood(
-        mut self,
-        value: impl Into<S>,
-    ) -> MoodBuilder<mood_state::SetMood<St>, S> {
+    pub fn mood(mut self, value: impl Into<S>) -> MoodBuilder<mood_state::SetMood<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
@@ -267,10 +263,7 @@ where
     St::Ref: mood_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> MoodBuilder<mood_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> MoodBuilder<mood_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
@@ -286,10 +279,7 @@ where
     St::When: mood_state::IsUnset,
 {
     /// Set the `when` field (required)
-    pub fn when(
-        mut self,
-        value: impl Into<Datetime>,
-    ) -> MoodBuilder<mood_state::SetWhen<St>, S> {
+    pub fn when(mut self, value: impl Into<Datetime>) -> MoodBuilder<mood_state::SetWhen<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
@@ -327,10 +317,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_mood() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.mood"),

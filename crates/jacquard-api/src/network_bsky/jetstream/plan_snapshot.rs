@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,20 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_bsky::jetstream::plan_snapshot;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_bsky::jetstream::plan_snapshot;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockRange<S: BosStr = DefaultStr> {
-    ///Index of the first block in the range.
+    /// Index of the first block in the range.
     pub first: i64,
-    ///Index of the last block in the range.
+    /// Index of the last block in the range.
     pub last: i64,
     #[serde(
         flatten,
@@ -42,29 +45,30 @@ pub struct BlockRange<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlanSnapshot<S: BosStr = DefaultStr> {
-    ///Start after this sequence number. Events at or below it are not included.
+    /// Start after this sequence number. Events at or below it are not included.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub after_seq: Option<i64>,
-    ///Stop at this sequence number. Events above it are not included.
+    /// Stop at this sequence number. Events above it are not included.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub before_seq: Option<i64>,
-    ///Collection NSIDs or namespace wildcards such as app.bsky.feed.*; constrains commit events only. Non-commit kinds are unaffected, so combine with kinds=commit for a commits-only collection plan. Rejected when kinds is set and excludes commit. Omit or pass an empty array to include all collections.
+    /// Collection NSIDs or namespace wildcards such as app.bsky.feed.*; constrains commit events only. Non-commit kinds are unaffected, so combine with kinds=commit for a commits-only collection plan. Rejected when kinds is set and excludes commit. Omit or pass an empty array to include all collections.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<S>>,
-    ///Only include data for these DIDs. Omit this field or pass an empty array to include all DIDs.
+    /// Only include data for these DIDs. Omit this field or pass an empty array to include all DIDs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dids: Option<Vec<Did<S>>>,
-    ///Event kinds to include. Omit this field or pass an empty array to include all kinds.
+    /// Event kinds to include. Omit this field or pass an empty array to include all kinds.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub kinds: Option<Vec<PlanSnapshotKinds<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlanSnapshotKinds<S: BosStr = DefaultStr> {
@@ -151,13 +155,15 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlanSnapshotOutput<S: BosStr = DefaultStr> {
-    ///The last sealed sequence covered by this page. Use this value as afterSeq for the next page. If the response hits the server's page limit, this is the maxSeq of the last item returned; otherwise it equals sealedTipSeq. Planning is complete when plannedThroughSeq reaches sealedTipSeq.
+    /// The last sealed sequence covered by this page. Use this value as afterSeq for the next page. If the response hits the server's page limit, this is the maxSeq of the last item returned; otherwise it equals sealedTipSeq. Planning is complete when plannedThroughSeq reaches sealedTipSeq.
     pub planned_through_seq: i64,
-    ///The end of the sealed archive for this snapshot, capped by beforeSeq when provided. Use this value as beforeSeq on later pages so the snapshot does not move while it is being downloaded.
+    /// The end of the sealed archive for this snapshot, capped by beforeSeq when provided. Use this value as beforeSeq on later pages so the snapshot does not move while it is being downloaded.
     pub sealed_tip_seq: i64,
     pub segments: Vec<plan_snapshot::Segment<S>>,
     pub stats: plan_snapshot::Stats<S>,
@@ -165,22 +171,24 @@ pub struct PlanSnapshotOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Segment<S: BosStr = DefaultStr> {
-    ///Block ranges to download, including both endpoints. This field is present only when mode is blocks.
+    /// Block ranges to download, including both endpoints. This field is present only when mode is blocks.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocks: Option<Vec<plan_snapshot::BlockRange<S>>>,
-    ///The segment's xxh3 metadata checksum, encoded as 16 hexadecimal characters.
+    /// The segment's xxh3 metadata checksum, encoded as 16 hexadecimal characters.
     pub checksum: S,
-    ///Zero-based segment index.
+    /// Zero-based segment index.
     pub index: i64,
     pub max_seq: i64,
     pub min_seq: i64,
-    ///How to download this segment. For segment, download the whole file with getSegment. For blocks, download the ranges listed in blocks with getBlock.
+    /// How to download this segment. For segment, download the whole file with getSegment. For blocks, download the ranges listed in blocks with getBlock.
     pub mode: SegmentMode<S>,
-    ///Segment filename to pass to getSegment or getBlock.
+    /// Segment filename to pass to getSegment or getBlock.
     pub name: S,
     #[serde(
         flatten,
@@ -270,12 +278,14 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Stats<S: BosStr = DefaultStr> {
     pub blocks_matched: i64,
-    ///Number of items counted toward the server's per-page plan limit.
+    /// Number of items counted toward the server's per-page plan limit.
     pub entries: i64,
     pub segments_examined: i64,
     pub segments_matched: i64,
@@ -336,9 +346,8 @@ impl jacquard_common::xrpc::XrpcResp for PlanSnapshotResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PlanSnapshot<S> {
     const NSID: &'static str = "network.bsky.jetstream.planSnapshot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PlanSnapshotResponse;
 }
 
@@ -348,9 +357,8 @@ Path: `/xrpc/network.bsky.jetstream.planSnapshot`. The request payload type is `
 pub struct PlanSnapshotRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlanSnapshotRequest {
     const PATH: &'static str = "/xrpc/network.bsky.jetstream.planSnapshot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PlanSnapshot<S>;
     type Response = PlanSnapshotResponse;
 }
@@ -484,15 +492,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod block_range_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -630,10 +637,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockRange<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockRange<S> {
         BlockRange {
             first: self._fields.0.unwrap(),
             last: self._fields.1.unwrap(),
@@ -643,10 +647,10 @@ where
 }
 
 fn lexicon_doc_network_bsky_jetstream_planSnapshot() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.bsky.jetstream.planSnapshot"),
@@ -655,9 +659,10 @@ fn lexicon_doc_network_bsky_jetstream_planSnapshot() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockRange"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("first"), SmolStr::new_static("last")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("first"),
+                        SmolStr::new_static("last"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -853,14 +858,12 @@ fn lexicon_doc_network_bsky_jetstream_planSnapshot() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("stats"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("segmentsExamined"),
-                            SmolStr::new_static("segmentsMatched"),
-                            SmolStr::new_static("blocksMatched"),
-                            SmolStr::new_static("entries")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("segmentsExamined"),
+                        SmolStr::new_static("segmentsMatched"),
+                        SmolStr::new_static("blocksMatched"),
+                        SmolStr::new_static("entries"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -910,15 +913,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod segment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1081,18 +1083,12 @@ impl<S: BosStr> SegmentBuilder<segment_state::Empty, S> {
 
 impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `blocks` field (optional)
-    pub fn blocks(
-        mut self,
-        value: impl Into<Option<Vec<plan_snapshot::BlockRange<S>>>>,
-    ) -> Self {
+    pub fn blocks(mut self, value: impl Into<Option<Vec<plan_snapshot::BlockRange<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `blocks` field to an Option value (optional)
-    pub fn maybe_blocks(
-        mut self,
-        value: Option<Vec<plan_snapshot::BlockRange<S>>>,
-    ) -> Self {
+    pub fn maybe_blocks(mut self, value: Option<Vec<plan_snapshot::BlockRange<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1199,10 +1195,7 @@ where
     St::Name: segment_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> SegmentBuilder<segment_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> SegmentBuilder<segment_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -1257,15 +1250,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

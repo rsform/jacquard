@@ -12,21 +12,18 @@ pub mod get;
 pub mod search;
 pub mod update;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{
-    Did, Handle, AtUri, Cid, Datetime, Language, UriValue,
-};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle, Language, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -34,27 +31,30 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::social_coves::embed::external::ExternalRecord;
-use crate::social_coves::embed::images::Images;
-use crate::social_coves::embed::video::Video;
 use crate::social_coves::community;
 use crate::social_coves::embed;
 use crate::social_coves::embed::external;
+use crate::social_coves::embed::external::ExternalRecord;
+use crate::social_coves::embed::images::Images;
+use crate::social_coves::embed::video::Video;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Aggregate vote counts asserted by the bridge for content federated from an origin platform (e.g. Lemmy). These supplement, and are kept separate from, native atproto votes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BridgedStats<S: BosStr = DefaultStr> {
-    ///Timestamp the origin-platform counts were sampled; used to discard stale updates
+    /// Timestamp the origin-platform counts were sampled; used to discard stale updates
     pub as_of: Datetime,
-    ///Number of downvotes on the origin platform as of asOf
+    /// Number of downvotes on the origin platform as of asOf
     pub downvotes: i64,
-    ///Number of upvotes on the origin platform as of asOf
+    /// Number of upvotes on the origin platform as of asOf
     pub upvotes: i64,
     #[serde(
         flatten,
@@ -75,40 +75,40 @@ pub struct BridgedStats<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
-    ///DID of the user who created this post
+    /// DID of the user who created this post
     pub author: Did<S>,
-    ///Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored posts.
+    /// Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored posts.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bridged_stats: Option<community::post::BridgedStats<S>>,
-    ///DID of the community this was posted to
+    /// DID of the community this was posted to
     pub community: Did<S>,
-    ///Post content - supports rich text via facets
+    /// Post content - supports rich text via facets
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
-    ///Timestamp of post creation
+    /// Timestamp of post creation
     pub created_at: Datetime,
-    ///Full chain of crossposts with version pinning. First element is original, last is immediate parent.
+    /// Full chain of crossposts with version pinning. First element is original, last is immediate parent.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crosspost_chain: Option<Vec<StrongRef<S>>>,
-    ///If this is a crosspost, strong reference to the immediate parent post
+    /// If this is a crosspost, strong reference to the immediate parent post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub crosspost_of: Option<StrongRef<S>>,
-    ///Embedded media, external links, or quoted posts
+    /// Embedded media, external links, or quoted posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<PostEmbed<S>>,
-    ///Annotations for rich text (mentions, links, formatting, block structure)
+    /// Annotations for rich text (mentions, links, formatting, block structure)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
-    ///Self-applied content labels (NSFW, spoilers, etc.)
+    /// Self-applied content labels (NSFW, spoilers, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Languages used in the post content (ISO 639-1)
+    /// Languages used in the post content (ISO 639-1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
-    ///User-applied topic tags
+    /// User-applied topic tags
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Post title (optional for media-only posts)
+    /// Post title (optional for media-only posts)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
     #[serde(
@@ -119,7 +119,6 @@ pub struct Post<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -146,9 +145,11 @@ pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Post<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AuthorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -156,7 +157,7 @@ pub struct AuthorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
     pub handle: Handle<S>,
-    ///Author's reputation in the community
+    /// Author's reputation in the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reputation: Option<i64>,
     #[serde(
@@ -171,7 +172,10 @@ pub struct AuthorView<S: BosStr = DefaultStr> {
 /// Minimal author info for blocked posts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockedAuthor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(
@@ -186,7 +190,10 @@ pub struct BlockedAuthor<S: BosStr = DefaultStr> {
 /// Minimal community info for blocked posts
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockedCommunity<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -203,12 +210,15 @@ pub struct BlockedCommunity<S: BosStr = DefaultStr> {
 /// Post is blocked due to viewer blocking author/community, or community moderation
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockedPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<community::post::BlockedAuthor<S>>,
     pub blocked: bool,
-    ///What caused the block: viewer blocked author, viewer blocked community, or post was removed by moderators
+    /// What caused the block: viewer blocked author, viewer blocked community, or post was removed by moderators
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by: Option<BlockedPostBlockedBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -301,21 +311,21 @@ where
             BlockedPostBlockedBy::Author => BlockedPostBlockedBy::Author,
             BlockedPostBlockedBy::Community => BlockedPostBlockedBy::Community,
             BlockedPostBlockedBy::Moderator => BlockedPostBlockedBy::Moderator,
-            BlockedPostBlockedBy::Other(v) => {
-                BlockedPostBlockedBy::Other(v.into_static())
-            }
+            BlockedPostBlockedBy::Other(v) => BlockedPostBlockedBy::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityRef<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
     pub did: Did<S>,
-    ///Current handle resolved from DID
+    /// Current handle resolved from DID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub handle: Option<Handle<S>>,
     pub name: S,
@@ -331,7 +341,10 @@ pub struct CommunityRef<S: BosStr = DefaultStr> {
 /// Post was not found (deleted, never indexed, or invalid URI)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotFoundPost<S: BosStr = DefaultStr> {
     pub not_found: bool,
     pub uri: AtUri<S>,
@@ -344,17 +357,19 @@ pub struct NotFoundPost<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostStats<S: BosStr = DefaultStr> {
     pub comment_count: i64,
     pub downvotes: i64,
-    ///Calculated score (upvotes - downvotes)
+    /// Calculated score (upvotes - downvotes)
     pub score: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub share_count: Option<i64>,
-    ///Map of tag name to the number of community members who applied it (e.g., {"insightful": 12})
+    /// Map of tag name to the number of community members who applied it (e.g., {"insightful": 12})
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tag_counts: Option<Data<S>>,
     pub upvotes: i64,
@@ -367,9 +382,11 @@ pub struct PostStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostView<S: BosStr = DefaultStr> {
     pub author: community::post::AuthorView<S>,
     pub cid: Cid<S>,
@@ -377,14 +394,14 @@ pub struct PostView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edited_at: Option<Datetime>,
-    ///Embedded content from the post record. Untransformed embeds keep their record types; when the AppView rewrites blob references to URLs or resolves quoted posts, it serves the corresponding #view type.
+    /// Embedded content from the post record. Untransformed embeds keep their record types; when the AppView rewrites blob references to URLs or resolves quoted posts, it serves the corresponding #view type.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<PostViewEmbed<S>>,
-    ///When this post was indexed by the AppView
+    /// When this post was indexed by the AppView
     pub indexed_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<Language>,
-    ///The actual post record (text, image, video, etc.)
+    /// The actual post record (text, image, video, etc.)
     pub record: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stats: Option<community::post::PostStats<S>>,
@@ -399,7 +416,6 @@ pub struct PostView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -419,18 +435,20 @@ pub enum PostViewEmbed<S: BosStr = DefaultStr> {
     PostView(Box<embed::post::View<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub saved: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub saved_uri: Option<AtUri<S>>,
-    ///Tags applied by the viewer to this post
+    /// Tags applied by the viewer to this post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Viewer's vote on this post
+    /// Viewer's vote on this post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vote: Option<ViewerStateVote<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -679,8 +697,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -955,8 +972,7 @@ impl<S: BosStr> LexiconSchema for ViewerState<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -988,15 +1004,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod bridged_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1169,10 +1184,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BridgedStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BridgedStats<S> {
         BridgedStats {
             as_of: self._fields.0.unwrap(),
             downvotes: self._fields.1.unwrap(),
@@ -1183,10 +1195,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.post"),
@@ -1441,9 +1453,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1455,7 +1466,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1552,19 +1563,7 @@ impl PostBuilder<post_state::Empty, DefaultStr> {
         PostBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1577,19 +1576,7 @@ impl<S: BosStr> PostBuilder<post_state::Empty, S> {
         PostBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1602,10 +1589,7 @@ where
     St::Author: post_state::IsUnset,
 {
     /// Set the `author` field (required)
-    pub fn author(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> PostBuilder<post_state::SetAuthor<St>, S> {
+    pub fn author(mut self, value: impl Into<Did<S>>) -> PostBuilder<post_state::SetAuthor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -1625,10 +1609,7 @@ impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
         self
     }
     /// Set the `bridgedStats` field to an Option value (optional)
-    pub fn maybe_bridged_stats(
-        mut self,
-        value: Option<community::post::BridgedStats<S>>,
-    ) -> Self {
+    pub fn maybe_bridged_stats(mut self, value: Option<community::post::BridgedStats<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1687,10 +1668,7 @@ where
 
 impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `crosspostChain` field (optional)
-    pub fn crosspost_chain(
-        mut self,
-        value: impl Into<Option<Vec<StrongRef<S>>>>,
-    ) -> Self {
+    pub fn crosspost_chain(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1846,15 +1824,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod author_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2040,10 +2017,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AuthorView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorView<S> {
         AuthorView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -2056,10 +2030,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.post.defs"),
@@ -2068,9 +2042,10 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2117,9 +2092,7 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockedAuthor"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Minimal author info for blocked posts"),
-                    ),
+                    description: Some(CowStr::new_static("Minimal author info for blocked posts")),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -2139,9 +2112,9 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockedCommunity"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Minimal community info for blocked posts"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Minimal community info for blocked posts",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -2226,9 +2199,10 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2249,9 +2223,9 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Current handle resolved from DID"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Current handle resolved from DID",
+                                )),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -2271,14 +2245,13 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notFoundPost"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Post was not found (deleted, never indexed, or invalid URI)",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("notFound")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Post was not found (deleted, never indexed, or invalid URI)",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("notFound"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2303,14 +2276,12 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("postStats"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("upvotes"),
-                            SmolStr::new_static("downvotes"),
-                            SmolStr::new_static("score"),
-                            SmolStr::new_static("commentCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("upvotes"),
+                        SmolStr::new_static("downvotes"),
+                        SmolStr::new_static("score"),
+                        SmolStr::new_static("commentCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2501,11 +2472,9 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Tags applied by the viewer to this post",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Tags applied by the viewer to this post",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(640usize),
                                     max_graphemes: Some(64usize),
@@ -2517,9 +2486,7 @@ fn lexicon_doc_social_coves_community_post_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("vote"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Viewer's vote on this post"),
-                                ),
+                                description: Some(CowStr::new_static("Viewer's vote on this post")),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -2549,15 +2516,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod blocked_author_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2588,10 +2554,7 @@ pub mod blocked_author_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockedAuthorBuilder<
-    St: blocked_author_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BlockedAuthorBuilder<St: blocked_author_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -2665,10 +2628,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockedAuthor<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedAuthor<S> {
         BlockedAuthor {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2683,15 +2643,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod blocked_community_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2722,10 +2681,7 @@ pub mod blocked_community_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockedCommunityBuilder<
-    St: blocked_community_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BlockedCommunityBuilder<St: blocked_community_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -2813,10 +2769,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockedCommunity<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedCommunity<S> {
         BlockedCommunity {
             did: self._fields.0.unwrap(),
             name: self._fields.1,
@@ -2832,15 +2785,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod blocked_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2933,18 +2885,12 @@ impl<S: BosStr> BlockedPostBuilder<blocked_post_state::Empty, S> {
 
 impl<St: blocked_post_state::State, S: BosStr> BlockedPostBuilder<St, S> {
     /// Set the `author` field (optional)
-    pub fn author(
-        mut self,
-        value: impl Into<Option<community::post::BlockedAuthor<S>>>,
-    ) -> Self {
+    pub fn author(mut self, value: impl Into<Option<community::post::BlockedAuthor<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(
-        mut self,
-        value: Option<community::post::BlockedAuthor<S>>,
-    ) -> Self {
+    pub fn maybe_author(mut self, value: Option<community::post::BlockedAuthor<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -2971,10 +2917,7 @@ where
 
 impl<St: blocked_post_state::State, S: BosStr> BlockedPostBuilder<St, S> {
     /// Set the `blockedBy` field (optional)
-    pub fn blocked_by(
-        mut self,
-        value: impl Into<Option<BlockedPostBlockedBy<S>>>,
-    ) -> Self {
+    pub fn blocked_by(mut self, value: impl Into<Option<BlockedPostBlockedBy<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -2995,10 +2938,7 @@ impl<St: blocked_post_state::State, S: BosStr> BlockedPostBuilder<St, S> {
         self
     }
     /// Set the `community` field to an Option value (optional)
-    pub fn maybe_community(
-        mut self,
-        value: Option<community::post::BlockedCommunity<S>>,
-    ) -> Self {
+    pub fn maybe_community(mut self, value: Option<community::post::BlockedCommunity<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -3041,10 +2981,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockedPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedPost<S> {
         BlockedPost {
             author: self._fields.0,
             blocked: self._fields.1.unwrap(),
@@ -3063,15 +3000,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod community_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3116,7 +3052,12 @@ pub mod community_ref_state {
 /// Builder for constructing an instance of this type.
 pub struct CommunityRefBuilder<St: community_ref_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<UriValue<S>>, Option<Did<S>>, Option<Handle<S>>, Option<S>),
+    _fields: (
+        Option<UriValue<S>>,
+        Option<Did<S>>,
+        Option<Handle<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -3237,10 +3178,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityRef<S> {
         CommunityRef {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -3258,15 +3196,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod not_found_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3404,10 +3341,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotFoundPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotFoundPost<S> {
         NotFoundPost {
             not_found: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -3423,15 +3357,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3676,10 +3609,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PostStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PostStats<S> {
         PostStats {
             comment_count: self._fields.0.unwrap(),
             downvotes: self._fields.1.unwrap(),
@@ -3699,15 +3629,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3879,18 +3808,7 @@ impl PostViewBuilder<post_view_state::Empty, DefaultStr> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3903,18 +3821,7 @@ impl<S: BosStr> PostViewBuilder<post_view_state::Empty, S> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4076,10 +3983,7 @@ where
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(
-        mut self,
-        value: impl Into<Option<community::post::PostStats<S>>>,
-    ) -> Self {
+    pub fn stats(mut self, value: impl Into<Option<community::post::PostStats<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -4111,18 +4015,12 @@ where
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<community::post::ViewerState<S>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<community::post::ViewerState<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<community::post::ViewerState<S>>,
-    ) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<community::post::ViewerState<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -4184,8 +4082,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -8,90 +8,95 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::scrobble::ScrobbleViewBasic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateScrobble<S: BosStr = DefaultStr> {
-    ///The album of the track being scrobbled
+    /// The album of the track being scrobbled
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
-    ///The URL of the album art for the track
+    /// The URL of the album art for the track
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album_art: Option<UriValue<S>>,
-    ///The Apple Music link for the track, if available
+    /// The Apple Music link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_music_link: Option<UriValue<S>>,
-    ///The artist of the track being scrobbled
+    /// The artist of the track being scrobbled
     pub artist: S,
-    ///The URL of the artist's picture, if available
+    /// The URL of the artist's picture, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_picture: Option<UriValue<S>>,
-    ///The composer of the track, if available
+    /// The composer of the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub composer: Option<S>,
-    ///The copyright message for the track, if available
+    /// The copyright message for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub copyright_message: Option<S>,
-    ///The Deezer link for the track, if available
+    /// The Deezer link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deezer_link: Option<UriValue<S>>,
-    ///The disc number of the track in the album, if applicable
+    /// The disc number of the track in the album, if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disc_number: Option<i64>,
-    ///The duration of the track in seconds
+    /// The duration of the track in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
-    ///The record label of the track, if available
+    /// The record label of the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<S>,
-    ///The Last.fm link for the track, if available
+    /// The Last.fm link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lastfm_link: Option<UriValue<S>>,
-    ///The lyrics of the track, if available
+    /// The lyrics of the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lyrics: Option<S>,
-    ///The MusicBrainz ID of the track, if available
+    /// The MusicBrainz ID of the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mb_id: Option<S>,
-    ///The release date of the track, formatted as YYYY-MM-DD
+    /// The release date of the track, formatted as YYYY-MM-DD
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_date: Option<S>,
-    ///The Spotify link for the track, if available
+    /// The Spotify link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spotify_link: Option<UriValue<S>>,
-    ///The Tidal link for the track, if available
+    /// The Tidal link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tidal_link: Option<UriValue<S>>,
-    ///The timestamp of the scrobble in milliseconds since epoch
+    /// The timestamp of the scrobble in milliseconds since epoch
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timestamp: Option<i64>,
-    ///The title of the track being scrobbled
+    /// The title of the track being scrobbled
     pub title: S,
-    ///The track number of the track in the album
+    /// The track number of the track in the album
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_number: Option<i64>,
-    ///The year the track was released
+    /// The year the track was released
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
-    ///The Youtube link for the track, if available
+    /// The Youtube link for the track, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub youtube_link: Option<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateScrobbleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ScrobbleViewBasic<S>,
@@ -112,9 +117,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateScrobble<S> {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateScrobbleResponse;
 }
 
@@ -124,9 +128,8 @@ Path: `/xrpc/app.rocksky.scrobble.createScrobble`. The request payload type is `
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateScrobble<S>;
     type Response = CreateScrobbleResponse;
 }

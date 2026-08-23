@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,32 +25,35 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_fitsky::workout;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_fitsky::workout;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CardioDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cardio_zones: Option<workout::CardioZoneData<S>>,
-    ///Distance in meters
+    /// Distance in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance_meters: Option<i64>,
-    ///Elevation gain in meters
+    /// Elevation gain in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub elevation_gain_meters: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heart_rate: Option<workout::HeartRateData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
-    ///Pace in seconds per kilometer
+    /// Pace in seconds per kilometer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pace_seconds_per_km: Option<i64>,
-    ///GPS route points recorded during the workout
+    /// GPS route points recorded during the workout
     #[serde(skip_serializing_if = "Option::is_none")]
     pub route_points: Option<Vec<workout::RoutePoint<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,7 +70,10 @@ pub struct CardioDetails<S: BosStr = DefaultStr> {
 /// Time in seconds spent in each heart rate zone
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CardioZoneData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone1_rest: Option<i64>,
@@ -88,9 +94,11 @@ pub struct CardioZoneData<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Exercise<S: BosStr = DefaultStr> {
     pub name: S,
     pub sets: Vec<workout::ExerciseSet<S>>,
@@ -103,13 +111,15 @@ pub struct Exercise<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExerciseSet<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reps: Option<i64>,
-    ///Weight in grams
+    /// Weight in grams
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weight_grams: Option<i64>,
     #[serde(
@@ -121,9 +131,11 @@ pub struct ExerciseSet<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -147,7 +159,6 @@ pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FlexibilityDetailsIntensity<S: BosStr = DefaultStr> {
@@ -198,8 +209,7 @@ impl<S: BosStr> Serialize for FlexibilityDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for FlexibilityDetailsIntensity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for FlexibilityDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -224,9 +234,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
-            FlexibilityDetailsIntensity::Moderate => {
-                FlexibilityDetailsIntensity::Moderate
-            }
+            FlexibilityDetailsIntensity::Moderate => FlexibilityDetailsIntensity::Moderate,
             FlexibilityDetailsIntensity::Intense => FlexibilityDetailsIntensity::Intense,
             FlexibilityDetailsIntensity::Other(v) => {
                 FlexibilityDetailsIntensity::Other(v.into_static())
@@ -235,9 +243,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HeartRateData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg: Option<i64>,
@@ -256,9 +266,11 @@ pub struct HeartRateData<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub bpm: i64,
     pub timestamp: Datetime,
@@ -271,15 +283,17 @@ pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cardio_zones: Option<workout::CardioZoneData<S>>,
-    ///Distance in meters
+    /// Distance in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance_meters: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -288,12 +302,12 @@ pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub intensity: Option<HiitSportsDetailsIntensity<S>>,
-    ///Pace in seconds per kilometer
+    /// Pace in seconds per kilometer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pace_seconds_per_km: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rounds: Option<i64>,
-    ///GPS route points recorded during the workout
+    /// GPS route points recorded during the workout
     #[serde(skip_serializing_if = "Option::is_none")]
     pub route_points: Option<Vec<workout::RoutePoint<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -308,7 +322,6 @@ pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HiitSportsDetailsIntensity<S: BosStr = DefaultStr> {
@@ -359,8 +372,7 @@ impl<S: BosStr> Serialize for HiitSportsDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for HiitSportsDetailsIntensity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for HiitSportsDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -407,23 +419,23 @@ pub struct Workout<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub details: Option<WorkoutDetails<S>>,
-    ///Duration in seconds
+    /// Duration in seconds
     pub duration: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<Datetime>,
-    ///Progress milestones for linear workouts
+    /// Progress milestones for linear workouts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub milestones: Option<Vec<workout::Milestone<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<S>,
-    ///Open Graph preview image for social sharing
+    /// Open Graph preview image for social sharing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub og_image: Option<BlobRef<S>>,
-    ///Reference to the workoutPlan used, if any
+    /// Reference to the workoutPlan used, if any
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_uri: Option<AtUri<S>>,
     pub started_at: Datetime,
-    ///Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
+    /// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<WorkoutStatus<S>>,
     pub title: S,
@@ -438,7 +450,6 @@ pub struct Workout<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -532,7 +543,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WorkoutType<S: BosStr = DefaultStr> {
@@ -658,15 +668,17 @@ pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Workout<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Milestone<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
     pub timestamp: Datetime,
     pub r#type: MilestoneType<S>,
-    ///Milestone value in meters
+    /// Milestone value in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value_meters: Option<i64>,
     #[serde(
@@ -677,7 +689,6 @@ pub struct Milestone<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MilestoneType<S: BosStr = DefaultStr> {
@@ -760,13 +771,15 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RoutePoint<S: BosStr = DefaultStr> {
-    ///Latitude in microdegrees (degrees * 1,000,000)
+    /// Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
-    ///Longitude in microdegrees (degrees * 1,000,000)
+    /// Longitude in microdegrees (degrees * 1,000,000)
     pub lng_e6: i64,
     pub timestamp: Datetime,
     #[serde(
@@ -778,9 +791,11 @@ pub struct RoutePoint<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StrengthDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -806,29 +821,32 @@ pub struct StrengthDetails<S: BosStr = DefaultStr> {
 /// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VisibilitySettings<S: BosStr = DefaultStr> {
-    /// Defaults to `"public"`.
+    ///  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_calories")]
     pub calories: Option<VisibilitySettingsCalories<S>>,
-    /// Defaults to `"private"`.
+    ///  Defaults to `"private"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_cardio_zones")]
     pub cardio_zones: Option<VisibilitySettingsCardioZones<S>>,
-    /// Defaults to `"public"`.
+    ///  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_details")]
     pub details: Option<VisibilitySettingsDetails<S>>,
-    /// Defaults to `"private"`.
+    ///  Defaults to `"private"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_heart_rate")]
     pub heart_rate: Option<VisibilitySettingsHeartRate<S>>,
-    /// Defaults to `"public"`.
+    ///  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_notes")]
     pub notes: Option<VisibilitySettingsNotes<S>>,
-    /// Defaults to `"public"`.
+    ///  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_visibility_settings_steps")]
     pub steps: Option<VisibilitySettingsSteps<S>>,
@@ -840,7 +858,6 @@ pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCalories<S: BosStr = DefaultStr> {
@@ -888,8 +905,7 @@ impl<S: BosStr> Serialize for VisibilitySettingsCalories<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsCalories<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsCalories<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -921,7 +937,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCardioZones<S: BosStr = DefaultStr> {
@@ -969,8 +984,7 @@ impl<S: BosStr> Serialize for VisibilitySettingsCardioZones<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsCardioZones<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsCardioZones<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -994,19 +1008,14 @@ where
     type Output = VisibilitySettingsCardioZones<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            VisibilitySettingsCardioZones::Public => {
-                VisibilitySettingsCardioZones::Public
-            }
-            VisibilitySettingsCardioZones::Private => {
-                VisibilitySettingsCardioZones::Private
-            }
+            VisibilitySettingsCardioZones::Public => VisibilitySettingsCardioZones::Public,
+            VisibilitySettingsCardioZones::Private => VisibilitySettingsCardioZones::Private,
             VisibilitySettingsCardioZones::Other(v) => {
                 VisibilitySettingsCardioZones::Other(v.into_static())
             }
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsDetails<S: BosStr = DefaultStr> {
@@ -1054,8 +1063,7 @@ impl<S: BosStr> Serialize for VisibilitySettingsDetails<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsDetails<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsDetails<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1087,7 +1095,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsHeartRate<S: BosStr = DefaultStr> {
@@ -1135,8 +1142,7 @@ impl<S: BosStr> Serialize for VisibilitySettingsHeartRate<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsHeartRate<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsHeartRate<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1168,7 +1174,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsNotes<S: BosStr = DefaultStr> {
@@ -1242,13 +1247,10 @@ where
         match self {
             VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
             VisibilitySettingsNotes::Private => VisibilitySettingsNotes::Private,
-            VisibilitySettingsNotes::Other(v) => {
-                VisibilitySettingsNotes::Other(v.into_static())
-            }
+            VisibilitySettingsNotes::Other(v) => VisibilitySettingsNotes::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsSteps<S: BosStr = DefaultStr> {
@@ -1322,9 +1324,7 @@ where
         match self {
             VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
             VisibilitySettingsSteps::Private => VisibilitySettingsSteps::Private,
-            VisibilitySettingsSteps::Other(v) => {
-                VisibilitySettingsSteps::Other(v.into_static())
-            }
+            VisibilitySettingsSteps::Other(v) => VisibilitySettingsSteps::Other(v.into_static()),
         }
     }
 }
@@ -1624,25 +1624,23 @@ impl<S: BosStr> LexiconSchema for Workout<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("og_image"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -1842,17 +1840,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.workout"),
@@ -1918,11 +1915,9 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("routePoints"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "GPS route points recorded during the workout",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "GPS route points recorded during the workout",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#routePoint"),
                                     ..Default::default()
@@ -1944,11 +1939,9 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cardioZoneData"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Time in seconds spent in each heart rate zone",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Time in seconds spent in each heart rate zone",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1990,9 +1983,10 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("exercise"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("sets")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("sets"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2140,11 +2134,10 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartRateSample"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("timestamp"), SmolStr::new_static("bpm")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("timestamp"),
+                        SmolStr::new_static("bpm"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2232,11 +2225,9 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("routePoints"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "GPS route points recorded during the workout",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "GPS route points recorded during the workout",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#routePoint"),
                                     ..Default::default()
@@ -2400,11 +2391,10 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("milestone"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("type"), SmolStr::new_static("timestamp")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("timestamp"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2444,12 +2434,11 @@ fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("routePoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("latE6"), SmolStr::new_static("lngE6"),
-                            SmolStr::new_static("timestamp")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("latE6"),
+                        SmolStr::new_static("lngE6"),
+                        SmolStr::new_static("timestamp"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2605,9 +2594,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2618,15 +2606,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod exercise_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2717,10 +2704,7 @@ where
     St::Name: exercise_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ExerciseBuilder<exercise_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ExerciseBuilder<exercise_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ExerciseBuilder {
             _state: PhantomData,
@@ -2780,9 +2764,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2793,9 +2776,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2806,9 +2788,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2819,15 +2800,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod heart_rate_sample_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2870,10 +2850,7 @@ pub mod heart_rate_sample_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HeartRateSampleBuilder<
-    St: heart_rate_sample_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct HeartRateSampleBuilder<St: heart_rate_sample_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
@@ -2968,10 +2945,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> HeartRateSample<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HeartRateSample<S> {
         HeartRateSample {
             bpm: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),
@@ -2987,9 +2961,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3000,9 +2973,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -3014,7 +2986,7 @@ where
 
 pub mod workout_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3145,19 +3117,7 @@ impl WorkoutBuilder<workout_state::Empty, DefaultStr> {
         WorkoutBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3170,19 +3130,7 @@ impl<S: BosStr> WorkoutBuilder<workout_state::Empty, S> {
         WorkoutBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3255,18 +3203,12 @@ impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
 
 impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `milestones` field (optional)
-    pub fn milestones(
-        mut self,
-        value: impl Into<Option<Vec<workout::Milestone<S>>>>,
-    ) -> Self {
+    pub fn milestones(mut self, value: impl Into<Option<Vec<workout::Milestone<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `milestones` field to an Option value (optional)
-    pub fn maybe_milestones(
-        mut self,
-        value: Option<Vec<workout::Milestone<S>>>,
-    ) -> Self {
+    pub fn maybe_milestones(mut self, value: Option<Vec<workout::Milestone<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -3349,10 +3291,7 @@ where
     St::Title: workout_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> WorkoutBuilder<workout_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> WorkoutBuilder<workout_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
@@ -3383,18 +3322,12 @@ where
 
 impl<St: workout_state::State, S: BosStr> WorkoutBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<workout::VisibilitySettings<S>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<workout::VisibilitySettings<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(
-        mut self,
-        value: Option<workout::VisibilitySettings<S>>,
-    ) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<workout::VisibilitySettings<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -3456,15 +3389,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod milestone_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3509,7 +3441,12 @@ pub mod milestone_state {
 /// Builder for constructing an instance of this type.
 pub struct MilestoneBuilder<St: milestone_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Datetime>, Option<MilestoneType<S>>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<Datetime>,
+        Option<MilestoneType<S>>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -3630,10 +3567,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Milestone<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Milestone<S> {
         Milestone {
             note: self._fields.0,
             timestamp: self._fields.1.unwrap(),
@@ -3651,15 +3585,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod route_point_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3832,10 +3765,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RoutePoint<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RoutePoint<S> {
         RoutePoint {
             lat_e6: self._fields.0.unwrap(),
             lng_e6: self._fields.1.unwrap(),
@@ -3852,9 +3782,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3865,44 +3794,49 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
-fn _default_visibility_settings_calories<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsCalories<S>,
-> {
-    Some(<VisibilitySettingsCalories<S>>::from_value(S::from_static("public")))
+fn _default_visibility_settings_calories<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsCalories<S>> {
+    Some(<VisibilitySettingsCalories<S>>::from_value(S::from_static(
+        "public",
+    )))
 }
 
-fn _default_visibility_settings_cardio_zones<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsCardioZones<S>,
-> {
-    Some(<VisibilitySettingsCardioZones<S>>::from_value(S::from_static("private")))
+fn _default_visibility_settings_cardio_zones<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsCardioZones<S>> {
+    Some(<VisibilitySettingsCardioZones<S>>::from_value(
+        S::from_static("private"),
+    ))
 }
 
-fn _default_visibility_settings_details<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsDetails<S>,
-> {
-    Some(<VisibilitySettingsDetails<S>>::from_value(S::from_static("public")))
+fn _default_visibility_settings_details<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsDetails<S>> {
+    Some(<VisibilitySettingsDetails<S>>::from_value(S::from_static(
+        "public",
+    )))
 }
 
-fn _default_visibility_settings_heart_rate<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsHeartRate<S>,
-> {
-    Some(<VisibilitySettingsHeartRate<S>>::from_value(S::from_static("private")))
+fn _default_visibility_settings_heart_rate<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsHeartRate<S>> {
+    Some(<VisibilitySettingsHeartRate<S>>::from_value(
+        S::from_static("private"),
+    ))
 }
 
-fn _default_visibility_settings_notes<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsNotes<S>,
-> {
-    Some(<VisibilitySettingsNotes<S>>::from_value(S::from_static("public")))
+fn _default_visibility_settings_notes<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsNotes<S>> {
+    Some(<VisibilitySettingsNotes<S>>::from_value(S::from_static(
+        "public",
+    )))
 }
 
-fn _default_visibility_settings_steps<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    VisibilitySettingsSteps<S>,
-> {
-    Some(<VisibilitySettingsSteps<S>>::from_value(S::from_static("public")))
+fn _default_visibility_settings_steps<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<VisibilitySettingsSteps<S>> {
+    Some(<VisibilitySettingsSteps<S>>::from_value(S::from_static(
+        "public",
+    )))
 }

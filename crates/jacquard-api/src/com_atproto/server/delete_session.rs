@@ -10,32 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DeleteSessionError {
     #[serde(rename = "InvalidToken")]
-    InvalidToken(Option<SmolStr>),
+    InvalidToken(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(Option<SmolStr>),
+    ExpiredToken(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DeleteSessionError {
@@ -97,14 +93,10 @@ impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
     const NSID: &'static str = "com.atproto.server.deleteSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteSessionResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -115,9 +107,8 @@ Path: `/xrpc/com.atproto.server.deleteSession`. The request payload type is `Del
 pub struct DeleteSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeleteSession;
     type Response = DeleteSessionResponse;
 }

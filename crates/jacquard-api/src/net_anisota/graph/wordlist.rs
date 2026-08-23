@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::graph::wordlist;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::graph::wordlist;
+use serde::{Deserialize, Serialize};
 /// A named, shareable list of muted words/phrases — Anisota's managed layer on top of Bluesky's flat muted-words preference. Each list is a complete, self-contained record so it can be shared by URL and saved (copied) into another user's PDS, mirroring the net.anisota.spell.custom architecture. Muting is applied client-side by the moderation pipeline: multiple enabled lists combine, a list can be scoped to specific feeds, restricted to a time-of-day/day-of-week window, and softened with a strength percentage (mute only that share of matching posts, deterministically per post). A list can optionally be projected into Bluesky's native mutedWordsPref for parity with other clients.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,39 +38,39 @@ use crate::net_anisota::graph::wordlist;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Wordlist<S: BosStr = DefaultStr> {
-    ///When this list was created
+    /// When this list was created
     pub created_at: Datetime,
-    ///Optional description of what this list covers
+    /// Optional description of what this list covers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Whether this list is currently active. Scheduling and spell effects further gate an enabled list.  Defaults to `false`.
+    /// Whether this list is currently active. Scheduling and spell effects further gate an enabled list.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_wordlist_enabled")]
     pub enabled: Option<bool>,
-    ///Display name for this word list
+    /// Display name for this word list
     pub name: S,
-    ///Optional active window. Absent means the list applies at all times while enabled.
+    /// Optional active window. Absent means the list applies at all times while enabled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schedule: Option<wordlist::Schedule<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<wordlist::Source<S>>,
-    ///Mute strength percentage: the share of matching posts this list mutes. Which posts fill that share is decided by match confidence — how many of the list's words hit, whether they landed in the post's own text, a hashtag, or only a quoted post, and how much of the post they account for — so a softened list keeps the squarest matches muted and lets the marginal ones through. Deterministic per post, so a post never flickers. Absent means 100 (mute everything it matches).
+    /// Mute strength percentage: the share of matching posts this list mutes. Which posts fill that share is decided by match confidence — how many of the list's words hit, whether they landed in the post's own text, a hashtag, or only a quoted post, and how much of the post they account for — so a softened list keeps the squarest matches muted and lets the marginal ones through. Deterministic per post, so a post never flickers. Absent means 100 (mute everything it matches).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strength: Option<i64>,
-    ///Whether this list's words are also projected into Bluesky's native mutedWordsPref (managed entries, removed when the list is disabled or deleted).  Defaults to `false`.
+    /// Whether this list's words are also projected into Bluesky's native mutedWordsPref (managed entries, removed when the list is disabled or deleted).  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_wordlist_sync_to_bluesky")]
     pub sync_to_bluesky: Option<bool>,
-    ///Feeds where this list applies: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline. Empty or absent applies everywhere.
+    /// Feeds where this list applies: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline. Empty or absent applies everywhere.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_feeds: Option<Vec<S>>,
-    ///What this list does to a post it mutes, overriding the app-wide muted-words handling: 'hide' removes it from feeds, 'warn' collapses it behind a notice, 'show' leaves it visible and only counts it toward impact. Absent inherits the global setting.
+    /// What this list does to a post it mutes, overriding the app-wide muted-words handling: 'hide' removes it from feeds, 'warn' collapses it behind a notice, 'show' leaves it visible and only counts it toward impact. Absent inherits the global setting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub treatment: Option<WordlistTreatment<S>>,
-    ///When this list was last modified
+    /// When this list was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///The muted words/phrases in this list
+    /// The muted words/phrases in this list
     pub words: Vec<wordlist::Word<S>>,
     #[serde(
         flatten,
@@ -178,15 +178,18 @@ pub struct WordlistGetRecordOutput<S: BosStr = DefaultStr> {
 /// A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is before its start wraps past midnight; equal start and end means no time bound (all day on the listed days).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Schedule<S: BosStr = DefaultStr> {
-    ///Days of week the list is active (0 = Sunday … 6 = Saturday)
+    /// Days of week the list is active (0 = Sunday … 6 = Saturday)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub days: Option<Vec<i64>>,
-    ///Window end as 'HH:MM' local time
+    /// Window end as 'HH:MM' local time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_time: Option<S>,
-    ///Window start as 'HH:MM' local time
+    /// Window start as 'HH:MM' local time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_time: Option<S>,
     #[serde(
@@ -201,18 +204,21 @@ pub struct Schedule<S: BosStr = DefaultStr> {
 /// Provenance. An 'original' list was created here; a 'learned' list was saved from another user, carrying a backlink to its immediate parent (originalUri/originalDid) and to the top of its lineage (rootUri/rootDid), modelled on net.anisota.spell.custom so save counts can aggregate across re-shares.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
-    ///DID of the user this list was saved from.
+    /// DID of the user this list was saved from.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_did: Option<Did<S>>,
-    ///AT URI of the list this copy was saved from (its immediate parent).
+    /// AT URI of the list this copy was saved from (its immediate parent).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_uri: Option<AtUri<S>>,
-    ///DID of the original author at the top of the lineage.
+    /// DID of the original author at the top of the lineage.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_did: Option<Did<S>>,
-    ///AT URI of the first author's list — the top of the lineage — propagated to every descendant.
+    /// AT URI of the first author's list — the top of the lineage — propagated to every descendant.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -225,7 +231,6 @@ pub struct Source<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SourceType<S: BosStr = DefaultStr> {
@@ -307,15 +312,18 @@ where
 /// One muted word or phrase, matching the shape of Bluesky's mutedWord items so a list can be projected into the native preference losslessly.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Word<S: BosStr = DefaultStr> {
-    ///Whose posts to apply this word to. Absent means 'all'.
+    /// Whose posts to apply this word to. Absent means 'all'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor_target: Option<WordActorTarget<S>>,
-    ///What to match against: post text ('content') and/or hashtags ('tag'). Absent means both.
+    /// What to match against: post text ('content') and/or hashtags ('tag'). Absent means both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub targets: Option<Vec<WordTargets<S>>>,
-    ///The word or phrase to mute
+    /// The word or phrase to mute
     pub value: S,
     #[serde(
         flatten,
@@ -404,7 +412,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WordTargets<S: BosStr = DefaultStr> {
@@ -718,9 +725,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -740,7 +746,7 @@ fn _default_wordlist_sync_to_bluesky() -> Option<bool> {
 
 pub mod wordlist_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -836,18 +842,7 @@ impl WordlistBuilder<wordlist_state::Empty, DefaultStr> {
         WordlistBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -860,18 +855,7 @@ impl<S: BosStr> WordlistBuilder<wordlist_state::Empty, S> {
         WordlistBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -929,10 +913,7 @@ where
     St::Name: wordlist_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> WordlistBuilder<wordlist_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> WordlistBuilder<wordlist_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WordlistBuilder {
             _state: PhantomData,
@@ -1098,10 +1079,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_graph_wordlist() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.graph.wordlist"),
@@ -1434,9 +1415,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1447,9 +1427,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1460,8 +1439,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

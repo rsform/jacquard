@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_certified::Did;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_certified::Did;
+use serde::{Deserialize, Serialize};
 /// Defines a badge that can be awarded via badge award records to users, projects, or activity claims.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,19 +39,19 @@ use crate::app_certified::Did;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Definition<S: BosStr = DefaultStr> {
-    ///Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.
+    /// Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_issuers: Option<Vec<Did<S>>>,
-    ///Category of the badge (e.g. endorsement, participation, affiliation).
+    /// Category of the badge (e.g. endorsement, participation, affiliation).
     pub badge_type: S,
-    ///Client-declared timestamp when this record was originally created
+    /// Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
-    ///Optional short statement describing what the badge represents.
+    /// Optional short statement describing what the badge represents.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Icon representing the badge, stored as a blob for compact visual display.
+    /// Icon representing the badge, stored as a blob for compact visual display.
     pub icon: BlobRef<S>,
-    ///Human-readable title of the badge.
+    /// Human-readable title of the badge.
     pub title: S,
     #[serde(
         flatten,
@@ -177,31 +177,25 @@ impl<S: BosStr> LexiconSchema for Definition<S> {
             let value = &self.icon;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/webp",
-                    "image/svg+xml",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string(), "image/svg+xml".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
+                            "image/svg+xml".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -230,9 +224,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -244,7 +237,7 @@ where
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -489,10 +482,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Definition<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Definition<S> {
         Definition {
             allowed_issuers: self._fields.0,
             badge_type: self._fields.1.unwrap(),
@@ -506,10 +496,10 @@ where
 }
 
 fn lexicon_doc_app_certified_badge_definition() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.badge.definition"),

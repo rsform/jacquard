@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,26 +24,29 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::dev_keytrace::claim;
+use crate::dev_keytrace::signature::Signature;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::dev_keytrace::signature::Signature;
-use crate::dev_keytrace::claim;
+use serde::{Deserialize, Serialize};
 /// Generic identity data for the claimed account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Identity<S: BosStr = DefaultStr> {
-    ///Avatar/profile image URL
+    /// Avatar/profile image URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_url: Option<UriValue<S>>,
-    ///Display name if different from subject
+    /// Display name if different from subject
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Profile page URL
+    /// Profile page URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_url: Option<UriValue<S>>,
-    ///Primary identifier (username, domain, handle, etc.)
+    /// Primary identifier (username, domain, handle, etc.)
     pub subject: S,
     #[serde(
         flatten,
@@ -64,36 +67,36 @@ pub struct Identity<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Claim<S: BosStr = DefaultStr> {
-    ///The identity claim URI (e.g., for github: https://gist.github.com/username/id, dns:example.com)
+    /// The identity claim URI (e.g., for github: https://gist.github.com/username/id, dns:example.com)
     pub claim_uri: S,
-    ///Optional user-provided label for this claim
+    /// Optional user-provided label for this claim
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Datetime when this claim was created (ISO 8601).
+    /// Datetime when this claim was created (ISO 8601).
     pub created_at: Datetime,
-    ///Timestamp when the claim last failed re-verification or was retracted
+    /// Timestamp when the claim last failed re-verification or was retracted
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failed_at: Option<Datetime>,
-    ///Structured data about the claimed identity, derived from the claimUri and knowledge inside the verification process. This is not the raw claim data, but a normalized set of fields that can be used for display and more.
+    /// Structured data about the claimed identity, derived from the claimUri and knowledge inside the verification process. This is not the raw claim data, but a normalized set of fields that can be used for display and more.
     pub identity: claim::Identity<S>,
-    ///Timestamp of the most recent successful re-verification by the system
+    /// Timestamp of the most recent successful re-verification by the system
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_verified_at: Option<Datetime>,
-    ///Random one-time value embedded in the challenge text posted to the external service. Used by verifiers to confirm the proof was created specifically for this claim session. Keytrace itself does not use this, but other services making claims may require it for their verification process.
+    /// Random one-time value embedded in the challenge text posted to the external service. Used by verifiers to confirm the proof was created specifically for this claim session. Keytrace itself does not use this, but other services making claims may require it for their verification process.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<S>,
-    ///Whether this claim was created during the prerelease/alpha period
+    /// Whether this claim was created during the prerelease/alpha period
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prerelease: Option<bool>,
-    ///Datetime when this claim was retracted. Present only if the claim has been retracted (ISO 8601).
+    /// Datetime when this claim was retracted. Present only if the claim has been retracted (ISO 8601).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retracted_at: Option<Datetime>,
-    ///Cryptographic attestation signatures from verification services, for example from @keytrace.dev. These are optional, and so you can pass an empty array. Keytrace will place its attestation signature in the claim here so that the library @keytrace/claims can be used by external developers to not have to implement their own verification logic.
+    /// Cryptographic attestation signatures from verification services, for example from @keytrace.dev. These are optional, and so you can pass an empty array. Keytrace will place its attestation signature in the claim here so that the library @keytrace/claims can be used by external developers to not have to implement their own verification logic.
     pub sigs: Vec<Signature<S>>,
-    ///Current verification status of this claim. Absent on legacy records, treated as 'verified'.
+    /// Current verification status of this claim. Absent on legacy records, treated as 'verified'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<ClaimStatus<S>>,
-    ///The claim type identifier
+    /// The claim type identifier
     pub r#type: ClaimType<S>,
     #[serde(
         flatten,
@@ -409,17 +412,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.claim"),
@@ -428,11 +430,9 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identity"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Generic identity data for the claimed account",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Generic identity data for the claimed account",
+                    )),
                     required: Some(vec![SmolStr::new_static("subject")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -440,9 +440,7 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatarUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Avatar/profile image URL"),
-                                ),
+                                description: Some(CowStr::new_static("Avatar/profile image URL")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -450,9 +448,9 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Display name if different from subject"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Display name if different from subject",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -467,11 +465,9 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("subject"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Primary identifier (username, domain, handle, etc.)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Primary identifier (username, domain, handle, etc.)",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -653,9 +649,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -667,7 +662,7 @@ where
 
 pub mod claim_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -797,18 +792,7 @@ impl ClaimBuilder<claim_state::Empty, DefaultStr> {
         ClaimBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -821,18 +805,7 @@ impl<S: BosStr> ClaimBuilder<claim_state::Empty, S> {
         ClaimBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }

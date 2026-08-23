@@ -10,13 +10,12 @@ pub mod get_actor_feed;
 pub mod get_play;
 pub mod play;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,18 +26,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fm_teal::alpha::feed;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::feed;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Artist<S: BosStr = DefaultStr> {
-    ///The MusicBrainz artist ID URI, formatted as mbid:<uuid>
+    /// The MusicBrainz artist ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_mb_id: Option<UriValue<S>>,
-    ///The name of the artist
+    /// The name of the artist
     pub artist_name: S,
     #[serde(
         flatten,
@@ -49,43 +51,45 @@ pub struct Artist<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlayView<S: BosStr = DefaultStr> {
-    ///Array of artists in order of original appearance.
+    /// Array of artists in order of original appearance.
     pub artists: Vec<feed::Artist<S>>,
-    ///The length of the track in seconds
+    /// The length of the track in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
-    ///The ISRC code associated with the recording
+    /// The ISRC code associated with the recording
     #[serde(skip_serializing_if = "Option::is_none")]
     pub isrc: Option<S>,
-    ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided.
+    /// The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub music_service_base_domain: Option<S>,
-    ///The URL associated with this track
+    /// The URL associated with this track
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin_url: Option<S>,
-    ///The unix timestamp of when the track was played
+    /// The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
-    ///The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>
+    /// The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recording_mb_id: Option<UriValue<S>>,
-    ///The MusicBrainz release ID URI, formatted as mbid:<uuid>
+    /// The MusicBrainz release ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_mb_id: Option<UriValue<S>>,
-    ///The name of the release/album
+    /// The name of the release/album
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_name: Option<S>,
-    ///A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.
+    /// A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submission_client_agent: Option<S>,
-    ///The MusicBrainz ID URI of the track, formatted as mbid:<uuid>
+    /// The MusicBrainz ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_mb_id: Option<UriValue<S>>,
-    ///The name of the track
+    /// The name of the track
     pub track_name: S,
     #[serde(
         flatten,
@@ -247,17 +251,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.feed.defs"),
@@ -273,11 +276,9 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artistMbId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The MusicBrainz artist ID URI, formatted as mbid:<uuid>",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The MusicBrainz artist ID URI, formatted as mbid:<uuid>",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -285,9 +286,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artistName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the artist"),
-                                ),
+                                description: Some(CowStr::new_static("The name of the artist")),
                                 min_length: Some(1usize),
                                 max_length: Some(256usize),
                                 max_graphemes: Some(2560usize),
@@ -465,15 +464,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod play_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -555,18 +553,7 @@ impl PlayViewBuilder<play_view_state::Empty, DefaultStr> {
         PlayViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -579,18 +566,7 @@ impl<S: BosStr> PlayViewBuilder<play_view_state::Empty, S> {
         PlayViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }

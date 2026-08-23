@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,21 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the [[offers]] property. Repeated events may be structured as separate Event objects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -96,13 +99,9 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_attendee_capacity: Option<EmbeddedMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_physical_attendee_capacity: Option<
-        EmbeddedMaximumPhysicalAttendeeCapacity<S>,
-    >,
+    pub maximum_physical_attendee_capacity: Option<EmbeddedMaximumPhysicalAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_virtual_attendee_capacity: Option<
-        EmbeddedMaximumVirtualAttendeeCapacity<S>,
-    >,
+    pub maximum_virtual_attendee_capacity: Option<EmbeddedMaximumVirtualAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -156,7 +155,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -169,7 +167,6 @@ pub enum EmbeddedActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -196,7 +193,6 @@ pub enum EmbeddedAttendee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -206,7 +202,6 @@ pub enum EmbeddedAttendees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -223,7 +218,6 @@ pub enum EmbeddedComposer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -233,7 +227,6 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -247,7 +240,6 @@ pub enum EmbeddedDirector<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -294,7 +286,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -312,7 +303,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -367,7 +357,6 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -377,7 +366,6 @@ pub enum EmbeddedOrganizer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -389,7 +377,6 @@ pub enum EmbeddedPerformer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -399,7 +386,6 @@ pub enum EmbeddedPerformers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -441,7 +427,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -455,7 +440,6 @@ pub enum EmbeddedSubEvent<S: BosStr = DefaultStr> {
     Embedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -463,7 +447,6 @@ pub enum EmbeddedSubEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     Embedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -473,7 +456,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     Embedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -481,7 +463,6 @@ pub enum EmbeddedSuperEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     Embedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -492,7 +473,6 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -581,13 +561,9 @@ pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_attendee_capacity: Option<EventMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_physical_attendee_capacity: Option<
-        EventMaximumPhysicalAttendeeCapacity<S>,
-    >,
+    pub maximum_physical_attendee_capacity: Option<EventMaximumPhysicalAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_virtual_attendee_capacity: Option<
-        EventMaximumVirtualAttendeeCapacity<S>,
-    >,
+    pub maximum_virtual_attendee_capacity: Option<EventMaximumVirtualAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<EventName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -641,7 +617,6 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -654,7 +629,6 @@ pub enum EventActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -681,7 +655,6 @@ pub enum EventAttendee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -691,7 +664,6 @@ pub enum EventAttendees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -708,7 +680,6 @@ pub enum EventComposer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -718,7 +689,6 @@ pub enum EventContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -732,7 +702,6 @@ pub enum EventDirector<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -779,7 +748,6 @@ pub enum EventFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -797,7 +765,6 @@ pub enum EventImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -852,7 +819,6 @@ pub enum EventOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -862,7 +828,6 @@ pub enum EventOrganizer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -874,7 +839,6 @@ pub enum EventPerformer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -884,7 +848,6 @@ pub enum EventPerformers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -926,7 +889,6 @@ pub enum EventSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -940,7 +902,6 @@ pub enum EventSubEvent<S: BosStr = DefaultStr> {
     Embedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -948,7 +909,6 @@ pub enum EventSubEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     Embedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -958,7 +918,6 @@ pub enum EventSubjectOf<S: BosStr = DefaultStr> {
     Embedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -966,7 +925,6 @@ pub enum EventSuperEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     Embedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -977,7 +935,6 @@ pub enum EventTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1079,17 +1036,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Event() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Event"),
@@ -2254,9 +2210,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -2268,7 +2223,7 @@ where
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2366,59 +2321,10 @@ impl EventBuilder<event_state::Empty, DefaultStr> {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2431,59 +2337,10 @@ impl<S: BosStr> EventBuilder<event_state::Empty, S> {
         EventBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2518,18 +2375,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(
-        mut self,
-        value: impl Into<Option<EventAdditionalType<S>>>,
-    ) -> Self {
+    pub fn additional_type(mut self, value: impl Into<Option<EventAdditionalType<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<EventAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<EventAdditionalType<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2537,18 +2388,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(
-        mut self,
-        value: impl Into<Option<EventAggregateRating<S>>>,
-    ) -> Self {
+    pub fn aggregate_rating(mut self, value: impl Into<Option<EventAggregateRating<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(
-        mut self,
-        value: Option<EventAggregateRating<S>>,
-    ) -> Self {
+    pub fn maybe_aggregate_rating(mut self, value: Option<EventAggregateRating<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2556,10 +2401,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(
-        mut self,
-        value: impl Into<Option<EventAlternateName<S>>>,
-    ) -> Self {
+    pub fn alternate_name(mut self, value: impl Into<Option<EventAlternateName<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -2740,10 +2582,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `eventSchedule` field (optional)
-    pub fn event_schedule(
-        mut self,
-        value: impl Into<Option<EventEventSchedule<S>>>,
-    ) -> Self {
+    pub fn event_schedule(mut self, value: impl Into<Option<EventEventSchedule<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
@@ -2756,10 +2595,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `eventStatus` field (optional)
-    pub fn event_status(
-        mut self,
-        value: impl Into<Option<EventEventStatus<S>>>,
-    ) -> Self {
+    pub fn event_status(mut self, value: impl Into<Option<EventEventStatus<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -2890,10 +2726,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(
-        mut self,
-        value: Option<EventMainEntityOfPage<S>>,
-    ) -> Self {
+    pub fn maybe_main_entity_of_page(mut self, value: Option<EventMainEntityOfPage<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -3023,18 +2856,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(
-        mut self,
-        value: impl Into<Option<EventPotentialAction<S>>>,
-    ) -> Self {
+    pub fn potential_action(mut self, value: impl Into<Option<EventPotentialAction<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(
-        mut self,
-        value: Option<EventPotentialAction<S>>,
-    ) -> Self {
+    pub fn maybe_potential_action(mut self, value: Option<EventPotentialAction<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -3050,10 +2877,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
         self
     }
     /// Set the `previousStartDate` field to an Option value (optional)
-    pub fn maybe_previous_start_date(
-        mut self,
-        value: Option<EventPreviousStartDate<S>>,
-    ) -> Self {
+    pub fn maybe_previous_start_date(mut self, value: Option<EventPreviousStartDate<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -3210,18 +3034,12 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
-    pub fn typical_age_range(
-        mut self,
-        value: impl Into<Option<EventTypicalAgeRange<S>>>,
-    ) -> Self {
+    pub fn typical_age_range(mut self, value: impl Into<Option<EventTypicalAgeRange<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(
-        mut self,
-        value: Option<EventTypicalAgeRange<S>>,
-    ) -> Self {
+    pub fn maybe_typical_age_range(mut self, value: Option<EventTypicalAgeRange<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -3242,10 +3060,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `workFeatured` field (optional)
-    pub fn work_featured(
-        mut self,
-        value: impl Into<Option<EventWorkFeatured<S>>>,
-    ) -> Self {
+    pub fn work_featured(mut self, value: impl Into<Option<EventWorkFeatured<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
@@ -3258,10 +3073,7 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `workPerformed` field (optional)
-    pub fn work_performed(
-        mut self,
-        value: impl Into<Option<EventWorkPerformed<S>>>,
-    ) -> Self {
+    pub fn work_performed(mut self, value: impl Into<Option<EventWorkPerformed<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }

@@ -19,7 +19,7 @@
 //! ## Streaming Download
 //!
 //! ```no_run
-//! # #[cfg(all(feature = "streaming", feature = "reqwest-client"))]
+//! # #[cfg(all(feature = "streaming", feature = "reqwest-stream"))]
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! use jacquard_common::http_client::{HttpClient, HttpClientExt};
 //! use futures_lite::StreamExt;

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,14 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::publication;
 use crate::pub_leaflet::theme::background_image::BackgroundImage;
 use crate::pub_leaflet::theme::color::Rgb;
 use crate::pub_leaflet::theme::color::Rgba;
 use crate::pub_leaflet::theme::wordmark::Wordmark;
-use crate::pub_leaflet::publication;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Record declaring a publication
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -74,35 +74,37 @@ pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Publication<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Preferences<S: BosStr = DefaultStr> {
-    /// Defaults to `"rtl"`.
+    ///  Defaults to `"rtl"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_prev_next_direction")]
     pub prev_next_direction: Option<PreferencesPrevNextDirection<S>>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_comments")]
     pub show_comments: Option<bool>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_first_last")]
     pub show_first_last: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_in_discover")]
     pub show_in_discover: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_mentions")]
     pub show_mentions: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_prev_next")]
     pub show_prev_next: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_recommends")]
     pub show_recommends: Option<bool>,
@@ -114,7 +116,6 @@ pub struct Preferences<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PreferencesPrevNextDirection<S: BosStr = DefaultStr> {
@@ -162,8 +163,7 @@ impl<S: BosStr> Serialize for PreferencesPrevNextDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PreferencesPrevNextDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PreferencesPrevNextDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -196,9 +196,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Theme<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent_background: Option<ThemeAccentBackground<S>>,
@@ -218,7 +220,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
     pub page_width: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub primary: Option<ThemePrimary<S>>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_theme_show_page_background")]
     pub show_page_background: Option<bool>,
@@ -233,7 +235,6 @@ pub struct Theme<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -243,7 +244,6 @@ pub enum ThemeAccentBackground<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
     ColorRgb(Box<Rgb<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -255,7 +255,6 @@ pub enum ThemeAccentText<S: BosStr = DefaultStr> {
     ColorRgb(Box<Rgb<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -266,7 +265,6 @@ pub enum ThemeBackgroundColor<S: BosStr = DefaultStr> {
     ColorRgb(Box<Rgb<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -276,7 +274,6 @@ pub enum ThemePageBackground<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
     ColorRgb(Box<Rgb<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -358,19 +355,16 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -470,9 +464,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -484,7 +477,7 @@ where
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -624,18 +617,12 @@ where
 
 impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `preferences` field (optional)
-    pub fn preferences(
-        mut self,
-        value: impl Into<Option<publication::Preferences<S>>>,
-    ) -> Self {
+    pub fn preferences(mut self, value: impl Into<Option<publication::Preferences<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
-    pub fn maybe_preferences(
-        mut self,
-        value: Option<publication::Preferences<S>>,
-    ) -> Self {
+    pub fn maybe_preferences(mut self, value: Option<publication::Preferences<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -672,10 +659,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Publication<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
         Publication {
             base_path: self._fields.0,
             description: self._fields.1,
@@ -689,10 +673,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.publication"),
@@ -701,9 +685,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Record declaring a publication"),
-                    ),
+                    description: Some(CowStr::new_static("Record declaring a publication")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("name")]),
@@ -725,7 +707,9 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("icon"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("name"),
@@ -763,7 +747,9 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("prevNextDirection"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("showComments"),
@@ -817,7 +803,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
                                 ],
                                 ..Default::default()
                             }),
@@ -827,7 +813,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
                                 ],
                                 ..Default::default()
                             }),
@@ -837,7 +823,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
                                 ],
                                 ..Default::default()
                             }),
@@ -845,9 +831,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundImage"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "pub.leaflet.theme.backgroundImage",
-                                ),
+                                r#ref: CowStr::new_static("pub.leaflet.theme.backgroundImage"),
                                 ..Default::default()
                             }),
                         );
@@ -870,7 +854,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
                                 ],
                                 ..Default::default()
                             }),
@@ -888,7 +872,7 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.theme.color#rgba"),
-                                    CowStr::new_static("pub.leaflet.theme.color#rgb")
+                                    CowStr::new_static("pub.leaflet.theme.color#rgb"),
                                 ],
                                 ..Default::default()
                             }),
@@ -924,16 +908,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
-fn _default_preferences_prev_next_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    PreferencesPrevNextDirection<S>,
-> {
-    Some(<PreferencesPrevNextDirection<S>>::from_value(S::from_static("rtl")))
+fn _default_preferences_prev_next_direction<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<PreferencesPrevNextDirection<S>> {
+    Some(<PreferencesPrevNextDirection<S>>::from_value(
+        S::from_static("rtl"),
+    ))
 }
 
 fn _default_preferences_show_comments() -> Option<bool> {
@@ -963,11 +947,9 @@ fn _default_preferences_show_recommends() -> Option<bool> {
 impl Default for Preferences {
     fn default() -> Self {
         Self {
-            prev_next_direction: Some(
-                <PreferencesPrevNextDirection>::from_value(
-                    jacquard_common::DefaultStr::from_static("rtl"),
-                ),
-            ),
+            prev_next_direction: Some(<PreferencesPrevNextDirection>::from_value(
+                jacquard_common::DefaultStr::from_static("rtl"),
+            )),
             show_comments: Some(true),
             show_first_last: Some(false),
             show_in_discover: Some(true),
@@ -986,9 +968,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 

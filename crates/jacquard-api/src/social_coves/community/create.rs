@@ -10,53 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid, Language};
+use jacquard_common::types::string::{AtUri, Cid, Did, Language};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Create<S: BosStr = DefaultStr> {
-    ///Whether other Coves instances can index and discover this community  Defaults to `true`.
+    /// Whether other Coves instances can index and discover this community  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_create_allow_external_discovery")]
     pub allow_external_discovery: Option<bool>,
-    ///Base64-encoded avatar image data (png, jpeg, or webp)
+    /// Base64-encoded avatar image data (png, jpeg, or webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_blob: Option<S>,
-    ///MIME type of the avatar image (image/png, image/jpeg, image/webp)
+    /// MIME type of the avatar image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_mime_type: Option<S>,
-    ///Base64-encoded banner image data (png, jpeg, or webp)
+    /// Base64-encoded banner image data (png, jpeg, or webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_blob: Option<S>,
-    ///MIME type of the banner image (image/png, image/jpeg, image/webp)
+    /// MIME type of the banner image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_mime_type: Option<S>,
-    ///Community categories for discovery
+    /// Community categories for discovery
     #[serde(skip_serializing_if = "Option::is_none")]
     pub categories: Option<Vec<S>>,
-    ///Community description
+    /// Community description
     pub description: S,
-    ///Display name for the community
+    /// Display name for the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Primary language of the community
+    /// Primary language of the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<Language>,
-    ///Reputation threshold required for membership  Defaults to `100`.
+    /// Reputation threshold required for membership  Defaults to `100`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_create_membership_threshold")]
     pub membership_threshold: Option<i64>,
-    ///Short community name used as the local part of the handle (e.g., 'gaming'). Must be a valid DNS label: ASCII letters, digits, and hyphens only.
+    /// Short community name used as the local part of the handle (e.g., 'gaming'). Must be a valid DNS label: ASCII letters, digits, and hyphens only.
     pub name: S,
-    ///Community rules
+    /// Community rules
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rules: Option<Vec<S>>,
-    ///Community visibility level  Defaults to `"public"`.
+    /// Community visibility level  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_create_visibility")]
     pub visibility: Option<CreateVisibility<S>>,
@@ -147,45 +150,42 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateOutput<S: BosStr = DefaultStr> {
-    ///CID of the created community profile
+    /// CID of the created community profile
     pub cid: Cid<S>,
-    ///DID of the created community
+    /// DID of the created community
     pub did: Did<S>,
-    ///Scoped handle of the created community (~name@instance)
+    /// Scoped handle of the created community (~name@instance)
     pub handle: S,
-    ///AT-URI of the created community profile
+    /// AT-URI of the created community profile
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateError {
     /// Community name is already taken
     #[serde(rename = "NameTaken")]
-    NameTaken(Option<SmolStr>),
+    NameTaken(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User has reached the maximum number of communities they can create
     #[serde(rename = "TooManyCommunities")]
-    TooManyCommunities(Option<SmolStr>),
+    TooManyCommunities(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateError {
@@ -229,9 +229,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Create<S> {
     const NSID: &'static str = "social.coves.community.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateResponse;
 }
 
@@ -241,9 +240,8 @@ Path: `/xrpc/social.coves.community.create`. The request payload type is `Create
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Create<S>;
     type Response = CreateResponse;
 }
@@ -256,8 +254,7 @@ fn _default_create_membership_threshold() -> Option<i64> {
     Some(100i64)
 }
 
-fn _default_create_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    CreateVisibility<S>,
-> {
+fn _default_create_visibility<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<CreateVisibility<S>> {
     Some(<CreateVisibility<S>>::from_value(S::from_static("public")))
 }

@@ -10,27 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AcceptContribution<S: BosStr = DefaultStr> {
-    ///URI of the contributionPatch record to accept.
+    /// URI of the contributionPatch record to accept.
     pub contribution_patch: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AcceptContributionOutput<S: BosStr = DefaultStr> {
-    ///URI of the updated entity record.
+    /// URI of the updated entity record.
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -49,9 +54,8 @@ impl jacquard_common::xrpc::XrpcResp for AcceptContributionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AcceptContribution<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.acceptContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AcceptContributionResponse;
 }
 
@@ -61,16 +65,15 @@ Path: `/xrpc/games.gamesgamesgamesgames.acceptContribution`. The request payload
 pub struct AcceptContributionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AcceptContributionRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.acceptContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AcceptContribution<S>;
     type Response = AcceptContributionResponse;
 }
 
 pub mod accept_contribution_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,10 +104,7 @@ pub mod accept_contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AcceptContributionBuilder<
-    St: accept_contribution_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AcceptContributionBuilder<St: accept_contribution_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -112,10 +112,7 @@ pub struct AcceptContributionBuilder<
 
 impl AcceptContribution<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> AcceptContributionBuilder<
-        accept_contribution_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> AcceptContributionBuilder<accept_contribution_state::Empty, DefaultStr> {
         AcceptContributionBuilder::new()
     }
 }
@@ -158,10 +155,7 @@ where
     pub fn contribution_patch(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AcceptContributionBuilder<
-        accept_contribution_state::SetContributionPatch<St>,
-        S,
-    > {
+    ) -> AcceptContributionBuilder<accept_contribution_state::SetContributionPatch<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AcceptContributionBuilder {
             _state: PhantomData,
@@ -184,10 +178,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AcceptContribution<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AcceptContribution<S> {
         AcceptContribution {
             contribution_patch: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

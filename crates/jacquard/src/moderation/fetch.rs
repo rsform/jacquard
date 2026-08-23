@@ -1,5 +1,6 @@
 use std::convert::From;
 
+#[cfg(feature = "api_bluesky")]
 use super::LabelerDefs;
 use crate::client::{AgentError, AgentSessionExt, CollectionErr, CollectionOutput};
 use crate::moderation::labeled::LabeledRecord;
@@ -12,11 +13,14 @@ use jacquard_api::app_bsky::labeler::{
 use jacquard_api::com_atproto::label::{Label, query_labels::QueryLabels};
 use jacquard_common::BosStr;
 use jacquard_common::bos::DefaultStr;
+#[cfg(feature = "api_bluesky")]
 use jacquard_common::error::ClientError;
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::uri::RecordUri;
-use jacquard_common::xrpc::{XrpcClient, XrpcError, XrpcResp};
+#[cfg(feature = "api_bluesky")]
+use jacquard_common::xrpc::XrpcClient;
+use jacquard_common::xrpc::{XrpcError, XrpcResp};
 use smol_str::SmolStr;
 
 /// Fetch labeler definitions from Bluesky's AppView (or a compatible one)

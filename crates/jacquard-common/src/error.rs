@@ -24,6 +24,7 @@ pub struct ClientError {
     #[cfg_attr(feature = "std", help)]
     help: Option<SmolStr>,
     context: Option<SmolStr>,
+    headers: Option<http::HeaderMap>,
     url: Option<SmolStr>,
     details: Option<SmolStr>,
     location: Option<SmolStr>,
@@ -116,6 +117,7 @@ impl ClientError {
             source,
             help: None,
             context: None,
+            headers: None,
             url: None,
             details: None,
             location: None,
@@ -130,6 +132,11 @@ impl ClientError {
     /// Get the source error if present
     pub fn source_err(&self) -> Option<&BoxError> {
         self.source.as_ref()
+    }
+
+    /// Consume the error and return its source error if present.
+    pub fn into_source(self) -> Option<BoxError> {
+        self.source
     }
 
     /// Returns the HTTP status code if this is an `Http` error kind.
@@ -159,6 +166,21 @@ impl ClientError {
     /// Get the context string if present
     pub fn context(&self) -> Option<&str> {
         self.context.as_ref().map(|s| s.as_str())
+    }
+
+    /// Get the response headers if present.
+    pub fn headers(&self) -> Option<&http::HeaderMap> {
+        self.headers.as_ref().or_else(|| {
+            self.source_err()
+                .and_then(|source| source.downcast_ref::<HttpError>())
+                .map(|error| &error.headers)
+        })
+    }
+
+    /// Attach response headers to this error.
+    pub fn with_headers(mut self, headers: http::HeaderMap) -> Self {
+        self.headers = Some(headers);
+        self
     }
 
     /// Get the URL if present
@@ -258,9 +280,13 @@ impl ClientError {
         Self::new(ClientErrorKind::Decode(msg.into()), None)
     }
 
-    /// Create an HTTP error with status code and optional body
-    pub fn http(status: http::StatusCode, body: Option<Bytes>) -> Self {
-        let http_err = HttpError { status, body };
+    /// Create an HTTP error with status code, headers, and optional body.
+    pub fn http(status: http::StatusCode, headers: http::HeaderMap, body: Option<Bytes>) -> Self {
+        let http_err = HttpError {
+            status,
+            headers,
+            body,
+        };
         Self::new(ClientErrorKind::Http { status }, Some(Box::new(http_err)))
     }
 
@@ -355,9 +381,11 @@ pub enum DecodeError {
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
 pub struct HttpError {
-    /// HTTP status code
+    /// HTTP status code.
     pub status: http::StatusCode,
-    /// Response body if available
+    /// Response headers.
+    pub headers: http::HeaderMap,
+    /// Response body if available.
     pub body: Option<Bytes>,
 }
 
@@ -437,7 +465,7 @@ impl From<DecodeError> for ClientError {
 
 impl From<HttpError> for ClientError {
     fn from(e: HttpError) -> Self {
-        Self::http(e.status, e.body)
+        Self::http(e.status, e.headers, e.body)
     }
 }
 
@@ -533,7 +561,7 @@ mod tests {
 
     #[test]
     fn client_error_status_from_http() {
-        let err = ClientError::http(StatusCode::CONFLICT, None);
+        let err = ClientError::http(StatusCode::CONFLICT, http::HeaderMap::new(), None);
         assert_eq!(err.status(), Some(StatusCode::CONFLICT));
     }
 
@@ -551,19 +579,28 @@ mod tests {
 
     #[test]
     fn client_error_is_auth_http_401() {
-        let err = ClientError::http(StatusCode::UNAUTHORIZED, None);
+        let err = ClientError::http(StatusCode::UNAUTHORIZED, http::HeaderMap::new(), None);
         assert!(err.is_auth());
     }
 
     #[test]
     fn client_error_is_not_found() {
-        assert!(ClientError::http(StatusCode::NOT_FOUND, None).is_not_found());
-        assert!(!ClientError::http(StatusCode::BAD_REQUEST, None).is_not_found());
+        assert!(
+            ClientError::http(StatusCode::NOT_FOUND, http::HeaderMap::new(), None).is_not_found()
+        );
+        assert!(
+            !ClientError::http(StatusCode::BAD_REQUEST, http::HeaderMap::new(), None)
+                .is_not_found()
+        );
     }
 
     #[test]
     fn client_error_is_conflict() {
-        assert!(ClientError::http(StatusCode::CONFLICT, None).is_conflict());
-        assert!(!ClientError::http(StatusCode::NOT_FOUND, None).is_conflict());
+        assert!(
+            ClientError::http(StatusCode::CONFLICT, http::HeaderMap::new(), None).is_conflict()
+        );
+        assert!(
+            !ClientError::http(StatusCode::NOT_FOUND, http::HeaderMap::new(), None).is_conflict()
+        );
     }
 }

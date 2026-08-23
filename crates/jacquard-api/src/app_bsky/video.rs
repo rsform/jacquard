@@ -15,13 +15,12 @@ pub mod start_upload;
 pub mod upload_part;
 pub mod upload_video;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,26 +34,29 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct JobStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
-    ///A machine-readable code for why the video processing job failed.
+    /// A machine-readable code for why the video processing job failed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failure_code: Option<JobStatusFailureCode<S>>,
     pub job_id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
-    ///Progress within the current processing state.
+    /// Progress within the current processing state.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<i64>,
-    ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
+    /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     pub state: JobStatusState<S>,
     #[serde(
         flatten,
@@ -146,22 +148,14 @@ where
     type Output = JobStatusFailureCode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            JobStatusFailureCode::ValidationFailure => {
-                JobStatusFailureCode::ValidationFailure
-            }
-            JobStatusFailureCode::EncodingFailure => {
-                JobStatusFailureCode::EncodingFailure
-            }
-            JobStatusFailureCode::PdsUploadFailure => {
-                JobStatusFailureCode::PdsUploadFailure
-            }
+            JobStatusFailureCode::ValidationFailure => JobStatusFailureCode::ValidationFailure,
+            JobStatusFailureCode::EncodingFailure => JobStatusFailureCode::EncodingFailure,
+            JobStatusFailureCode::PdsUploadFailure => JobStatusFailureCode::PdsUploadFailure,
             JobStatusFailureCode::PdsUploadUnsupportedBlobSize => {
                 JobStatusFailureCode::PdsUploadUnsupportedBlobSize
             }
             JobStatusFailureCode::GenericFailure => JobStatusFailureCode::GenericFailure,
-            JobStatusFailureCode::Other(v) => {
-                JobStatusFailureCode::Other(v.into_static())
-            }
+            JobStatusFailureCode::Other(v) => JobStatusFailureCode::Other(v.into_static()),
         }
     }
 }
@@ -313,15 +307,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod job_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -476,10 +469,7 @@ impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
 
 impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `failureCode` field (optional)
-    pub fn failure_code(
-        mut self,
-        value: impl Into<Option<JobStatusFailureCode<S>>>,
-    ) -> Self {
+    pub fn failure_code(mut self, value: impl Into<Option<JobStatusFailureCode<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -576,10 +566,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> JobStatus<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JobStatus<S> {
         JobStatus {
             blob: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -595,10 +582,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_video_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.video.defs"),

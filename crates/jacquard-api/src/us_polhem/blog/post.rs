@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::embed::images::Image;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::embed::images::Image;
+use serde::{Deserialize, Serialize};
 /// Record describing a blog post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -50,7 +50,7 @@ pub struct Post<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<AtUri<S>>>,
     pub title: S,
-    ///Tells the visibility of the article to AppView.  Defaults to `"public"`.
+    /// Tells the visibility of the article to AppView.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_post_visibility")]
     pub visibility: Option<PostVisibility<S>>,
@@ -255,9 +255,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -267,15 +266,14 @@ where
     Ok(data)
 }
 
-fn _default_post_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    PostVisibility<S>,
-> {
+fn _default_post_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<PostVisibility<S>>
+{
     Some(<PostVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -406,10 +404,7 @@ where
     St::Content: post_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -483,10 +478,7 @@ where
     St::Slug: post_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetSlug<St>, S> {
+    pub fn slug(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetSlug<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -515,10 +507,7 @@ where
     St::Title: post_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -582,10 +571,10 @@ where
 }
 
 fn lexicon_doc_us_polhem_blog_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("us.polhem.blog.post"),

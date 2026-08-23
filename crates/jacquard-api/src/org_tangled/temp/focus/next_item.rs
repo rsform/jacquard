@@ -10,36 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::string::{AtUri, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NextItem<S: BosStr = DefaultStr> {
-    ///ID of the notification just addressed, to be marked read.
+    /// ID of the notification just addressed, to be marked read.
     pub current_id: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NextItemOutput<S: BosStr = DefaultStr> {
-    ///AT-URI of the issue to navigate to, if the item is an issue.
+    /// AT-URI of the issue to navigate to, if the item is an issue.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub issue_at: Option<AtUri<S>>,
-    ///ID of the next notification to address. Absent when focus mode has ended.
+    /// ID of the next notification to address. Absent when focus mode has ended.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notification_id: Option<i64>,
-    ///AT-URI of the pull to navigate to, if the item is a pull.
+    /// AT-URI of the pull to navigate to, if the item is a pull.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pull_at: Option<AtUri<S>>,
-    ///DID of the repository the next item belongs to. Absent when focus mode has ended.
+    /// DID of the repository the next item belongs to. Absent when focus mode has ended.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo_did: Option<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -59,9 +64,8 @@ impl jacquard_common::xrpc::XrpcResp for NextItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NextItem<S> {
     const NSID: &'static str = "org.tangled.temp.focus.nextItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = NextItemResponse;
 }
 
@@ -71,16 +75,15 @@ Path: `/xrpc/org.tangled.temp.focus.nextItem`. The request payload type is `Next
 pub struct NextItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NextItemRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.focus.nextItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = NextItem<S>;
     type Response = NextItemResponse;
 }
 
 pub mod next_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

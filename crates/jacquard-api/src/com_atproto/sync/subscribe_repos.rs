@@ -10,33 +10,36 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::cid::CidLink;
-use jacquard_common::types::string::{Did, Handle, Tid, Datetime};
+use jacquard_common::types::string::{Datetime, Did, Handle, Tid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::sync::subscribe_repos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::sync::subscribe_repos;
+use serde::{Deserialize, Serialize};
 /// Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Account<S: BosStr = DefaultStr> {
-    ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
+    /// Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
     pub did: Did<S>,
     pub seq: i64,
-    ///If active=false, this optional field indicates a reason for why the account is not active.
+    /// If active=false, this optional field indicates a reason for why the account is not active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<AccountStatus<S>>,
     pub time: Datetime,
@@ -147,32 +150,35 @@ where
 /// Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Commit<S: BosStr = DefaultStr> {
     pub blobs: Vec<CidLink<S>>,
-    ///CAR file containing relevant blocks, as a diff since the previous repo state. The commit must be included as a block, and the commit block CID must be the first entry in the CAR header 'roots' list.
+    /// CAR file containing relevant blocks, as a diff since the previous repo state. The commit must be included as a block, and the commit block CID must be the first entry in the CAR header 'roots' list.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub blocks: Bytes,
-    ///Repo commit object CID.
+    /// Repo commit object CID.
     pub commit: CidLink<S>,
     pub ops: Vec<subscribe_repos::RepoOp<S>>,
-    ///The root CID of the MST tree for the previous commit from this repo (indicated by the 'since' revision field in this message). Corresponds to the 'data' field in the repo commit object. NOTE: this field is effectively required for the 'inductive' version of firehose.
+    /// The root CID of the MST tree for the previous commit from this repo (indicated by the 'since' revision field in this message). Corresponds to the 'data' field in the repo commit object. NOTE: this field is effectively required for the 'inductive' version of firehose.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prev_data: Option<CidLink<S>>,
-    ///DEPRECATED -- unused
+    /// DEPRECATED -- unused
     pub rebase: bool,
-    ///The repo this event comes from. Note that all other message types name this field 'did'.
+    /// The repo this event comes from. Note that all other message types name this field 'did'.
     pub repo: Did<S>,
-    ///The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.
+    /// The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.
     pub rev: Tid,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
-    ///The rev of the last emitted commit from this repo (if any).
+    /// The rev of the last emitted commit from this repo (if any).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<Tid>,
-    ///Timestamp of when this message was originally broadcast.
+    /// Timestamp of when this message was originally broadcast.
     pub time: Datetime,
-    ///DEPRECATED -- replaced by #sync event and data limits. Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.
+    /// DEPRECATED -- replaced by #sync event and data limits. Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.
     pub too_big: bool,
     #[serde(
         flatten,
@@ -186,10 +192,13 @@ pub struct Commit<S: BosStr = DefaultStr> {
 /// Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Identity<S: BosStr = DefaultStr> {
     pub did: Did<S>,
-    ///The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.
+    /// The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub handle: Option<Handle<S>>,
     pub seq: i64,
@@ -203,9 +212,11 @@ pub struct Identity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Info<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -218,7 +229,6 @@ pub struct Info<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InfoName<S: BosStr = DefaultStr> {
@@ -293,14 +303,12 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -326,71 +334,52 @@ impl<S: BosStr> SubscribeReposMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
-            bytes,
-        )?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
         match header.t.as_str() {
             "#commit" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Commit(Box::new(variant)))
             }
             "#sync" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Sync(Box::new(variant)))
             }
             "#identity" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Identity(Box::new(variant)))
             }
             "#account" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Account(Box::new(variant)))
             }
             "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Info(Box::new(variant)))
             }
-            unknown => {
-                Err(
-                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
-                )
-            }
+            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
+                unknown.into(),
+            )),
         }
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeReposError {
     #[serde(rename = "FutureCursor")]
-    FutureCursor(Option<SmolStr>),
+    FutureCursor(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.
     #[serde(rename = "ConsumerTooSlow")]
-    ConsumerTooSlow(Option<SmolStr>),
+    ConsumerTooSlow(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SubscribeReposError {
@@ -424,14 +413,17 @@ impl core::fmt::Display for SubscribeReposError {
 /// A repo operation, ie a mutation of a single record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RepoOp<S: BosStr = DefaultStr> {
     pub action: RepoOpAction<S>,
-    ///For creates and updates, the new record CID. For deletions, null.
+    /// For creates and updates, the new record CID. For deletions, null.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<CidLink<S>>,
     pub path: S,
-    ///For updates and deletes, the previous record CID (required for inductive firehose). For creations, field should not be defined.
+    /// For updates and deletes, the previous record CID (required for inductive firehose). For creations, field should not be defined.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prev: Option<CidLink<S>>,
     #[serde(
@@ -442,7 +434,6 @@ pub struct RepoOp<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RepoOpAction<S: BosStr = DefaultStr> {
@@ -528,18 +519,21 @@ where
 /// Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Sync<S: BosStr = DefaultStr> {
-    ///CAR file containing the commit, as a block. The CAR header must include the commit block CID as the first 'root'.
+    /// CAR file containing the commit, as a block. The CAR header must include the commit block CID as the first 'root'.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub blocks: Bytes,
-    ///The account this repo event corresponds to. Must match that in the commit object.
+    /// The account this repo event corresponds to. Must match that in the commit object.
     pub did: Did<S>,
-    ///The rev of the commit. This value must match that in the commit object.
+    /// The rev of the commit. This value must match that in the commit object.
     pub rev: S,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
-    ///Timestamp of when this message was originally broadcast.
+    /// Timestamp of when this message was originally broadcast.
     pub time: Datetime,
     #[serde(
         flatten,
@@ -626,7 +620,8 @@ impl<S: BosStr> LexiconSchema for Info<S> {
 pub struct SubscribeReposStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Message<S: BosStr> = SubscribeReposMessage<S>;
     type Error = SubscribeReposError;
     fn decode_message<'de, S>(
@@ -642,14 +637,16 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Stream = SubscribeReposStream;
 }
 
 pub struct SubscribeReposEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     const PATH: &'static str = "/xrpc/com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Params<S: BosStr> = SubscribeRepos;
     type Stream = SubscribeReposStream;
 }
@@ -691,15 +688,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod account_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -845,10 +841,7 @@ where
     St::Did: account_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> AccountBuilder<account_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> AccountBuilder<account_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AccountBuilder {
             _state: PhantomData,
@@ -864,10 +857,7 @@ where
     St::Seq: account_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> AccountBuilder<account_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> AccountBuilder<account_state::SetSeq<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AccountBuilder {
             _state: PhantomData,
@@ -942,10 +932,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_sync_subscribeRepos() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.sync.subscribeRepos"),
@@ -1204,11 +1194,15 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1218,45 +1212,42 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(
-                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("repoOp"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A repo operation, ie a mutation of a single record.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("action"), SmolStr::new_static("path"),
-                            SmolStr::new_static("cid")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A repo operation, ie a mutation of a single record.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("action"),
+                        SmolStr::new_static("path"),
+                        SmolStr::new_static("cid"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("action"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
@@ -1266,7 +1257,9 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("path"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("prev"),
@@ -1363,15 +1356,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod commit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1621,18 +1613,7 @@ impl CommitBuilder<commit_state::Empty, DefaultStr> {
         CommitBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1645,18 +1626,7 @@ impl<S: BosStr> CommitBuilder<commit_state::Empty, S> {
         CommitBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1777,10 +1747,7 @@ where
     St::Repo: commit_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> CommitBuilder<commit_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> CommitBuilder<commit_state::SetRepo<St>, S> {
         self._fields.6 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -1796,10 +1763,7 @@ where
     St::Rev: commit_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(
-        mut self,
-        value: impl Into<Tid>,
-    ) -> CommitBuilder<commit_state::SetRev<St>, S> {
+    pub fn rev(mut self, value: impl Into<Tid>) -> CommitBuilder<commit_state::SetRev<St>, S> {
         self._fields.7 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -1815,10 +1779,7 @@ where
     St::Seq: commit_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> CommitBuilder<commit_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> CommitBuilder<commit_state::SetSeq<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -1938,15 +1899,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2005,7 +1965,12 @@ pub mod identity_state {
 /// Builder for constructing an instance of this type.
 pub struct IdentityBuilder<St: identity_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<Handle<S>>, Option<i64>, Option<Datetime>),
+    _fields: (
+        Option<Did<S>>,
+        Option<Handle<S>>,
+        Option<i64>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2083,10 +2048,7 @@ where
     St::Seq: identity_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> IdentityBuilder<identity_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> IdentityBuilder<identity_state::SetSeq<St>, S> {
         self._fields.2 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -2151,15 +2113,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod subscribe_repos_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2241,15 +2202,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod repo_op_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2377,10 +2337,7 @@ where
     St::Path: repo_op_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(
-        mut self,
-        value: impl Into<S>,
-    ) -> RepoOpBuilder<repo_op_state::SetPath<St>, S> {
+    pub fn path(mut self, value: impl Into<S>) -> RepoOpBuilder<repo_op_state::SetPath<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RepoOpBuilder {
             _state: PhantomData,
@@ -2438,15 +2395,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod sync_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2539,7 +2495,13 @@ pub mod sync_state {
 /// Builder for constructing an instance of this type.
 pub struct SyncBuilder<St: sync_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Bytes>, Option<Did<S>>, Option<S>, Option<i64>, Option<Datetime>),
+    _fields: (
+        Option<Bytes>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2585,10 +2547,7 @@ where
     St::Blocks: sync_state::IsUnset,
 {
     /// Set the `blocks` field (required)
-    pub fn blocks(
-        mut self,
-        value: impl Into<Bytes>,
-    ) -> SyncBuilder<sync_state::SetBlocks<St>, S> {
+    pub fn blocks(mut self, value: impl Into<Bytes>) -> SyncBuilder<sync_state::SetBlocks<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SyncBuilder {
             _state: PhantomData,
@@ -2604,10 +2563,7 @@ where
     St::Did: sync_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> SyncBuilder<sync_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> SyncBuilder<sync_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SyncBuilder {
             _state: PhantomData,
@@ -2639,10 +2595,7 @@ where
     St::Seq: sync_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> SyncBuilder<sync_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> SyncBuilder<sync_state::SetSeq<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SyncBuilder {
             _state: PhantomData,
@@ -2658,10 +2611,7 @@ where
     St::Time: sync_state::IsUnset,
 {
     /// Set the `time` field (required)
-    pub fn time(
-        mut self,
-        value: impl Into<Datetime>,
-    ) -> SyncBuilder<sync_state::SetTime<St>, S> {
+    pub fn time(mut self, value: impl Into<Datetime>) -> SyncBuilder<sync_state::SetTime<St>, S> {
         self._fields.4 = Option::Some(value.into());
         SyncBuilder {
             _state: PhantomData,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::beta::game::pack;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::beta::game::pack;
+use serde::{Deserialize, Serialize};
 /// Beta version: Record tracking daily pack openings and streak information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,22 +38,22 @@ use crate::net_anisota::beta::game::pack;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Pack<S: BosStr = DefaultStr> {
-    ///When the record was created
+    /// When the record was created
     pub created_at: Datetime,
-    ///When the record was last modified
+    /// When the record was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_modified: Option<Datetime>,
-    ///When daily pack was last opened
+    /// When daily pack was last opened
     pub last_open_time: Datetime,
-    ///Longest daily pack opening streak achieved
+    /// Longest daily pack opening streak achieved
     #[serde(skip_serializing_if = "Option::is_none")]
     pub longest_streak: Option<i64>,
-    ///History of the last few pack openings
+    /// History of the last few pack openings
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pack_history: Option<Vec<pack::PackHistoryEntry<S>>>,
-    ///Current daily pack opening streak count
+    /// Current daily pack opening streak count
     pub streak: i64,
-    ///Total number of times daily packs have been opened
+    /// Total number of times daily packs have been opened
     pub total_opens: i64,
     #[serde(
         flatten,
@@ -78,15 +78,18 @@ pub struct PackGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single pack opening entry in the history
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
-    ///Items received from this pack
+    /// Items received from this pack
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_received: Option<Vec<pack::ReceivedItem<S>>>,
-    ///When this pack was opened
+    /// When this pack was opened
     #[serde(skip_serializing_if = "Option::is_none")]
     pub open_time: Option<Datetime>,
-    ///Streak count at time of opening
+    /// Streak count at time of opening
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streak_count: Option<i64>,
     #[serde(
@@ -101,15 +104,18 @@ pub struct PackHistoryEntry<S: BosStr = DefaultStr> {
 /// An item received from a pack opening
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReceivedItem<S: BosStr = DefaultStr> {
-    ///ID of the item received
+    /// ID of the item received
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<S>,
-    ///Quantity received
+    /// Quantity received
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<i64>,
-    ///Rarity of the item
+    /// Rarity of the item
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<S>,
     #[serde(
@@ -245,9 +251,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -259,7 +264,7 @@ where
 
 pub mod pack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -456,10 +461,7 @@ impl<St: pack_state::State, S: BosStr> PackBuilder<St, S> {
         self
     }
     /// Set the `packHistory` field to an Option value (optional)
-    pub fn maybe_pack_history(
-        mut self,
-        value: Option<Vec<pack::PackHistoryEntry<S>>>,
-    ) -> Self {
+    pub fn maybe_pack_history(mut self, value: Option<Vec<pack::PackHistoryEntry<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -471,10 +473,7 @@ where
     St::Streak: pack_state::IsUnset,
 {
     /// Set the `streak` field (required)
-    pub fn streak(
-        mut self,
-        value: impl Into<i64>,
-    ) -> PackBuilder<pack_state::SetStreak<St>, S> {
+    pub fn streak(mut self, value: impl Into<i64>) -> PackBuilder<pack_state::SetStreak<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
@@ -540,10 +539,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.pack"),
@@ -552,30 +551,26 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Beta version: Record tracking daily pack openings and streak information",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Beta version: Record tracking daily pack openings and streak information",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("lastOpenTime"),
-                                SmolStr::new_static("totalOpens"),
-                                SmolStr::new_static("streak"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("lastOpenTime"),
+                            SmolStr::new_static("totalOpens"),
+                            SmolStr::new_static("streak"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When the record was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the record was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -583,9 +578,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lastModified"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When the record was last modified"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the record was last modified",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -593,9 +588,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lastOpenTime"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When daily pack was last opened"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When daily pack was last opened",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -610,9 +605,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("packHistory"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("History of the last few pack openings"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "History of the last few pack openings",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#packHistoryEntry"),
                                         ..Default::default()
@@ -645,18 +640,18 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("packHistoryEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A single pack opening entry in the history"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A single pack opening entry in the history",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemsReceived"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Items received from this pack"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Items received from this pack",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#receivedItem"),
                                     ..Default::default()
@@ -667,9 +662,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("openTime"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When this pack was opened"),
-                                ),
+                                description: Some(CowStr::new_static("When this pack was opened")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -688,18 +681,14 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("receivedItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An item received from a pack opening"),
-                    ),
+                    description: Some(CowStr::new_static("An item received from a pack opening")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("ID of the item received"),
-                                ),
+                                description: Some(CowStr::new_static("ID of the item received")),
                                 ..Default::default()
                             }),
                         );
@@ -734,9 +723,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -747,8 +735,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

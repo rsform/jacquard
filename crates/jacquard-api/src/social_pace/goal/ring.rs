@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,17 +38,17 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct Ring<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///The total minutes of exercise completed.
+    /// The total minutes of exercise completed.
     pub exercise: i64,
-    ///The daily exercise goal in minutes.
+    /// The daily exercise goal in minutes.
     pub exercise_goal: i64,
-    ///The total active calories burned for the day.
+    /// The total active calories burned for the day.
     pub r#move: i64,
-    ///The daily move goal in calories.
+    /// The daily move goal in calories.
     pub move_goal: i64,
-    ///The daily stand goal in hours.
+    /// The daily stand goal in hours.
     pub stand_goal: i64,
-    ///The number of hours the user stood up and moved around.
+    /// The number of hours the user stood up and moved around.
     pub stand_hours: i64,
     #[serde(
         flatten,
@@ -125,9 +125,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -139,7 +138,7 @@ where
 
 pub mod ring_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,10 +384,7 @@ where
     St::Move: ring_state::IsUnset,
 {
     /// Set the `move` field (required)
-    pub fn r#move(
-        mut self,
-        value: impl Into<i64>,
-    ) -> RingBuilder<ring_state::SetMove<St>, S> {
+    pub fn r#move(mut self, value: impl Into<i64>) -> RingBuilder<ring_state::SetMove<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -495,10 +491,10 @@ where
 }
 
 fn lexicon_doc_social_pace_goal_ring() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.goal.ring"),

@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,7 +19,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// The content contains information that can be used to identify a particular individual, such as a name, phone number, email address, physical address, or IP address.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -83,7 +83,10 @@ impl core::fmt::Display for Language {
 /// Content warnings for a stream.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContentWarnings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warnings: Option<Vec<ContentWarningsWarnings<S>>>,
@@ -95,7 +98,6 @@ pub struct ContentWarnings<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContentWarningsWarnings<S: BosStr = DefaultStr> {
@@ -117,12 +119,8 @@ impl<S: BosStr> ContentWarningsWarnings<S> {
         match self {
             Self::Death => "place.stream.metadata.contentWarnings#death",
             Self::DrugUse => "place.stream.metadata.contentWarnings#drugUse",
-            Self::FantasyViolence => {
-                "place.stream.metadata.contentWarnings#fantasyViolence"
-            }
-            Self::FlashingLights => {
-                "place.stream.metadata.contentWarnings#flashingLights"
-            }
+            Self::FantasyViolence => "place.stream.metadata.contentWarnings#fantasyViolence",
+            Self::FlashingLights => "place.stream.metadata.contentWarnings#flashingLights",
             Self::Language => "place.stream.metadata.contentWarnings#language",
             Self::Nudity => "place.stream.metadata.contentWarnings#nudity",
             Self::Pii => "place.stream.metadata.contentWarnings#PII",
@@ -137,12 +135,8 @@ impl<S: BosStr> ContentWarningsWarnings<S> {
         match s.as_ref() {
             "place.stream.metadata.contentWarnings#death" => Self::Death,
             "place.stream.metadata.contentWarnings#drugUse" => Self::DrugUse,
-            "place.stream.metadata.contentWarnings#fantasyViolence" => {
-                Self::FantasyViolence
-            }
-            "place.stream.metadata.contentWarnings#flashingLights" => {
-                Self::FlashingLights
-            }
+            "place.stream.metadata.contentWarnings#fantasyViolence" => Self::FantasyViolence,
+            "place.stream.metadata.contentWarnings#flashingLights" => Self::FlashingLights,
             "place.stream.metadata.contentWarnings#language" => Self::Language,
             "place.stream.metadata.contentWarnings#nudity" => Self::Nudity,
             "place.stream.metadata.contentWarnings#PII" => Self::Pii,
@@ -201,21 +195,15 @@ where
         match self {
             ContentWarningsWarnings::Death => ContentWarningsWarnings::Death,
             ContentWarningsWarnings::DrugUse => ContentWarningsWarnings::DrugUse,
-            ContentWarningsWarnings::FantasyViolence => {
-                ContentWarningsWarnings::FantasyViolence
-            }
-            ContentWarningsWarnings::FlashingLights => {
-                ContentWarningsWarnings::FlashingLights
-            }
+            ContentWarningsWarnings::FantasyViolence => ContentWarningsWarnings::FantasyViolence,
+            ContentWarningsWarnings::FlashingLights => ContentWarningsWarnings::FlashingLights,
             ContentWarningsWarnings::Language => ContentWarningsWarnings::Language,
             ContentWarningsWarnings::Nudity => ContentWarningsWarnings::Nudity,
             ContentWarningsWarnings::Pii => ContentWarningsWarnings::Pii,
             ContentWarningsWarnings::Sexuality => ContentWarningsWarnings::Sexuality,
             ContentWarningsWarnings::Suffering => ContentWarningsWarnings::Suffering,
             ContentWarningsWarnings::Violence => ContentWarningsWarnings::Violence,
-            ContentWarningsWarnings::Other(v) => {
-                ContentWarningsWarnings::Other(v.into_static())
-            }
+            ContentWarningsWarnings::Other(v) => ContentWarningsWarnings::Other(v.into_static()),
         }
     }
 }
@@ -282,17 +270,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_place_stream_metadata_contentWarnings() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.metadata.contentWarnings"),
@@ -300,34 +287,44 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("PII"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("death"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("drugUse"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("fantasyViolence"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("flashingLights"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("language"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Content warnings for a stream."),
-                    ),
+                    description: Some(CowStr::new_static("Content warnings for a stream.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -347,19 +344,27 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("nudity"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("sexuality"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("suffering"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("violence"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map
         },

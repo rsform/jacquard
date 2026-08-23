@@ -20,17 +20,20 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::bullet_list::BulletList;
 use crate::blog_pckt::block::ordered_list::OrderedList;
 use crate::blog_pckt::block::text::Text;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItem<S: BosStr = DefaultStr> {
-    ///Array of block content (text or nested lists)
+    /// Array of block content (text or nested lists)
     pub content: Vec<ListItemContentItem<S>>,
     #[serde(
         flatten,
@@ -40,7 +43,6 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -76,15 +78,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,10 +199,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_listItem() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.listItem"),
@@ -217,16 +218,14 @@ fn lexicon_doc_blog_pckt_block_listItem() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Array of block content (text or nested lists)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Array of block content (text or nested lists)",
+                                )),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("blog.pckt.block.text"),
                                         CowStr::new_static("blog.pckt.block.bulletList"),
-                                        CowStr::new_static("blog.pckt.block.orderedList")
+                                        CowStr::new_static("blog.pckt.block.orderedList"),
                                     ],
                                     closed: Some(false),
                                     ..Default::default()

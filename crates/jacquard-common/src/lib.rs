@@ -214,9 +214,8 @@ pub mod jss;
 
 #[cfg(feature = "websocket")]
 pub use websocket::{
-    CloseCode, CloseFrame, WebSocketClient, WebSocketConnection, WebSocketError, WsMessage,
-    WsSink, WsStream,
-    WsText, tungstenite_client::TungsteniteClient,
+    CloseCode, CloseFrame, WebSocketClient, WebSocketConnection, WebSocketError, WsMessage, WsSink,
+    WsStream, WsText, tungstenite_client::TungsteniteClient,
 };
 
 pub use smol_str::{SmolStr, ToSmolStr, format_smolstr};

@@ -66,46 +66,48 @@ pub mod search_slugs;
 pub mod slug;
 pub mod toggle_list_item;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Datetime, Did, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::games_gamesgamesgamesgames;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivityFeedItem<S: BosStr = DefaultStr> {
-    ///When the activity occurred.
+    /// When the activity occurred.
     pub created_at: Datetime,
-    ///The game associated with this activity.
+    /// The game associated with this activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub game: Option<games_gamesgamesgamesgames::GameView<S>>,
-    ///List data, present when type is 'listCreate' or 'listAddGame'.
+    /// List data, present when type is 'listCreate' or 'listAddGame'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list: Option<games_gamesgamesgamesgames::ActivityListView<S>>,
-    ///Review data, present when type is 'review'.
+    /// Review data, present when type is 'review'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub review: Option<games_gamesgamesgamesgames::ActivityReviewView<S>>,
-    ///The type of activity.
+    /// The type of activity.
     pub r#type: ActivityFeedItemType<S>,
     #[serde(
         flatten,
@@ -198,16 +200,16 @@ where
             ActivityFeedItemType::Review => ActivityFeedItemType::Review,
             ActivityFeedItemType::ListCreate => ActivityFeedItemType::ListCreate,
             ActivityFeedItemType::ListAddGame => ActivityFeedItemType::ListAddGame,
-            ActivityFeedItemType::Other(v) => {
-                ActivityFeedItemType::Other(v.into_static())
-            }
+            ActivityFeedItemType::Other(v) => ActivityFeedItemType::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivityListView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub name: S,
@@ -221,9 +223,11 @@ pub struct ActivityListView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivityReviewView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contains_spoilers: Option<bool>,
@@ -245,9 +249,11 @@ pub struct ActivityReviewView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActorCreditView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor_uri: Option<AtUri<S>>,
@@ -264,9 +270,11 @@ pub struct ActorCreditView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActorProfileDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -293,9 +301,11 @@ pub struct ActorProfileDetailView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActorProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -312,9 +322,11 @@ pub struct ActorProfileSummaryView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeRating<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_descriptors: Option<Vec<S>>,
@@ -328,7 +340,6 @@ pub struct AgeRating<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AgeRatingOrganization<S: BosStr = DefaultStr> {
@@ -422,16 +433,16 @@ where
             AgeRatingOrganization::Grac => AgeRatingOrganization::Grac,
             AgeRatingOrganization::ClassInd => AgeRatingOrganization::ClassInd,
             AgeRatingOrganization::Acb => AgeRatingOrganization::Acb,
-            AgeRatingOrganization::Other(v) => {
-                AgeRatingOrganization::Other(v.into_static())
-            }
+            AgeRatingOrganization::Other(v) => AgeRatingOrganization::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AlternativeName<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -450,7 +461,10 @@ pub struct AlternativeName<S: BosStr = DefaultStr> {
 pub type ApplicationType<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionSummaryView<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -466,7 +480,6 @@ pub struct CollectionSummaryView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CollectionSummaryViewType<S: BosStr = DefaultStr> {
@@ -517,8 +530,7 @@ impl<S: BosStr> Serialize for CollectionSummaryViewType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for CollectionSummaryViewType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionSummaryViewType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -555,7 +567,10 @@ where
 /// Lightweight actor view for community feed items.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityFeedActorView<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -574,22 +589,25 @@ pub struct CommunityFeedActorView<S: BosStr = DefaultStr> {
 /// A community activity item with actor information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityFeedItem<S: BosStr = DefaultStr> {
-    ///The user who performed this activity.
+    /// The user who performed this activity.
     pub actor: games_gamesgamesgamesgames::CommunityFeedActorView<S>,
-    ///When the activity occurred.
+    /// When the activity occurred.
     pub created_at: Datetime,
-    ///The game associated with this activity.
+    /// The game associated with this activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub game: Option<games_gamesgamesgamesgames::GameView<S>>,
-    ///List data, present when type is 'listCreate' or 'listAddGame'.
+    /// List data, present when type is 'listCreate' or 'listAddGame'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list: Option<games_gamesgamesgamesgames::ActivityListView<S>>,
-    ///Review data, present when type is 'review'.
+    /// Review data, present when type is 'review'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub review: Option<games_gamesgamesgamesgames::ActivityReviewView<S>>,
-    ///The type of activity.
+    /// The type of activity.
     pub r#type: CommunityFeedItemType<S>,
     #[serde(
         flatten,
@@ -682,13 +700,10 @@ where
             CommunityFeedItemType::Review => CommunityFeedItemType::Review,
             CommunityFeedItemType::ListCreate => CommunityFeedItemType::ListCreate,
             CommunityFeedItemType::ListAddGame => CommunityFeedItemType::ListAddGame,
-            CommunityFeedItemType::Other(v) => {
-                CommunityFeedItemType::Other(v.into_static())
-            }
+            CommunityFeedItemType::Other(v) => CommunityFeedItemType::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CompanyRole<S: BosStr = DefaultStr> {
@@ -769,9 +784,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreditEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub department: Option<S>,
@@ -785,9 +802,11 @@ pub struct CreditEntry<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EngineSummaryView<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -802,9 +821,11 @@ pub struct EngineSummaryView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExternalIds<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_app_store: Option<S>,
@@ -839,9 +860,11 @@ pub struct ExternalIds<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExternalVideo<S: BosStr = DefaultStr> {
     pub platform: ExternalVideoPlatform<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -855,7 +878,6 @@ pub struct ExternalVideo<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ExternalVideoPlatform<S: BosStr = DefaultStr> {
@@ -933,16 +955,16 @@ where
             ExternalVideoPlatform::Youtube => ExternalVideoPlatform::Youtube,
             ExternalVideoPlatform::Twitch => ExternalVideoPlatform::Twitch,
             ExternalVideoPlatform::Vimeo => ExternalVideoPlatform::Vimeo,
-            ExternalVideoPlatform::Other(v) => {
-                ExternalVideoPlatform::Other(v.into_static())
-            }
+            ExternalVideoPlatform::Other(v) => ExternalVideoPlatform::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GameDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor_credits: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
@@ -977,9 +999,7 @@ pub struct GameDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub player_perspectives: Option<
-        Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>,
-    >,
+    pub player_perspectives: Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1008,9 +1028,11 @@ pub struct GameDetailView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GameFeedViewItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_context: Option<S>,
@@ -1024,13 +1046,15 @@ pub struct GameFeedViewItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GameSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
-    ///Earliest release date as YYYYMMDD integer.
+    /// Earliest release date as YYYYMMDD integer.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub first_release_date: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1050,9 +1074,11 @@ pub struct GameSummaryView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GameView<S: BosStr = DefaultStr> {
     pub application_type: games_gamesgamesgamesgames::ApplicationType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1081,7 +1107,6 @@ pub struct GameView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Genre<S: BosStr = DefaultStr> {
@@ -1185,7 +1210,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IndividualRole<S: BosStr = DefaultStr> {
@@ -1306,9 +1330,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ItchIoId<S: BosStr = DefaultStr> {
     pub developer: S,
     pub game: S,
@@ -1321,9 +1347,11 @@ pub struct ItchIoId<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LanguageSupport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio: Option<bool>,
@@ -1341,9 +1369,11 @@ pub struct LanguageSupport<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MediaItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
@@ -1367,7 +1397,6 @@ pub struct MediaItem<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MediaItemMediaType<S: BosStr = DefaultStr> {
@@ -1512,9 +1541,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             MediaItemMediaType::AccoladesTrailer => MediaItemMediaType::AccoladesTrailer,
-            MediaItemMediaType::AnnouncementTrailer => {
-                MediaItemMediaType::AnnouncementTrailer
-            }
+            MediaItemMediaType::AnnouncementTrailer => MediaItemMediaType::AnnouncementTrailer,
             MediaItemMediaType::Artwork => MediaItemMediaType::Artwork,
             MediaItemMediaType::CinematicTrailer => MediaItemMediaType::CinematicTrailer,
             MediaItemMediaType::ConceptArt => MediaItemMediaType::ConceptArt,
@@ -1535,9 +1562,7 @@ where
             MediaItemMediaType::LogoBlack => MediaItemMediaType::LogoBlack,
             MediaItemMediaType::LogoColor => MediaItemMediaType::LogoColor,
             MediaItemMediaType::LogoWhite => MediaItemMediaType::LogoWhite,
-            MediaItemMediaType::ReleaseDateTrailer => {
-                MediaItemMediaType::ReleaseDateTrailer
-            }
+            MediaItemMediaType::ReleaseDateTrailer => MediaItemMediaType::ReleaseDateTrailer,
             MediaItemMediaType::Screenshot => MediaItemMediaType::Screenshot,
             MediaItemMediaType::Teaser => MediaItemMediaType::Teaser,
             MediaItemMediaType::Trailer => MediaItemMediaType::Trailer,
@@ -1545,7 +1570,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Mode<S: BosStr = DefaultStr> {
@@ -1634,9 +1658,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MultiplayerMode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_campaign_coop: Option<bool>,
@@ -1667,9 +1693,11 @@ pub struct MultiplayerMode<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OrgCreditView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
@@ -1686,9 +1714,11 @@ pub struct OrgCreditView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OrgProfileDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -1722,7 +1752,6 @@ pub struct OrgProfileDetailView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OrgProfileDetailViewStatus<S: BosStr = DefaultStr> {
@@ -1779,8 +1808,7 @@ impl<S: BosStr> Serialize for OrgProfileDetailViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for OrgProfileDetailViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OrgProfileDetailViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1816,9 +1844,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OrgProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -1834,7 +1864,6 @@ pub struct OrgProfileSummaryView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlatformCategory<S: BosStr = DefaultStr> {
@@ -1922,7 +1951,10 @@ where
 /// Features supported by a game on a specific storefront/platform.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlatformFeatures<S: BosStr = DefaultStr> {
     pub features: Vec<PlatformFeaturesFeatures<S>>,
     pub platform: PlatformFeaturesPlatform<S>,
@@ -1934,7 +1966,6 @@ pub struct PlatformFeatures<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlatformFeaturesFeatures<S: BosStr = DefaultStr> {
@@ -2060,8 +2091,7 @@ impl<S: BosStr> Serialize for PlatformFeaturesFeatures<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PlatformFeaturesFeatures<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PlatformFeaturesFeatures<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2085,9 +2115,7 @@ where
     type Output = PlatformFeaturesFeatures<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            PlatformFeaturesFeatures::Achievements => {
-                PlatformFeaturesFeatures::Achievements
-            }
+            PlatformFeaturesFeatures::Achievements => PlatformFeaturesFeatures::Achievements,
             PlatformFeaturesFeatures::CloudSaves => PlatformFeaturesFeatures::CloudSaves,
             PlatformFeaturesFeatures::ControllerSupport => {
                 PlatformFeaturesFeatures::ControllerSupport
@@ -2101,65 +2129,40 @@ where
             PlatformFeaturesFeatures::CrossPlatformMultiplayer => {
                 PlatformFeaturesFeatures::CrossPlatformMultiplayer
             }
-            PlatformFeaturesFeatures::FamilySharing => {
-                PlatformFeaturesFeatures::FamilySharing
-            }
-            PlatformFeaturesFeatures::InAppPurchases => {
-                PlatformFeaturesFeatures::InAppPurchases
-            }
-            PlatformFeaturesFeatures::Leaderboards => {
-                PlatformFeaturesFeatures::Leaderboards
-            }
-            PlatformFeaturesFeatures::LevelEditor => {
-                PlatformFeaturesFeatures::LevelEditor
-            }
-            PlatformFeaturesFeatures::ModdingSupport => {
-                PlatformFeaturesFeatures::ModdingSupport
-            }
-            PlatformFeaturesFeatures::MultiPlayer => {
-                PlatformFeaturesFeatures::MultiPlayer
-            }
-            PlatformFeaturesFeatures::MultiPlayerLan => {
-                PlatformFeaturesFeatures::MultiPlayerLan
-            }
+            PlatformFeaturesFeatures::FamilySharing => PlatformFeaturesFeatures::FamilySharing,
+            PlatformFeaturesFeatures::InAppPurchases => PlatformFeaturesFeatures::InAppPurchases,
+            PlatformFeaturesFeatures::Leaderboards => PlatformFeaturesFeatures::Leaderboards,
+            PlatformFeaturesFeatures::LevelEditor => PlatformFeaturesFeatures::LevelEditor,
+            PlatformFeaturesFeatures::ModdingSupport => PlatformFeaturesFeatures::ModdingSupport,
+            PlatformFeaturesFeatures::MultiPlayer => PlatformFeaturesFeatures::MultiPlayer,
+            PlatformFeaturesFeatures::MultiPlayerLan => PlatformFeaturesFeatures::MultiPlayerLan,
             PlatformFeaturesFeatures::MultiPlayerOnline => {
                 PlatformFeaturesFeatures::MultiPlayerOnline
             }
             PlatformFeaturesFeatures::Pvp => PlatformFeaturesFeatures::Pvp,
             PlatformFeaturesFeatures::PvpLan => PlatformFeaturesFeatures::PvpLan,
             PlatformFeaturesFeatures::PvpOnline => PlatformFeaturesFeatures::PvpOnline,
-            PlatformFeaturesFeatures::RemotePlayPhone => {
-                PlatformFeaturesFeatures::RemotePlayPhone
-            }
+            PlatformFeaturesFeatures::RemotePlayPhone => PlatformFeaturesFeatures::RemotePlayPhone,
             PlatformFeaturesFeatures::RemotePlayTablet => {
                 PlatformFeaturesFeatures::RemotePlayTablet
             }
-            PlatformFeaturesFeatures::RemotePlayTv => {
-                PlatformFeaturesFeatures::RemotePlayTv
-            }
+            PlatformFeaturesFeatures::RemotePlayTv => PlatformFeaturesFeatures::RemotePlayTv,
             PlatformFeaturesFeatures::RemotePlayTogether => {
                 PlatformFeaturesFeatures::RemotePlayTogether
             }
-            PlatformFeaturesFeatures::SinglePlayer => {
-                PlatformFeaturesFeatures::SinglePlayer
-            }
+            PlatformFeaturesFeatures::SinglePlayer => PlatformFeaturesFeatures::SinglePlayer,
             PlatformFeaturesFeatures::SteamTradingCards => {
                 PlatformFeaturesFeatures::SteamTradingCards
             }
-            PlatformFeaturesFeatures::SteamWorkshop => {
-                PlatformFeaturesFeatures::SteamWorkshop
-            }
+            PlatformFeaturesFeatures::SteamWorkshop => PlatformFeaturesFeatures::SteamWorkshop,
             PlatformFeaturesFeatures::TrackingAndManagement => {
                 PlatformFeaturesFeatures::TrackingAndManagement
             }
             PlatformFeaturesFeatures::VrSupport => PlatformFeaturesFeatures::VrSupport,
-            PlatformFeaturesFeatures::Other(v) => {
-                PlatformFeaturesFeatures::Other(v.into_static())
-            }
+            PlatformFeaturesFeatures::Other(v) => PlatformFeaturesFeatures::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlatformFeaturesPlatform<S: BosStr = DefaultStr> {
@@ -2219,8 +2222,7 @@ impl<S: BosStr> Serialize for PlatformFeaturesPlatform<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PlatformFeaturesPlatform<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PlatformFeaturesPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2247,23 +2249,19 @@ where
             PlatformFeaturesPlatform::Steam => PlatformFeaturesPlatform::Steam,
             PlatformFeaturesPlatform::Gog => PlatformFeaturesPlatform::Gog,
             PlatformFeaturesPlatform::EpicGames => PlatformFeaturesPlatform::EpicGames,
-            PlatformFeaturesPlatform::PlayStation => {
-                PlatformFeaturesPlatform::PlayStation
-            }
+            PlatformFeaturesPlatform::PlayStation => PlatformFeaturesPlatform::PlayStation,
             PlatformFeaturesPlatform::Xbox => PlatformFeaturesPlatform::Xbox,
-            PlatformFeaturesPlatform::NintendoEshop => {
-                PlatformFeaturesPlatform::NintendoEshop
-            }
-            PlatformFeaturesPlatform::Other(v) => {
-                PlatformFeaturesPlatform::Other(v.into_static())
-            }
+            PlatformFeaturesPlatform::NintendoEshop => PlatformFeaturesPlatform::NintendoEshop,
+            PlatformFeaturesPlatform::Other(v) => PlatformFeaturesPlatform::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlatformSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub abbreviation: Option<S>,
@@ -2282,9 +2280,11 @@ pub struct PlatformSummaryView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlatformVersion<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub connectivity: Option<S>,
@@ -2315,7 +2315,6 @@ pub struct PlatformVersion<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlayerPerspective<S: BosStr = DefaultStr> {
@@ -2412,9 +2411,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -2431,7 +2432,6 @@ pub struct ProfileSummaryView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileSummaryViewProfileType<S: BosStr = DefaultStr> {
@@ -2479,8 +2479,7 @@ impl<S: BosStr> Serialize for ProfileSummaryViewProfileType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ProfileSummaryViewProfileType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileSummaryViewProfileType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2513,14 +2512,16 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Release<S: BosStr = DefaultStr> {
-    ///Free-text platform name, used when no platform record exists.
+    /// Free-text platform name, used when no platform record exists.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<S>,
-    ///AT URI of a platform record.
+    /// AT URI of a platform record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2534,9 +2535,11 @@ pub struct Release<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReleaseDate<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region: Option<ReleaseDateRegion<S>>,
@@ -2554,7 +2557,6 @@ pub struct ReleaseDate<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReleaseDateRegion<S: BosStr = DefaultStr> {
@@ -2665,7 +2667,6 @@ where
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReleaseDateReleasedAtFormat<S: BosStr = DefaultStr> {
     YyyyMmDd,
@@ -2730,8 +2731,7 @@ impl<S: BosStr> Serialize for ReleaseDateReleasedAtFormat<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ReleaseDateReleasedAtFormat<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReleaseDateReleasedAtFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2755,9 +2755,7 @@ where
     type Output = ReleaseDateReleasedAtFormat<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ReleaseDateReleasedAtFormat::YyyyMmDd => {
-                ReleaseDateReleasedAtFormat::YyyyMmDd
-            }
+            ReleaseDateReleasedAtFormat::YyyyMmDd => ReleaseDateReleasedAtFormat::YyyyMmDd,
             ReleaseDateReleasedAtFormat::YyyyMm => ReleaseDateReleasedAtFormat::YyyyMm,
             ReleaseDateReleasedAtFormat::YyyyQ1 => ReleaseDateReleasedAtFormat::YyyyQ1,
             ReleaseDateReleasedAtFormat::YyyyQ2 => ReleaseDateReleasedAtFormat::YyyyQ2,
@@ -2771,7 +2769,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReleaseDateStatus<S: BosStr = DefaultStr> {
@@ -2885,11 +2882,14 @@ where
 /// An inline attestation signature.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Signature<S: BosStr = DefaultStr> {
-    ///DID key reference (e.g., did:web:example.com#signing1).
+    /// DID key reference (e.g., did:web:example.com#signing1).
     pub key: S,
-    ///The signature bytes.
+    /// The signature bytes.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub signature: Bytes,
     #[serde(
@@ -2901,9 +2901,11 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonGameFeedItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_context: Option<S>,
@@ -2920,7 +2922,10 @@ pub struct SkeletonGameFeedItem<S: BosStr = DefaultStr> {
 /// System requirements for a game on a specific platform.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SystemRequirements<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum: Option<games_gamesgamesgamesgames::SystemSpec<S>>,
@@ -2935,7 +2940,6 @@ pub struct SystemRequirements<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SystemRequirementsPlatform<S: BosStr = DefaultStr> {
@@ -2986,8 +2990,7 @@ impl<S: BosStr> Serialize for SystemRequirementsPlatform<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for SystemRequirementsPlatform<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SystemRequirementsPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -3024,7 +3027,10 @@ where
 /// Hardware/software specification for a platform.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SystemSpec<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_notes: Option<S>,
@@ -3050,7 +3056,6 @@ pub struct SystemSpec<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Theme<S: BosStr = DefaultStr> {
@@ -3203,9 +3208,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TimeToBeat<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completely: Option<i64>,
@@ -3222,9 +3229,11 @@ pub struct TimeToBeat<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<AtUri<S>>,
@@ -3237,9 +3246,11 @@ pub struct ViewerState<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Website<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<WebsiteType<S>>,
@@ -3252,7 +3263,6 @@ pub struct Website<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WebsiteType<S: BosStr = DefaultStr> {
@@ -3520,25 +3530,20 @@ impl<S: BosStr> LexiconSchema for ActorProfileDetailView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -3605,25 +3610,20 @@ impl<S: BosStr> LexiconSchema for ActorProfileSummaryView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -3934,19 +3934,16 @@ impl<S: BosStr> LexiconSchema for MediaItem<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*", "video/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -4027,25 +4024,20 @@ impl<S: BosStr> LexiconSchema for OrgProfileDetailView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -4102,25 +4094,20 @@ impl<S: BosStr> LexiconSchema for OrgProfileSummaryView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -4212,25 +4199,20 @@ impl<S: BosStr> LexiconSchema for ProfileSummaryView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -4402,15 +4384,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod activity_feed_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4453,10 +4434,7 @@ pub mod activity_feed_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActivityFeedItemBuilder<
-    St: activity_feed_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ActivityFeedItemBuilder<St: activity_feed_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -4470,10 +4448,7 @@ pub struct ActivityFeedItemBuilder<
 
 impl ActivityFeedItem<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActivityFeedItemBuilder<
-        activity_feed_item_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ActivityFeedItemBuilder<activity_feed_item_state::Empty, DefaultStr> {
         ActivityFeedItemBuilder::new()
     }
 }
@@ -4536,10 +4511,7 @@ impl<St: activity_feed_item_state::State, S: BosStr> ActivityFeedItemBuilder<St,
         self
     }
     /// Set the `game` field to an Option value (optional)
-    pub fn maybe_game(
-        mut self,
-        value: Option<games_gamesgamesgamesgames::GameView<S>>,
-    ) -> Self {
+    pub fn maybe_game(mut self, value: Option<games_gamesgamesgamesgames::GameView<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -4620,10 +4592,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActivityFeedItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActivityFeedItem<S> {
         ActivityFeedItem {
             created_at: self._fields.0.unwrap(),
             game: self._fields.1,
@@ -4636,10 +4605,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.defs"),
@@ -4648,20 +4617,19 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityFeedItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("type"), SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the activity occurred."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the activity occurred.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -4696,9 +4664,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The type of activity."),
-                                ),
+                                description: Some(CowStr::new_static("The type of activity.")),
                                 ..Default::default()
                             }),
                         );
@@ -4710,12 +4676,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityListView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4728,7 +4693,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -4745,12 +4712,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityReviewView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("rating"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("rating"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4786,11 +4752,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("text"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -4807,9 +4777,10 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("actorCreditView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("credits")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("credits"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4854,15 +4825,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("actorProfileDetailView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("did")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -4936,15 +4907,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("actorProfileSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("did")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -4975,12 +4946,10 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("ageRating"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("organization"),
-                            SmolStr::new_static("rating")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("organization"),
+                        SmolStr::new_static("rating"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4995,11 +4964,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("organization"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rating"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5015,15 +4988,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("locale"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5032,28 +5011,37 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("applicationType"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("collectionSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -5070,11 +5058,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityFeedActorView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Lightweight actor view for community feed items.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Lightweight actor view for community feed items.",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -5095,7 +5081,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5105,18 +5093,14 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityFeedItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A community activity item with actor information.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("type"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("actor")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A community activity item with actor information.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("actor"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5132,9 +5116,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the activity occurred."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the activity occurred.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -5169,9 +5153,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The type of activity."),
-                                ),
+                                description: Some(CowStr::new_static("The type of activity.")),
                                 ..Default::default()
                             }),
                         );
@@ -5182,7 +5164,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("companyRole"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("creditEntry"),
@@ -5215,19 +5199,24 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("engineSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -5249,27 +5238,39 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("appleAppStore"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("epicGames"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("gog"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("googlePlay"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("humbleBundle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("igdb"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("itchIo"),
@@ -5282,23 +5283,33 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("nintendoEshop"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("playStation"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("steam"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("twitch"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("xbox"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5308,26 +5319,30 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("externalVideo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("videoId"),
-                            SmolStr::new_static("platform")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("videoId"),
+                        SmolStr::new_static("platform"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("platform"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("videoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5337,12 +5352,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameDetailView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("uri"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5498,7 +5512,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("orgCredits"),
@@ -5552,15 +5568,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("storyline"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("summary"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("themes"),
@@ -5650,9 +5672,10 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5685,15 +5708,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("summary"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -5710,12 +5739,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("name"),
-                            SmolStr::new_static("applicationType")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("applicationType"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5761,7 +5789,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("releases"),
@@ -5777,11 +5807,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("summary"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("themes"),
@@ -5818,30 +5852,37 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("genre"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("individualRole"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("itchIoId"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("developer"), SmolStr::new_static("game")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("developer"),
+                        SmolStr::new_static("game"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("developer"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("game"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -5869,7 +5910,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("language"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("subtitles"),
@@ -5890,11 +5933,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("height"),
@@ -5904,15 +5951,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("locale"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("mediaType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("width"),
@@ -5927,7 +5980,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("mode"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("multiplayerMode"),
@@ -5991,7 +6046,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6001,9 +6058,10 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("orgCreditView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("roles")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("roles"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6048,19 +6106,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("orgProfileDetailView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("did")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("country"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -6128,7 +6188,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -6157,15 +6219,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("orgProfileSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("did")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -6195,22 +6257,20 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("platformCategory"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("platformFeatures"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Features supported by a game on a specific storefront/platform.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("platform"),
-                            SmolStr::new_static("features")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Features supported by a game on a specific storefront/platform.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("platform"),
+                        SmolStr::new_static("features"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6225,7 +6285,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6235,15 +6297,18 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("platformSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("abbreviation"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("category"),
@@ -6256,11 +6321,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -6283,19 +6352,27 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("connectivity"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("cpu"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("gpu"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("maxResolution"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("media"),
@@ -6311,27 +6388,39 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("memory"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("os"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("output"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("storage"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("summary"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6340,23 +6429,26 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("playerPerspective"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("profileSummaryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("did"),
-                            SmolStr::new_static("profileType")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("profileType"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -6374,7 +6466,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("profileType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -6397,20 +6491,18 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Free-text platform name, used when no platform record exists.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Free-text platform name, used when no platform record exists.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platformUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT URI of a platform record."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT URI of a platform record.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -6440,19 +6532,27 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("region"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("releasedAt"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("releasedAtFormat"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6462,31 +6562,28 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An inline attestation signature."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("key"), SmolStr::new_static("signature")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("An inline attestation signature.")),
+                    required: Some(vec![
+                        SmolStr::new_static("key"),
+                        SmolStr::new_static("signature"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID key reference (e.g., did:web:example.com#signing1).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID key reference (e.g., did:web:example.com#signing1).",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signature"),
-                            LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
+                            LexObjectProperty::Bytes(LexBytes {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6522,11 +6619,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemRequirements"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "System requirements for a game on a specific platform.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System requirements for a game on a specific platform.",
+                    )),
                     required: Some(vec![SmolStr::new_static("platform")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -6540,7 +6635,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("recommended"),
@@ -6557,45 +6654,59 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemSpec"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Hardware/software specification for a platform.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Hardware/software specification for a platform.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("additionalNotes"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("directx"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("graphics"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("memory"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("os"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("processor"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("soundCard"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("storage"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -6604,7 +6715,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("theme"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("timeToBeat"),
@@ -6662,7 +6775,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
@@ -6689,15 +6804,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod activity_list_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6754,10 +6868,7 @@ pub mod activity_list_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActivityListViewBuilder<
-    St: activity_list_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ActivityListViewBuilder<St: activity_list_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -6765,10 +6876,7 @@ pub struct ActivityListViewBuilder<
 
 impl ActivityListView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActivityListViewBuilder<
-        activity_list_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ActivityListViewBuilder<activity_list_view_state::Empty, DefaultStr> {
         ActivityListViewBuilder::new()
     }
 }
@@ -6876,10 +6984,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActivityListView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActivityListView<S> {
         ActivityListView {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -6896,15 +7001,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod activity_review_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6961,10 +7065,8 @@ pub mod activity_review_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActivityReviewViewBuilder<
-    St: activity_review_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ActivityReviewViewBuilder<St: activity_review_view_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -6980,10 +7082,7 @@ pub struct ActivityReviewViewBuilder<
 
 impl ActivityReviewView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActivityReviewViewBuilder<
-        activity_review_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ActivityReviewViewBuilder<activity_review_view_state::Empty, DefaultStr> {
         ActivityReviewViewBuilder::new()
     }
 }
@@ -7147,10 +7246,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActivityReviewView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActivityReviewView<S> {
         ActivityReviewView {
             contains_spoilers: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -7171,15 +7267,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod actor_credit_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7222,10 +7317,7 @@ pub mod actor_credit_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActorCreditViewBuilder<
-    St: actor_credit_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ActorCreditViewBuilder<St: actor_credit_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -7353,10 +7445,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActorCreditView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActorCreditView<S> {
         ActorCreditView {
             actor_uri: self._fields.0,
             credits: self._fields.1.unwrap(),
@@ -7374,15 +7463,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod actor_profile_detail_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7446,20 +7534,15 @@ pub struct ActorProfileDetailViewBuilder<
 
 impl ActorProfileDetailView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActorProfileDetailViewBuilder<
-        actor_profile_detail_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ActorProfileDetailViewBuilder<actor_profile_detail_view_state::Empty, DefaultStr>
+    {
         ActorProfileDetailViewBuilder::new()
     }
 }
 
 impl<S: BosStr> ActorProfileDetailView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ActorProfileDetailViewBuilder<
-        actor_profile_detail_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ActorProfileDetailViewBuilder<actor_profile_detail_view_state::Empty, S> {
         ActorProfileDetailViewBuilder::builder()
     }
 }
@@ -7475,9 +7558,7 @@ impl ActorProfileDetailViewBuilder<actor_profile_detail_view_state::Empty, Defau
     }
 }
 
-impl<
-    S: BosStr,
-> ActorProfileDetailViewBuilder<actor_profile_detail_view_state::Empty, S> {
+impl<S: BosStr> ActorProfileDetailViewBuilder<actor_profile_detail_view_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ActorProfileDetailViewBuilder {
@@ -7488,10 +7569,7 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -7504,10 +7582,7 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -7520,10 +7595,7 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -7536,15 +7608,9 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -7574,10 +7640,7 @@ where
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -7590,10 +7653,7 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -7625,10 +7685,7 @@ where
     }
 }
 
-impl<
-    St: actor_profile_detail_view_state::State,
-    S: BosStr,
-> ActorProfileDetailViewBuilder<St, S> {
+impl<St: actor_profile_detail_view_state::State, S: BosStr> ActorProfileDetailViewBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
@@ -7695,15 +7752,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod actor_profile_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7751,34 +7807,31 @@ pub struct ActorProfileSummaryViewBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
+    _fields: (
+        Option<BlobRef<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ActorProfileSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActorProfileSummaryViewBuilder<
-        actor_profile_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::Empty, DefaultStr> {
         ActorProfileSummaryViewBuilder::new()
     }
 }
 
 impl<S: BosStr> ActorProfileSummaryView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ActorProfileSummaryViewBuilder<
-        actor_profile_summary_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::Empty, S> {
         ActorProfileSummaryViewBuilder::builder()
     }
 }
 
-impl ActorProfileSummaryViewBuilder<
-    actor_profile_summary_view_state::Empty,
-    DefaultStr,
-> {
+impl ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ActorProfileSummaryViewBuilder {
@@ -7789,9 +7842,7 @@ impl ActorProfileSummaryViewBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::Empty, S> {
+impl<S: BosStr> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ActorProfileSummaryViewBuilder {
@@ -7802,10 +7853,7 @@ impl<
     }
 }
 
-impl<
-    St: actor_profile_summary_view_state::State,
-    S: BosStr,
-> ActorProfileSummaryViewBuilder<St, S> {
+impl<St: actor_profile_summary_view_state::State, S: BosStr> ActorProfileSummaryViewBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -7827,10 +7875,7 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActorProfileSummaryViewBuilder<
-        actor_profile_summary_view_state::SetDid<St>,
-        S,
-    > {
+    ) -> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ActorProfileSummaryViewBuilder {
             _state: PhantomData,
@@ -7840,10 +7885,7 @@ where
     }
 }
 
-impl<
-    St: actor_profile_summary_view_state::State,
-    S: BosStr,
-> ActorProfileSummaryViewBuilder<St, S> {
+impl<St: actor_profile_summary_view_state::State, S: BosStr> ActorProfileSummaryViewBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -7865,10 +7907,7 @@ where
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ActorProfileSummaryViewBuilder<
-        actor_profile_summary_view_state::SetUri<St>,
-        S,
-    > {
+    ) -> ActorProfileSummaryViewBuilder<actor_profile_summary_view_state::SetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ActorProfileSummaryViewBuilder {
             _state: PhantomData,
@@ -7916,9 +7955,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -7929,9 +7967,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -7942,15 +7979,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod collection_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8009,20 +8045,14 @@ pub struct CollectionSummaryViewBuilder<
 
 impl CollectionSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CollectionSummaryViewBuilder<
-        collection_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CollectionSummaryViewBuilder<collection_summary_view_state::Empty, DefaultStr> {
         CollectionSummaryViewBuilder::new()
     }
 }
 
 impl<S: BosStr> CollectionSummaryView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CollectionSummaryViewBuilder<
-        collection_summary_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> CollectionSummaryViewBuilder<collection_summary_view_state::Empty, S> {
         CollectionSummaryViewBuilder::builder()
     }
 }
@@ -8068,10 +8098,7 @@ where
     }
 }
 
-impl<
-    St: collection_summary_view_state::State,
-    S: BosStr,
-> CollectionSummaryViewBuilder<St, S> {
+impl<St: collection_summary_view_state::State, S: BosStr> CollectionSummaryViewBuilder<St, S> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -8084,15 +8111,9 @@ impl<
     }
 }
 
-impl<
-    St: collection_summary_view_state::State,
-    S: BosStr,
-> CollectionSummaryViewBuilder<St, S> {
+impl<St: collection_summary_view_state::State, S: BosStr> CollectionSummaryViewBuilder<St, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(
-        mut self,
-        value: impl Into<Option<CollectionSummaryViewType<S>>>,
-    ) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<CollectionSummaryViewType<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -8160,15 +8181,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod community_feed_actor_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8210,20 +8230,15 @@ pub struct CommunityFeedActorViewBuilder<
 
 impl CommunityFeedActorView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CommunityFeedActorViewBuilder<
-        community_feed_actor_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CommunityFeedActorViewBuilder<community_feed_actor_view_state::Empty, DefaultStr>
+    {
         CommunityFeedActorViewBuilder::new()
     }
 }
 
 impl<S: BosStr> CommunityFeedActorView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CommunityFeedActorViewBuilder<
-        community_feed_actor_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> CommunityFeedActorViewBuilder<community_feed_actor_view_state::Empty, S> {
         CommunityFeedActorViewBuilder::builder()
     }
 }
@@ -8239,9 +8254,7 @@ impl CommunityFeedActorViewBuilder<community_feed_actor_view_state::Empty, Defau
     }
 }
 
-impl<
-    S: BosStr,
-> CommunityFeedActorViewBuilder<community_feed_actor_view_state::Empty, S> {
+impl<S: BosStr> CommunityFeedActorViewBuilder<community_feed_actor_view_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         CommunityFeedActorViewBuilder {
@@ -8271,10 +8284,7 @@ where
     }
 }
 
-impl<
-    St: community_feed_actor_view_state::State,
-    S: BosStr,
-> CommunityFeedActorViewBuilder<St, S> {
+impl<St: community_feed_actor_view_state::State, S: BosStr> CommunityFeedActorViewBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -8287,10 +8297,7 @@ impl<
     }
 }
 
-impl<
-    St: community_feed_actor_view_state::State,
-    S: BosStr,
-> CommunityFeedActorViewBuilder<St, S> {
+impl<St: community_feed_actor_view_state::State, S: BosStr> CommunityFeedActorViewBuilder<St, S> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -8338,15 +8345,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod community_feed_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8403,10 +8409,7 @@ pub mod community_feed_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityFeedItemBuilder<
-    St: community_feed_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CommunityFeedItemBuilder<St: community_feed_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<games_gamesgamesgamesgames::CommunityFeedActorView<S>>,
@@ -8421,10 +8424,7 @@ pub struct CommunityFeedItemBuilder<
 
 impl CommunityFeedItem<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CommunityFeedItemBuilder<
-        community_feed_item_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CommunityFeedItemBuilder<community_feed_item_state::Empty, DefaultStr> {
         CommunityFeedItemBuilder::new()
     }
 }
@@ -8506,10 +8506,7 @@ impl<St: community_feed_item_state::State, S: BosStr> CommunityFeedItemBuilder<S
         self
     }
     /// Set the `game` field to an Option value (optional)
-    pub fn maybe_game(
-        mut self,
-        value: Option<games_gamesgamesgamesgames::GameView<S>>,
-    ) -> Self {
+    pub fn maybe_game(mut self, value: Option<games_gamesgamesgamesgames::GameView<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -8592,10 +8589,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityFeedItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityFeedItem<S> {
         CommunityFeedItem {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -8615,15 +8609,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod credit_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8656,7 +8649,10 @@ pub mod credit_entry_state {
 /// Builder for constructing an instance of this type.
 pub struct CreditEntryBuilder<St: credit_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<games_gamesgamesgamesgames::IndividualRole<S>>),
+    _fields: (
+        Option<S>,
+        Option<games_gamesgamesgamesgames::IndividualRole<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -8742,10 +8738,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreditEntry<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreditEntry<S> {
         CreditEntry {
             department: self._fields.0,
             role: self._fields.1.unwrap(),
@@ -8761,15 +8754,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod engine_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8812,10 +8804,7 @@ pub mod engine_summary_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EngineSummaryViewBuilder<
-    St: engine_summary_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct EngineSummaryViewBuilder<St: engine_summary_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -8823,10 +8812,7 @@ pub struct EngineSummaryViewBuilder<
 
 impl EngineSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EngineSummaryViewBuilder<
-        engine_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> EngineSummaryViewBuilder<engine_summary_view_state::Empty, DefaultStr> {
         EngineSummaryViewBuilder::new()
     }
 }
@@ -8927,10 +8913,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> EngineSummaryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EngineSummaryView<S> {
         EngineSummaryView {
             name: self._fields.0.unwrap(),
             slug: self._fields.1,
@@ -8947,9 +8930,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -8960,9 +8942,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -8973,15 +8954,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod game_detail_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9038,10 +9018,7 @@ pub mod game_detail_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameDetailViewBuilder<
-    St: game_detail_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GameDetailViewBuilder<St: game_detail_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
@@ -9096,34 +9073,8 @@ impl GameDetailViewBuilder<game_detail_view_state::Empty, DefaultStr> {
         GameDetailViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -9136,34 +9087,8 @@ impl<S: BosStr> GameDetailViewBuilder<game_detail_view_state::Empty, S> {
         GameDetailViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -9390,10 +9315,7 @@ impl<St: game_detail_view_state::State, S: BosStr> GameDetailViewBuilder<St, S> 
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Mode<S>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<games_gamesgamesgamesgames::Mode<S>>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -9696,10 +9618,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GameDetailView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GameDetailView<S> {
         GameDetailView {
             actor_credits: self._fields.0,
             age_ratings: self._fields.1,
@@ -9741,15 +9660,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod game_feed_view_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9780,10 +9698,7 @@ pub mod game_feed_view_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameFeedViewItemBuilder<
-    St: game_feed_view_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GameFeedViewItemBuilder<St: game_feed_view_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<games_gamesgamesgamesgames::GameView<S>>),
     _type: PhantomData<fn() -> S>,
@@ -9791,10 +9706,7 @@ pub struct GameFeedViewItemBuilder<
 
 impl GameFeedViewItem<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GameFeedViewItemBuilder<
-        game_feed_view_item_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GameFeedViewItemBuilder<game_feed_view_item_state::Empty, DefaultStr> {
         GameFeedViewItemBuilder::new()
     }
 }
@@ -9874,10 +9786,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GameFeedViewItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GameFeedViewItem<S> {
         GameFeedViewItem {
             feed_context: self._fields.0,
             game: self._fields.1.unwrap(),
@@ -9893,15 +9802,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod game_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9944,10 +9852,7 @@ pub mod game_summary_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GameSummaryViewBuilder<
-    St: game_summary_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GameSummaryViewBuilder<St: game_summary_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<games_gamesgamesgamesgames::ApplicationType<S>>,
@@ -10132,10 +10037,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GameSummaryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GameSummaryView<S> {
         GameSummaryView {
             application_type: self._fields.0,
             first_release_date: self._fields.1,
@@ -10156,15 +10058,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod game_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10258,7 +10159,9 @@ impl GameViewBuilder<game_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         GameViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -10269,7 +10172,9 @@ impl<S: BosStr> GameViewBuilder<game_view_state::Empty, S> {
     pub fn builder() -> Self {
         GameViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -10351,10 +10256,7 @@ where
     St::Name: game_view_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> GameViewBuilder<game_view_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> GameViewBuilder<game_view_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         GameViewBuilder {
             _state: PhantomData,
@@ -10516,9 +10418,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -10529,9 +10430,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -10542,9 +10442,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -10555,9 +10454,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -10568,15 +10466,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod org_credit_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10619,10 +10516,7 @@ pub mod org_credit_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OrgCreditViewBuilder<
-    St: org_credit_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct OrgCreditViewBuilder<St: org_credit_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -10750,10 +10644,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> OrgCreditView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OrgCreditView<S> {
         OrgCreditView {
             display_name: self._fields.0,
             org_uri: self._fields.1,
@@ -10771,15 +10662,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod org_profile_detail_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10847,20 +10737,14 @@ pub struct OrgProfileDetailViewBuilder<
 
 impl OrgProfileDetailView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> OrgProfileDetailViewBuilder<
-        org_profile_detail_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> OrgProfileDetailViewBuilder<org_profile_detail_view_state::Empty, DefaultStr> {
         OrgProfileDetailViewBuilder::new()
     }
 }
 
 impl<S: BosStr> OrgProfileDetailView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> OrgProfileDetailViewBuilder<
-        org_profile_detail_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> OrgProfileDetailViewBuilder<org_profile_detail_view_state::Empty, S> {
         OrgProfileDetailViewBuilder::builder()
     }
 }
@@ -10871,19 +10755,7 @@ impl OrgProfileDetailViewBuilder<org_profile_detail_view_state::Empty, DefaultSt
         OrgProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -10896,29 +10768,14 @@ impl<S: BosStr> OrgProfileDetailViewBuilder<org_profile_detail_view_state::Empty
         OrgProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -10931,10 +10788,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -10947,10 +10801,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -10963,10 +10814,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -10979,15 +10827,9 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -11017,10 +10859,7 @@ where
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -11033,10 +10872,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `foundedAt` field (optional)
     pub fn founded_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -11049,10 +10885,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
@@ -11071,10 +10904,7 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -11087,15 +10917,9 @@ impl<
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<OrgProfileDetailViewStatus<S>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<OrgProfileDetailViewStatus<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -11125,10 +10949,7 @@ where
     }
 }
 
-impl<
-    St: org_profile_detail_view_state::State,
-    S: BosStr,
-> OrgProfileDetailViewBuilder<St, S> {
+impl<St: org_profile_detail_view_state::State, S: BosStr> OrgProfileDetailViewBuilder<St, S> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
@@ -11203,15 +11024,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod org_profile_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11259,26 +11079,26 @@ pub struct OrgProfileSummaryViewBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
+    _fields: (
+        Option<BlobRef<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl OrgProfileSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> OrgProfileSummaryViewBuilder<
-        org_profile_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> OrgProfileSummaryViewBuilder<org_profile_summary_view_state::Empty, DefaultStr>
+    {
         OrgProfileSummaryViewBuilder::new()
     }
 }
 
 impl<S: BosStr> OrgProfileSummaryView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> OrgProfileSummaryViewBuilder<
-        org_profile_summary_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> OrgProfileSummaryViewBuilder<org_profile_summary_view_state::Empty, S> {
         OrgProfileSummaryViewBuilder::builder()
     }
 }
@@ -11305,10 +11125,7 @@ impl<S: BosStr> OrgProfileSummaryViewBuilder<org_profile_summary_view_state::Emp
     }
 }
 
-impl<
-    St: org_profile_summary_view_state::State,
-    S: BosStr,
-> OrgProfileSummaryViewBuilder<St, S> {
+impl<St: org_profile_summary_view_state::State, S: BosStr> OrgProfileSummaryViewBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -11340,10 +11157,7 @@ where
     }
 }
 
-impl<
-    St: org_profile_summary_view_state::State,
-    S: BosStr,
-> OrgProfileSummaryViewBuilder<St, S> {
+impl<St: org_profile_summary_view_state::State, S: BosStr> OrgProfileSummaryViewBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -11413,15 +11227,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod platform_features_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11464,10 +11277,7 @@ pub mod platform_features_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlatformFeaturesBuilder<
-    St: platform_features_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PlatformFeaturesBuilder<St: platform_features_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<PlatformFeaturesFeatures<S>>>,
@@ -11565,10 +11375,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PlatformFeatures<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlatformFeatures<S> {
         PlatformFeatures {
             features: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -11584,15 +11391,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod platform_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11652,20 +11458,14 @@ pub struct PlatformSummaryViewBuilder<
 
 impl PlatformSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> PlatformSummaryViewBuilder<
-        platform_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> PlatformSummaryViewBuilder<platform_summary_view_state::Empty, DefaultStr> {
         PlatformSummaryViewBuilder::new()
     }
 }
 
 impl<S: BosStr> PlatformSummaryView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> PlatformSummaryViewBuilder<
-        platform_summary_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> PlatformSummaryViewBuilder<platform_summary_view_state::Empty, S> {
         PlatformSummaryViewBuilder::builder()
     }
 }
@@ -11692,10 +11492,7 @@ impl<S: BosStr> PlatformSummaryViewBuilder<platform_summary_view_state::Empty, S
     }
 }
 
-impl<
-    St: platform_summary_view_state::State,
-    S: BosStr,
-> PlatformSummaryViewBuilder<St, S> {
+impl<St: platform_summary_view_state::State, S: BosStr> PlatformSummaryViewBuilder<St, S> {
     /// Set the `abbreviation` field (optional)
     pub fn abbreviation(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -11708,10 +11505,7 @@ impl<
     }
 }
 
-impl<
-    St: platform_summary_view_state::State,
-    S: BosStr,
-> PlatformSummaryViewBuilder<St, S> {
+impl<St: platform_summary_view_state::State, S: BosStr> PlatformSummaryViewBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(
         mut self,
@@ -11749,10 +11543,7 @@ where
     }
 }
 
-impl<
-    St: platform_summary_view_state::State,
-    S: BosStr,
-> PlatformSummaryViewBuilder<St, S> {
+impl<St: platform_summary_view_state::State, S: BosStr> PlatformSummaryViewBuilder<St, S> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -11802,10 +11593,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PlatformSummaryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlatformSummaryView<S> {
         PlatformSummaryView {
             abbreviation: self._fields.0,
             category: self._fields.1,
@@ -11824,9 +11612,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -11837,15 +11624,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod profile_summary_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11902,10 +11688,8 @@ pub mod profile_summary_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileSummaryViewBuilder<
-    St: profile_summary_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ProfileSummaryViewBuilder<St: profile_summary_view_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
@@ -11919,10 +11703,7 @@ pub struct ProfileSummaryViewBuilder<
 
 impl ProfileSummaryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ProfileSummaryViewBuilder<
-        profile_summary_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ProfileSummaryViewBuilder<profile_summary_view_state::Empty, DefaultStr> {
         ProfileSummaryViewBuilder::new()
     }
 }
@@ -12058,10 +11839,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileSummaryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileSummaryView<S> {
         ProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -12080,9 +11858,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12093,9 +11870,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12106,15 +11882,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12205,10 +11980,7 @@ where
     St::Key: signature_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<S>,
-    ) -> SignatureBuilder<signature_state::SetKey<St>, S> {
+    pub fn key(mut self, value: impl Into<S>) -> SignatureBuilder<signature_state::SetKey<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -12252,10 +12024,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Signature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
         Signature {
             key: self._fields.0.unwrap(),
             signature: self._fields.1.unwrap(),
@@ -12271,15 +12040,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod skeleton_game_feed_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12321,20 +12089,14 @@ pub struct SkeletonGameFeedItemBuilder<
 
 impl SkeletonGameFeedItem<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SkeletonGameFeedItemBuilder<
-        skeleton_game_feed_item_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> SkeletonGameFeedItemBuilder<skeleton_game_feed_item_state::Empty, DefaultStr> {
         SkeletonGameFeedItemBuilder::new()
     }
 }
 
 impl<S: BosStr> SkeletonGameFeedItem<S> {
     /// Create a new builder for this type
-    pub fn builder() -> SkeletonGameFeedItemBuilder<
-        skeleton_game_feed_item_state::Empty,
-        S,
-    > {
+    pub fn builder() -> SkeletonGameFeedItemBuilder<skeleton_game_feed_item_state::Empty, S> {
         SkeletonGameFeedItemBuilder::builder()
     }
 }
@@ -12361,10 +12123,7 @@ impl<S: BosStr> SkeletonGameFeedItemBuilder<skeleton_game_feed_item_state::Empty
     }
 }
 
-impl<
-    St: skeleton_game_feed_item_state::State,
-    S: BosStr,
-> SkeletonGameFeedItemBuilder<St, S> {
+impl<St: skeleton_game_feed_item_state::State, S: BosStr> SkeletonGameFeedItemBuilder<St, S> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -12429,9 +12188,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12442,9 +12200,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12455,9 +12212,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12468,9 +12224,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -12481,15 +12236,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod website_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

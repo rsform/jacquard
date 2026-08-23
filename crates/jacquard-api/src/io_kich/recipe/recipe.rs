@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,46 +25,49 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::io_kich::recipe::recipe;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Ingredient<S: BosStr = DefaultStr> {
-    ///[Deprecated] Amount needed in grams. Use measuredAmount/measuredUnit instead.
+    /// [Deprecated] Amount needed in grams. Use measuredAmount/measuredUnit instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grams: Option<i64>,
-    ///Optional group name for organizing ingredients (e.g., 'For the sauce:', 'For the pasta:')
+    /// Optional group name for organizing ingredients (e.g., 'For the sauce:', 'For the pasta:')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<S>,
-    ///Heuristic amount from parsed ingredient text (e.g., 2 in "2 cups")
+    /// Heuristic amount from parsed ingredient text (e.g., 2 in "2 cups")
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heuristic_amount: Option<i64>,
-    ///Heuristic unit from parsed ingredient text (e.g., cup, cookies)
+    /// Heuristic unit from parsed ingredient text (e.g., cup, cookies)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heuristic_unit: Option<S>,
-    ///Unique identifier for this ingredient
+    /// Unique identifier for this ingredient
     pub id: S,
-    ///Whether this ingredient is detached (doesn't count towards recipe completeness)  Defaults to `false`.
+    /// Whether this ingredient is detached (doesn't count towards recipe completeness)  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_ingredient_is_detached")]
     pub is_detached: Option<bool>,
-    ///Whether this ingredient is optional  Defaults to `false`.
+    /// Whether this ingredient is optional  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_ingredient_is_optional")]
     pub is_optional: Option<bool>,
-    ///Measured amount needed (e.g., 250, 1.5)
+    /// Measured amount needed (e.g., 250, 1.5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measured_amount: Option<i64>,
-    ///Measured unit (g, kg, oz, lb, ml)
+    /// Measured unit (g, kg, oz, lb, ml)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measured_unit: Option<S>,
-    ///Ingredient name
+    /// Ingredient name
     pub name: S,
-    ///Optional notes about this ingredient (e.g., original quantity)
+    /// Optional notes about this ingredient (e.g., original quantity)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<S>,
     #[serde(
@@ -76,13 +79,15 @@ pub struct Ingredient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InstructionStep<S: BosStr = DefaultStr> {
-    ///Unique identifier for this instruction step
+    /// Unique identifier for this instruction step
     pub id: S,
-    ///Instruction text
+    /// Instruction text
     pub value: S,
     #[serde(
         flatten,
@@ -93,7 +98,6 @@ pub struct InstructionStep<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
@@ -102,57 +106,57 @@ pub struct InstructionStep<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Recipe<S: BosStr = DefaultStr> {
-    ///Cooking time in minutes
+    /// Cooking time in minutes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cook_time_minutes: Option<i64>,
-    ///When this recipe was created
+    /// When this recipe was created
     pub created_at: Datetime,
-    ///Reference to the user who created this recipe
+    /// Reference to the user who created this recipe
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<StrongRef<S>>,
-    ///Recipe description
+    /// Recipe description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Vector embedding for semantic similarity search (1024 dimensions, stored as JSON array of numbers)
+    /// Vector embedding for semantic similarity search (1024 dimensions, stored as JSON array of numbers)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embedding: Option<S>,
-    ///[Deprecated] Image URL for the recipe. Use images blob array instead. Kept for legacy fallback.
+    /// [Deprecated] Image URL for the recipe. Use images blob array instead. Kept for legacy fallback.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image_url: Option<UriValue<S>>,
-    ///Recipe images as blobs (hero first; preferred over imageUrl)
+    /// Recipe images as blobs (hero first; preferred over imageUrl)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<BlobRef<S>>>,
-    ///Recipe ingredients
+    /// Recipe ingredients
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ingredients: Option<Vec<recipe::Ingredient<S>>>,
-    ///Cooking instructions as an array of steps
+    /// Cooking instructions as an array of steps
     #[serde(skip_serializing_if = "Option::is_none")]
     pub instructions: Option<Vec<recipe::InstructionStep<S>>>,
-    ///Whether this recipe is private (only visible to household members)  Defaults to `false`.
+    /// Whether this recipe is private (only visible to household members)  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_recipe_is_private")]
     pub is_private: Option<bool>,
-    ///Recipe name
+    /// Recipe name
     pub name: S,
-    ///Preparation time in minutes
+    /// Preparation time in minutes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prep_time_minutes: Option<i64>,
-    ///Number of servings this recipe makes  Defaults to `1`.
+    /// Number of servings this recipe makes  Defaults to `1`.
     #[serde(default = "_default_recipe_servings")]
     pub servings: i64,
-    ///Source name (book, magazine, blog)
+    /// Source name (book, magazine, blog)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<S>,
-    ///Tags for categorizing the recipe
+    /// Tags for categorizing the recipe
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<recipe::Tag<S>>>,
-    ///When this recipe was last updated
+    /// When this recipe was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///Source URL of the recipe
+    /// Source URL of the recipe
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
-    ///Optional reference to the original recipe this is a variation of (for attribution and variation discovery)
+    /// Optional reference to the original recipe this is a variation of (for attribution and variation discovery)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub variation_of: Option<StrongRef<S>>,
     #[serde(
@@ -175,13 +179,15 @@ pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Recipe<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Tag<S: BosStr = DefaultStr> {
-    ///Tag identifier
+    /// Tag identifier
     pub id: S,
-    ///Tag display name
+    /// Tag display name
     pub name: S,
     #[serde(
         flatten,
@@ -302,9 +308,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -317,10 +322,10 @@ fn _default_ingredient_is_optional() -> Option<bool> {
 }
 
 fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.kich.recipe.recipe"),
@@ -431,20 +436,19 @@ fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("instructionStep"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("value")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Unique identifier for this instruction step",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique identifier for this instruction step",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -651,9 +655,7 @@ fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tag"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -689,9 +691,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -702,9 +703,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -724,7 +724,7 @@ fn _default_recipe_servings() -> i64 {
 
 pub mod recipe_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -826,24 +826,8 @@ impl RecipeBuilder<recipe_state::Empty, DefaultStr> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -856,24 +840,8 @@ impl<S: BosStr> RecipeBuilder<recipe_state::Empty, S> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -979,18 +947,12 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `ingredients` field (optional)
-    pub fn ingredients(
-        mut self,
-        value: impl Into<Option<Vec<recipe::Ingredient<S>>>>,
-    ) -> Self {
+    pub fn ingredients(mut self, value: impl Into<Option<Vec<recipe::Ingredient<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `ingredients` field to an Option value (optional)
-    pub fn maybe_ingredients(
-        mut self,
-        value: Option<Vec<recipe::Ingredient<S>>>,
-    ) -> Self {
+    pub fn maybe_ingredients(mut self, value: Option<Vec<recipe::Ingredient<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1006,10 +968,7 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `instructions` field to an Option value (optional)
-    pub fn maybe_instructions(
-        mut self,
-        value: Option<Vec<recipe::InstructionStep<S>>>,
-    ) -> Self {
+    pub fn maybe_instructions(mut self, value: Option<Vec<recipe::InstructionStep<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1034,10 +993,7 @@ where
     St::Name: recipe_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RecipeBuilder<recipe_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> RecipeBuilder<recipe_state::SetName<St>, S> {
         self._fields.10 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
@@ -1208,8 +1164,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

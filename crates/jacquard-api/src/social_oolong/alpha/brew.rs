@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A tea brewing session
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,33 +38,33 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct Brew<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///AT-URI to a social.oolong.alpha.infuser record. Only meaningful when infusionMethod=infuser.
+    /// AT-URI to a social.oolong.alpha.infuser record. Only meaningful when infusionMethod=infuser.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infuser_ref: Option<AtUri<S>>,
-    ///How the leaf was contained during brewing
+    /// How the leaf was contained during brewing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infusion_method: Option<BrewInfusionMethod<S>>,
-    ///Leaf weight in tenths of a gram (e.g. 50 = 5.0g)
+    /// Leaf weight in tenths of a gram (e.g. 50 = 5.0g)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub leaf_grams: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
-    ///Brewing style. Required. Canonical filterable axis.
+    /// Brewing style. Required. Canonical filterable axis.
     pub style: BrewStyle<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasting_notes: Option<S>,
-    ///AT-URI to a social.oolong.alpha.tea record
+    /// AT-URI to a social.oolong.alpha.tea record
     pub tea_ref: AtUri<S>,
-    ///Water temperature in tenths of °C (e.g. 850 = 85.0°C)
+    /// Water temperature in tenths of °C (e.g. 850 = 85.0°C)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<i64>,
-    ///Total brew time in seconds
+    /// Total brew time in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_seconds: Option<i64>,
-    ///AT-URI to a social.oolong.alpha.brewer record
+    /// AT-URI to a social.oolong.alpha.brewer record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vessel_ref: Option<AtUri<S>>,
-    ///Amount of water used in grams or milliliters
+    /// Amount of water used in grams or milliliters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub water_amount: Option<i64>,
     #[serde(
@@ -398,9 +398,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -412,7 +411,7 @@ where
 
 pub mod brew_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -508,18 +507,7 @@ impl BrewBuilder<brew_state::Empty, DefaultStr> {
         BrewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -532,18 +520,7 @@ impl<S: BosStr> BrewBuilder<brew_state::Empty, S> {
         BrewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -584,18 +561,12 @@ impl<St: brew_state::State, S: BosStr> BrewBuilder<St, S> {
 
 impl<St: brew_state::State, S: BosStr> BrewBuilder<St, S> {
     /// Set the `infusionMethod` field (optional)
-    pub fn infusion_method(
-        mut self,
-        value: impl Into<Option<BrewInfusionMethod<S>>>,
-    ) -> Self {
+    pub fn infusion_method(mut self, value: impl Into<Option<BrewInfusionMethod<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `infusionMethod` field to an Option value (optional)
-    pub fn maybe_infusion_method(
-        mut self,
-        value: Option<BrewInfusionMethod<S>>,
-    ) -> Self {
+    pub fn maybe_infusion_method(mut self, value: Option<BrewInfusionMethod<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -776,10 +747,10 @@ where
 }
 
 fn lexicon_doc_social_oolong_alpha_brew() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.oolong.alpha.brew"),

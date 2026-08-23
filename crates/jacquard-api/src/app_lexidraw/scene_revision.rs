@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// An immutable checkpoint of a app.lexidraw.scene record. Captured periodically alongside the mutable scene record; the scene blob is content-addressed and shared with the scene record, so no data is duplicated.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,11 +40,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 )]
 pub struct SceneRevision<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///Gzipped Excalidraw scene JSON (serializeAsJSON output, gzip level 6), as captured at checkpoint time.
+    /// Gzipped Excalidraw scene JSON (serializeAsJSON output, gzip level 6), as captured at checkpoint time.
     pub scene: BlobRef<S>,
-    ///Strong reference (uri + record cid) to the parent app.lexidraw.scene record at checkpoint time.
+    /// Strong reference (uri + record cid) to the parent app.lexidraw.scene record at checkpoint time.
     pub subject: StrongRef<S>,
-    ///WebP preview of the scene (max 1024px on the longest side).
+    /// WebP preview of the scene (max 1024px on the longest side).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<BlobRef<S>>,
     #[serde(
@@ -129,19 +129,16 @@ impl<S: BosStr> LexiconSchema for SceneRevision<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["application/gzip"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("scene"),
@@ -167,19 +164,16 @@ impl<S: BosStr> LexiconSchema for SceneRevision<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -200,9 +194,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -214,7 +207,7 @@ where
 
 pub mod scene_revision_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -271,10 +264,7 @@ pub mod scene_revision_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SceneRevisionBuilder<
-    St: scene_revision_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SceneRevisionBuilder<St: scene_revision_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -409,10 +399,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SceneRevision<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SceneRevision<S> {
         SceneRevision {
             created_at: self._fields.0.unwrap(),
             scene: self._fields.1.unwrap(),
@@ -424,10 +411,10 @@ where
 }
 
 fn lexicon_doc_app_lexidraw_sceneRevision() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.lexidraw.sceneRevision"),

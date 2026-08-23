@@ -8,14 +8,14 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::fm_teal::alpha::stats::ArtistView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::stats::ArtistView;
+use serde::{Deserialize, Serialize};
 /// Time period for top artists
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -99,9 +99,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTopArtists<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -115,12 +117,14 @@ pub struct GetTopArtists<S: BosStr = DefaultStr> {
     pub period: Option<GetTopArtistsPeriod<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTopArtistsOutput<S: BosStr = DefaultStr> {
     pub artists: Vec<ArtistView<S>>,
-    ///Next page cursor
+    /// Next page cursor
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -159,15 +163,14 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_period<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetTopArtistsPeriod<S>,
-> {
+fn _default_period<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetTopArtistsPeriod<S>> {
     Some(<GetTopArtistsPeriod<S>>::from_value(S::from_static("all")))
 }
 
 pub mod get_top_artists_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -185,10 +188,7 @@ pub mod get_top_artists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTopArtistsBuilder<
-    St: get_top_artists_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetTopArtistsBuilder<St: get_top_artists_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<GetTopArtistsPeriod<S>>),
     _type: PhantomData<fn() -> S>,

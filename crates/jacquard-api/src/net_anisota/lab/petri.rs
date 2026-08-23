@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A petri culture grown in the Anisota Lab's Petri studio and saved to the owner's collection. A culture is stored as its recipe rather than its pixels: a 'seed', the dish dimensions, and the ordered list of 'drops' (each an ingredient inoculated at a normalised point and at a given iteration). Because the Gray-Scott reaction-diffusion simulation is deterministic, replaying that recipe rebuilds the exact field. 'iterations' is how far the culture has grown; 'lastTickAt' lets a reopened culture advance proportionally to real time elapsed. A small PNG thumbnail is kept for display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,37 +37,37 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Petri<S: BosStr = DefaultStr> {
-    ///Form tunable 'branching' (dense blob → open dendrites → veins), scaled 0..1000
+    /// Form tunable 'branching' (dense blob → open dendrites → veins), scaled 0..1000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<i64>,
-    ///When the culture was saved
+    /// When the culture was saved
     pub created_at: Datetime,
-    ///Ordered inoculations: each an ingredient placed at a normalised point at a given iteration
+    /// Ordered inoculations: each an ingredient placed at a normalised point at a given iteration
     pub drops: Vec<Data<S>>,
-    ///Dish grid height in cells
+    /// Dish grid height in cells
     pub height: i64,
-    ///A PNG data URL thumbnail of the culture
+    /// A PNG data URL thumbnail of the culture
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<S>,
-    ///How many simulation iterations the culture has grown
+    /// How many simulation iterations the culture has grown
     pub iterations: i64,
-    ///When the culture last advanced, used to grow it forward on reopen
+    /// When the culture last advanced, used to grow it forward on reopen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_tick_at: Option<Datetime>,
-    ///Display name for the culture
+    /// Display name for the culture
     pub name: S,
-    ///Colour palette id (agar, rose, amber, marine)
+    /// Colour palette id (agar, rose, amber, marine)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub palette: Option<S>,
-    ///PRNG seed the simulation was initialised with
+    /// PRNG seed the simulation was initialised with
     pub seed: i64,
-    ///Form tunable 'thickness' (fine veins → fat rivulets), scaled 0..1000
+    /// Form tunable 'thickness' (fine veins → fat rivulets), scaled 0..1000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thickness: Option<i64>,
-    ///Form tunable 'wander' (straight → meandering branches), scaled 0..1000
+    /// Form tunable 'wander' (straight → meandering branches), scaled 0..1000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wander: Option<i64>,
-    ///Dish grid width in cells
+    /// Dish grid width in cells
     pub width: i64,
     #[serde(
         flatten,
@@ -199,9 +199,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -213,7 +212,7 @@ where
 
 pub mod petri_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,19 +385,7 @@ impl PetriBuilder<petri_state::Empty, DefaultStr> {
         PetriBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -411,19 +398,7 @@ impl<S: BosStr> PetriBuilder<petri_state::Empty, S> {
         PetriBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -487,10 +462,7 @@ where
     St::Height: petri_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(
-        mut self,
-        value: impl Into<i64>,
-    ) -> PetriBuilder<petri_state::SetHeight<St>, S> {
+    pub fn height(mut self, value: impl Into<i64>) -> PetriBuilder<petri_state::SetHeight<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PetriBuilder {
             _state: PhantomData,
@@ -551,10 +523,7 @@ where
     St::Name: petri_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> PetriBuilder<petri_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> PetriBuilder<petri_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         PetriBuilder {
             _state: PhantomData,
@@ -583,10 +552,7 @@ where
     St::Seed: petri_state::IsUnset,
 {
     /// Set the `seed` field (required)
-    pub fn seed(
-        mut self,
-        value: impl Into<i64>,
-    ) -> PetriBuilder<petri_state::SetSeed<St>, S> {
+    pub fn seed(mut self, value: impl Into<i64>) -> PetriBuilder<petri_state::SetSeed<St>, S> {
         self._fields.9 = Option::Some(value.into());
         PetriBuilder {
             _state: PhantomData,
@@ -628,10 +594,7 @@ where
     St::Width: petri_state::IsUnset,
 {
     /// Set the `width` field (required)
-    pub fn width(
-        mut self,
-        value: impl Into<i64>,
-    ) -> PetriBuilder<petri_state::SetWidth<St>, S> {
+    pub fn width(mut self, value: impl Into<i64>) -> PetriBuilder<petri_state::SetWidth<St>, S> {
         self._fields.12 = Option::Some(value.into());
         PetriBuilder {
             _state: PhantomData,
@@ -693,10 +656,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_petri() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.petri"),

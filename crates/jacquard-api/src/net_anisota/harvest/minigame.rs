@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::harvest::minigame;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::harvest::minigame;
+use serde::{Deserialize, Serialize};
 /// A record of a harvest minigame round played by a user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,49 +38,49 @@ use crate::net_anisota::harvest::minigame;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Minigame<S: BosStr = DefaultStr> {
-    ///Version of the Anisota client
+    /// Version of the Anisota client
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_version: Option<S>,
-    ///When the record was created
+    /// When the record was created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Number of shapes harvested early (during growth phase)
+    /// Number of shapes harvested early (during growth phase)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub early_harvests: Option<i64>,
-    ///Bonus points awarded for harvest efficiency (percentage of shapes collected)
+    /// Bonus points awarded for harvest efficiency (percentage of shapes collected)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub efficiency_bonus: Option<i64>,
-    ///Final score achieved in the round
+    /// Final score achieved in the round
     pub final_score: i64,
-    ///Where the game was played: dedicated minigame page or harvest loading screen
+    /// Where the game was played: dedicated minigame page or harvest loading screen
     pub game_context: MinigameGameContext<S>,
-    ///Number of shapes harvested late (during decay phase)
+    /// Number of shapes harvested late (during decay phase)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub late_harvests: Option<i64>,
-    ///Percentage indicating how close on average the user harvested at peak timing (scaled by 100, so 9550 = 95.50%)
+    /// Percentage indicating how close on average the user harvested at peak timing (scaled by 100, so 9550 = 95.50%)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub peak_harvest_rate: Option<i64>,
-    ///Bonus points awarded for achieving high peak harvest rate
+    /// Bonus points awarded for achieving high peak harvest rate
     #[serde(skip_serializing_if = "Option::is_none")]
     pub peak_rate_bonus: Option<i64>,
-    ///Number of shapes harvested at perfect (peak) timing
+    /// Number of shapes harvested at perfect (peak) timing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub perfect_harvests: Option<i64>,
-    ///When the game round was played (ISO 8601)
+    /// When the game round was played (ISO 8601)
     pub played_at: Datetime,
-    ///Average rate of points scored per second (scaled by 100, so 123 = 1.23 points/second)
+    /// Average rate of points scored per second (scaled by 100, so 123 = 1.23 points/second)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub points_per_second: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity_breakdown: Option<minigame::RarityBreakdown<S>>,
-    ///Duration of the round in seconds
+    /// Duration of the round in seconds
     pub round_duration: i64,
-    ///Total number of shapes collected/harvested
+    /// Total number of shapes collected/harvested
     pub shapes_collected: i64,
-    ///Total number of shapes that expired without being harvested
+    /// Total number of shapes that expired without being harvested
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shapes_missed: Option<i64>,
-    ///Total number of shapes spawned during the round (collected + missed)
+    /// Total number of shapes spawned during the round (collected + missed)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_shapes_spawned: Option<i64>,
     #[serde(
@@ -185,21 +185,24 @@ pub struct MinigameGetRecordOutput<S: BosStr = DefaultStr> {
 /// Count of each rarity level collected
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RarityBreakdown<S: BosStr = DefaultStr> {
-    ///Number of common (triangle) shapes collected
+    /// Number of common (triangle) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub common: Option<i64>,
-    ///Number of rare (star) shapes collected
+    /// Number of rare (star) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rare: Option<i64>,
-    ///Number of uncommon (diamond) shapes collected
+    /// Number of uncommon (diamond) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uncommon: Option<i64>,
-    ///Number of very common (circle) shapes collected
+    /// Number of very common (circle) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub very_common: Option<i64>,
-    ///Number of very rare (sparkle) shapes collected
+    /// Number of very rare (sparkle) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub very_rare: Option<i64>,
     #[serde(
@@ -446,9 +449,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -460,7 +462,7 @@ where
 
 pub mod minigame_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -595,23 +597,8 @@ impl MinigameBuilder<minigame_state::Empty, DefaultStr> {
         MinigameBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -624,23 +611,8 @@ impl<S: BosStr> MinigameBuilder<minigame_state::Empty, S> {
         MinigameBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -831,10 +803,7 @@ impl<St: minigame_state::State, S: BosStr> MinigameBuilder<St, S> {
         self
     }
     /// Set the `rarityBreakdown` field to an Option value (optional)
-    pub fn maybe_rarity_breakdown(
-        mut self,
-        value: Option<minigame::RarityBreakdown<S>>,
-    ) -> Self {
+    pub fn maybe_rarity_breakdown(mut self, value: Option<minigame::RarityBreakdown<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -962,10 +931,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_harvest_minigame() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.harvest.minigame"),
@@ -1137,9 +1106,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rarityBreakdown"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Count of each rarity level collected"),
-                    ),
+                    description: Some(CowStr::new_static("Count of each rarity level collected")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1196,8 +1163,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -20,16 +20,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// Embedded reference to another post (quoted post)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Post<S: BosStr = DefaultStr> {
-    ///Strong reference to the embedded post (includes URI and CID)
+    /// Strong reference to the embedded post (includes URI and CID)
     pub post: StrongRef<S>,
     #[serde(
         flatten,
@@ -43,11 +46,14 @@ pub struct Post<S: BosStr = DefaultStr> {
 /// View of a quoted-post embed as served by the AppView, optionally enriched with resolved post data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
-    ///Strong reference to the embedded post (includes URI and CID)
+    /// Strong reference to the embedded post (includes URI and CID)
     pub post: StrongRef<S>,
-    ///Resolved data for the referenced post (e.g., a hydrated Bluesky post), or an unavailable marker with a user-facing message
+    /// Resolved data for the referenced post (e.g., a hydrated Bluesky post), or an unavailable marker with a user-facing message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub resolved: Option<Data<S>>,
     #[serde(
@@ -96,15 +102,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,10 +223,10 @@ where
 }
 
 fn lexicon_doc_social_coves_embed_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.embed.post"),
@@ -230,11 +235,9 @@ fn lexicon_doc_social_coves_embed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Embedded reference to another post (quoted post)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Embedded reference to another post (quoted post)",
+                    )),
                     required: Some(vec![SmolStr::new_static("post")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -294,15 +297,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Represents the hold's ownership and metadata. Stored as a singleton record at rkey 'self' in the hold's embedded PDS.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Captain<S: BosStr = DefaultStr> {
-    ///Allow any authenticated user to register as crew
+    /// Allow any authenticated user to register as crew
     pub allow_all_crew: bool,
-    ///RFC3339 timestamp of when the hold was deployed
+    /// RFC3339 timestamp of when the hold was deployed
     pub deployed_at: Datetime,
-    ///Enable Bluesky posts when manifests are pushed
+    /// Enable Bluesky posts when manifests are pushed
     pub enable_bluesky_posts: bool,
-    ///DID of the hold owner
+    /// DID of the hold owner
     pub owner: Did<S>,
-    ///Whether this hold allows public blob reads (pulls) without authentication
+    /// Whether this hold allows public blob reads (pulls) without authentication
     pub public: bool,
-    ///S3 region where blobs are stored
+    /// S3 region where blobs are stored
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region: Option<S>,
-    ///DID of successor hold for migration redirect
+    /// DID of successor hold for migration redirect
     #[serde(skip_serializing_if = "Option::is_none")]
     pub successor: Option<Did<S>>,
     #[serde(
@@ -138,9 +138,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -152,7 +151,7 @@ where
 
 pub mod captain_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -452,10 +451,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_captain() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.captain"),

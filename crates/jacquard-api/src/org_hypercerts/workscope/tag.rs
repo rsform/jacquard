@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,34 +40,34 @@ use crate::org_hypercerts::Uri;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tag<S: BosStr = DefaultStr> {
-    ///Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
+    /// Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<S>>,
-    ///Category type of this scope.
+    /// Category type of this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<TagCategory<S>>,
-    ///Client-declared timestamp when this record was originally created.
+    /// Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
-    ///Optional longer description of this scope.
+    /// Optional longer description of this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Lowercase, underscore-separated machine-readable key for this scope (e.g., 'mangrove_restoration', 'biodiversity_monitoring'). Used as the canonical identifier in CEL expressions.
+    /// Lowercase, underscore-separated machine-readable key for this scope (e.g., 'mangrove_restoration', 'biodiversity_monitoring'). Used as the canonical identifier in CEL expressions.
     pub key: S,
-    ///Human-readable name for this scope.
+    /// Human-readable name for this scope.
     pub name: S,
-    ///Optional strong reference to a parent work scope tag record for taxonomy/hierarchy support. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
+    /// Optional strong reference to a parent work scope tag record for taxonomy/hierarchy support. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<StrongRef<S>>,
-    ///Link to a governance or reference document where this work scope tag is defined and further explained.
+    /// Link to a governance or reference document where this work scope tag is defined and further explained.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reference_document: Option<TagReferenceDocument<S>>,
-    ///URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.
+    /// URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub same_as: Option<Vec<UriValue<S>>>,
-    ///Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
+    /// Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<TagStatus<S>>,
-    ///When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
+    /// When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub superseded_by: Option<StrongRef<S>>,
     #[serde(
@@ -165,7 +165,6 @@ where
         }
     }
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -434,9 +433,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -448,7 +446,7 @@ where
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -542,7 +540,9 @@ impl TagBuilder<tag_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -553,7 +553,9 @@ impl<S: BosStr> TagBuilder<tag_state::Empty, S> {
     pub fn builder() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -664,18 +666,12 @@ impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
 
 impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `referenceDocument` field (optional)
-    pub fn reference_document(
-        mut self,
-        value: impl Into<Option<TagReferenceDocument<S>>>,
-    ) -> Self {
+    pub fn reference_document(mut self, value: impl Into<Option<TagReferenceDocument<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `referenceDocument` field to an Option value (optional)
-    pub fn maybe_reference_document(
-        mut self,
-        value: Option<TagReferenceDocument<S>>,
-    ) -> Self {
+    pub fn maybe_reference_document(mut self, value: Option<TagReferenceDocument<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -764,10 +760,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_workscope_tag() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.workscope.tag"),

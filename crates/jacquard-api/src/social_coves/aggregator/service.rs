@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Declaration of an aggregator service that can post to communities. Published in the aggregator's own repository. Similar to app.bsky.feed.generator and app.bsky.labeler.service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,24 +38,24 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Service<S: BosStr = DefaultStr> {
-    ///Avatar image for bot identity
+    /// Avatar image for bot identity
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
-    ///JSON Schema describing config options for this aggregator. Communities use this to know what configuration fields are available.
+    /// JSON Schema describing config options for this aggregator. Communities use this to know what configuration fields are available.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config_schema: Option<Data<S>>,
     pub created_at: Datetime,
-    ///Description of what this aggregator does
+    /// Description of what this aggregator does
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///DID of the aggregator service (must match repo DID)
+    /// DID of the aggregator service (must match repo DID)
     pub did: Did<S>,
-    ///Human-readable name (e.g., 'RSS News Aggregator')
+    /// Human-readable name (e.g., 'RSS News Aggregator')
     pub display_name: S,
-    ///DID of person/organization maintaining this aggregator
+    /// DID of person/organization maintaining this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maintainer: Option<Did<S>>,
-    ///URL to aggregator's source code (for transparency)
+    /// URL to aggregator's source code (for transparency)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_url: Option<UriValue<S>>,
     #[serde(
@@ -138,25 +138,23 @@ impl<S: BosStr> LexiconSchema for Service<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -220,9 +218,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -234,7 +231,7 @@ where
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -406,10 +403,7 @@ where
     St::Did: service_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> ServiceBuilder<service_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> ServiceBuilder<service_state::SetDid<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
@@ -502,10 +496,10 @@ where
 }
 
 fn lexicon_doc_social_coves_aggregator_service() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.aggregator.service"),

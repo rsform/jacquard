@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record indicating a livestream is published and available for replication at a given address. By convention, the record key is streamer::server
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,19 +37,19 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Origin<S: BosStr = DefaultStr> {
-    ///did of the broadcaster that operates the server syndicating the livestream
+    /// did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
-    ///Iroh ticket that can be used to access the livestream from the server
+    /// Iroh ticket that can be used to access the livestream from the server
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iroh_ticket: Option<S>,
-    ///did of the server that's currently rebroadcasting the livestream
+    /// did of the server that's currently rebroadcasting the livestream
     pub server: Did<S>,
-    ///DID of the streamer whose livestream is being published
+    /// DID of the streamer whose livestream is being published
     pub streamer: Did<S>,
-    ///Periodically updated timestamp when this origin last saw a livestream
+    /// Periodically updated timestamp when this origin last saw a livestream
     pub updated_at: Datetime,
-    ///URL of the websocket endpoint for the livestream
+    /// URL of the websocket endpoint for the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
     pub websocket_url: Option<UriValue<S>>,
     #[serde(
@@ -137,9 +137,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -151,7 +150,7 @@ where
 
 pub mod origin_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -387,10 +386,10 @@ where
 }
 
 fn lexicon_doc_place_stream_broadcast_origin() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.broadcast.origin"),

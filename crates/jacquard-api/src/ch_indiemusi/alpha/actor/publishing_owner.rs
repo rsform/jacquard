@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A songwriter, composer, or music publisher who owns the publishing rights to a song or musical work
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -43,7 +43,7 @@ pub struct PublishingOwner<S: BosStr = DefaultStr> {
     pub company_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub first_name: Option<S>,
-    ///Interested Party Information (IPI) number assigned to the publishing owner by a collecting society
+    /// Interested Party Information (IPI) number assigned to the publishing owner by a collecting society
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ipi: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -173,9 +173,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -187,7 +186,7 @@ where
 
 pub mod publishing_owner_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -205,10 +204,7 @@ pub mod publishing_owner_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PublishingOwnerBuilder<
-    St: publishing_owner_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PublishingOwnerBuilder<St: publishing_owner_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -331,10 +327,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PublishingOwner<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PublishingOwner<S> {
         PublishingOwner {
             collecting_society: self._fields.0,
             company_name: self._fields.1,
@@ -347,10 +340,10 @@ where
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.actor.publishingOwner"),

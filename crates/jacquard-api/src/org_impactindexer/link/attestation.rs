@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,24 +24,27 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_impactindexer::link::attestation;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_impactindexer::link::attestation;
+use serde::{Deserialize, Serialize};
 /// The EIP-712 typed data message structure
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Eip712Message<S: BosStr = DefaultStr> {
-    ///The chain ID as a string (for bigint compatibility, max uint256)
+    /// The chain ID as a string (for bigint compatibility, max uint256)
     pub chain_id: S,
-    ///The ATProto DID being linked
+    /// The ATProto DID being linked
     pub did: S,
-    ///The EVM address being linked (0x-prefixed)
+    /// The EVM address being linked (0x-prefixed)
     pub evm_address: S,
-    ///Replay protection nonce as a string (for bigint compatibility)
+    /// Replay protection nonce as a string (for bigint compatibility)
     pub nonce: S,
-    ///Unix timestamp as a string (for bigint compatibility)
+    /// Unix timestamp as a string (for bigint compatibility)
     pub timestamp: S,
     #[serde(
         flatten,
@@ -62,17 +65,17 @@ pub struct Eip712Message<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Attestation<S: BosStr = DefaultStr> {
-    ///The EVM wallet address (checksummed or lowercase, 0x-prefixed)
+    /// The EVM wallet address (checksummed or lowercase, 0x-prefixed)
     pub address: S,
-    ///The EVM chain ID where the signature was created
+    /// The EVM chain ID where the signature was created
     pub chain_id: i64,
-    ///Timestamp when the attestation was created
+    /// Timestamp when the attestation was created
     pub created_at: Datetime,
-    ///The EIP-712 typed data message that was signed
+    /// The EIP-712 typed data message that was signed
     pub message: attestation::Eip712Message<S>,
-    ///The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)
+    /// The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)
     pub signature: S,
-    ///The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
+    /// The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
     pub signature_type: AttestationSignatureType<S>,
     #[serde(
         flatten,
@@ -134,8 +137,7 @@ impl<S: BosStr> Serialize for AttestationSignatureType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for AttestationSignatureType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AttestationSignatureType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -162,9 +164,7 @@ where
             AttestationSignatureType::Eoa => AttestationSignatureType::Eoa,
             AttestationSignatureType::Erc1271 => AttestationSignatureType::Erc1271,
             AttestationSignatureType::Erc6492 => AttestationSignatureType::Erc6492,
-            AttestationSignatureType::Other(v) => {
-                AttestationSignatureType::Other(v.into_static())
-            }
+            AttestationSignatureType::Other(v) => AttestationSignatureType::Other(v.into_static()),
         }
     }
 }
@@ -381,17 +381,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_org_impactindexer_link_attestation() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.impactindexer.link.attestation"),
@@ -586,9 +585,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -600,7 +598,7 @@ where
 
 pub mod attestation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -897,10 +895,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Attestation<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attestation<S> {
         Attestation {
             address: self._fields.0.unwrap(),
             chain_id: self._fields.1.unwrap(),

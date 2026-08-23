@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,21 +22,24 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::club_stellz::evm::address_control;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::club_stellz::evm::address_control;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddressControl<S: BosStr = DefaultStr> {
-    ///Ethereum address as bytes (20 bytes)
+    /// Ethereum address as bytes (20 bytes)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub address: Bytes,
-    ///List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
+    /// List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub also_on: Option<Vec<i64>>,
-    ///Sign in With Ethereum message signature as bytes
+    /// Sign in With Ethereum message signature as bytes
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub signature: Bytes,
     pub siwe: address_control::SiweMessage<S>,
@@ -49,25 +52,27 @@ pub struct AddressControl<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SiweMessage<S: BosStr = DefaultStr> {
-    ///Ethereum address in 0x-prefixed, checksummed hex format
+    /// Ethereum address in 0x-prefixed, checksummed hex format
     pub address: S,
-    ///Chain ID of the Ethereum VM network the address is on
+    /// Chain ID of the Ethereum VM network the address is on
     pub chain_id: i64,
-    ///Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
+    /// Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
     pub domain: S,
-    ///Timestamp when the message was signed
+    /// Timestamp when the message was signed
     pub issued_at: Datetime,
-    ///Random nonce the message was signed with
+    /// Random nonce the message was signed with
     pub nonce: S,
-    ///The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
+    /// The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
     pub statement: S,
-    ///URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
+    /// URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
     pub uri: UriValue<S>,
-    ///Sign in With Ethereum message version
+    /// Sign in With Ethereum message version
     pub version: SiweMessageVersion<S>,
     #[serde(
         flatten,
@@ -245,15 +250,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod address_control_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -310,10 +314,7 @@ pub mod address_control_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AddressControlBuilder<
-    St: address_control_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AddressControlBuilder<St: address_control_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Bytes>,
@@ -448,10 +449,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AddressControl<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddressControl<S> {
         AddressControl {
             address: self._fields.0.unwrap(),
             also_on: self._fields.1,
@@ -463,10 +461,10 @@ where
 }
 
 fn lexicon_doc_club_stellz_evm_addressControl() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("club.stellz.evm.addressControl"),
@@ -638,15 +636,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod siwe_message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1033,10 +1030,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SiweMessage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SiweMessage<S> {
         SiweMessage {
             address: self._fields.0.unwrap(),
             chain_id: self._fields.1.unwrap(),

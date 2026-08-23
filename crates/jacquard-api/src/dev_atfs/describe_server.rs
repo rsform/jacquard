@@ -10,26 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DescribeServerOutput<S: BosStr = DefaultStr> {
-    ///The largest single blob this instance will ever accept, whether uploaded or pinned — atfs's own fixed ceiling, not configurable per instance. A caller planning a large upload should check this before trying, since a blob over it fails fast with BlobTooLarge rather than partway through a transfer.
+    /// The largest single blob this instance will ever accept, whether uploaded or pinned — atfs's own fixed ceiling, not configurable per instance. A caller planning a large upload should check this before trying, since a blob over it fails fast with BlobTooLarge rather than partway through a transfer.
     pub max_blob_size: i64,
-    ///This instance's best current guess at the largest HTTP request body its own ingress will actually let through, in bytes — learned from an operator-set override, the dev.atfs.server record, or headers sniffed off arriving requests (see dev.atfs.server's requestBodyCap field for the full list, lowest wins). Absent means genuinely unknown: no source has reported anything yet, which is a legitimate answer a client must be prepared to handle, not an oversight — it does not mean unlimited, and it does not mean zero. A client that needs a real answer before deciding how to transfer a large file should treat an absent value the same as a value it cannot rely on, and prefer sending bytes over libp2p (see maxBlobSize) rather than a single HTTP request body of unknown fate.
+    /// This instance's best current guess at the largest HTTP request body its own ingress will actually let through, in bytes — learned from an operator-set override, the dev.atfs.server record, or headers sniffed off arriving requests (see dev.atfs.server's requestBodyCap field for the full list, lowest wins). Absent means genuinely unknown: no source has reported anything yet, which is a legitimate answer a client must be prepared to handle, not an oversight — it does not mean unlimited, and it does not mean zero. A client that needs a real answer before deciding how to transfer a large file should treat an absent value the same as a value it cannot rely on, and prefer sending bytes over libp2p (see maxBlobSize) rather than a single HTTP request body of unknown fate.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_request_body: Option<i64>,
-    ///The multiaddrs this instance currently has announced as reachable — today typically TCP and QUIC listen addresses; more transports (for example a browser-dialable WebSocket address) are expected to appear here automatically as this instance gains them, with no client-side change needed. An empty array is itself a meaningful, honest answer: this instance currently has nothing dialable over libp2p, and a client should say so rather than hang waiting for a connection that will never come. Read live on every call, not cached at boot, since the announced set can grow after startup as NAT traversal completes.
+    /// The multiaddrs this instance currently has announced as reachable — today typically TCP and QUIC listen addresses; more transports (for example a browser-dialable WebSocket address) are expected to appear here automatically as this instance gains them, with no client-side change needed. An empty array is itself a meaningful, honest answer: this instance currently has nothing dialable over libp2p, and a client should say so rather than hang waiting for a connection that will never come. Read live on every call, not cached at boot, since the announced set can grow after startup as NAT traversal completes.
     pub multiaddrs: Vec<S>,
-    ///This instance's libp2p peer ID, exchanged on every libp2p connection anyway. Combine with each entry in multiaddrs to form a dialable address (append `/p2p/<peerId>` to a bare multiaddr, or supply both to a libp2p AddrInfo).
+    /// This instance's libp2p peer ID, exchanged on every libp2p connection anyway. Combine with each entry in multiaddrs to form a dialable address (append `/p2p/<peerId>` to a bare multiaddr, or supply both to a libp2p AddrInfo).
     pub peer_id: S,
-    ///This instance's own identity — the same value as its dev.atfs.server record's serviceDid, and the `aud` an uploader's inter-service auth JWT must name. May be empty when the instance hasn't been configured with one yet, in which case uploads are disabled instance-wide (see dev.atfs.server).
+    /// This instance's own identity — the same value as its dev.atfs.server record's serviceDid, and the `aud` an uploader's inter-service auth JWT must name. May be empty when the instance hasn't been configured with one yet, in which case uploads are disabled instance-wide (see dev.atfs.server).
     pub service_did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -56,10 +59,7 @@ impl jacquard_common::xrpc::XrpcRequest for DescribeServer {
     const NSID: &'static str = "dev.atfs.describeServer";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DescribeServerResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }

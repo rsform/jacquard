@@ -20,17 +20,20 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fyi_questionable::richtext::list;
+use crate::fyi_questionable::richtext::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fyi_questionable::richtext::text::Text;
-use crate::fyi_questionable::richtext::list;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct List<S: BosStr = DefaultStr> {
     pub items: Vec<ListItemsItem<S>>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_list_ordered")]
     pub ordered: Option<bool>,
@@ -42,7 +45,6 @@ pub struct List<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -76,9 +78,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -88,7 +89,7 @@ fn _default_list_ordered() -> Option<bool> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -217,10 +218,10 @@ where
 }
 
 fn lexicon_doc_fyi_questionable_richtext_list() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.questionable.richtext.list"),
@@ -239,7 +240,7 @@ fn lexicon_doc_fyi_questionable_richtext_list() -> LexiconDoc<'static> {
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("fyi.questionable.richtext.text"),
-                                        CowStr::new_static("fyi.questionable.richtext.list")
+                                        CowStr::new_static("fyi.questionable.richtext.list"),
                                     ],
                                     ..Default::default()
                                 }),

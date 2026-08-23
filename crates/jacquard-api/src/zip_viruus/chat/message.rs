@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A single chat message in a whoossh channel.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Message<S: BosStr = DefaultStr> {
-    ///The channel the message was sent in.
+    /// The channel the message was sent in.
     pub channel: S,
-    ///Timestamp of when the message was sent.
+    /// Timestamp of when the message was sent.
     pub created_at: Datetime,
-    ///The message content.
+    /// The message content.
     pub text: S,
     #[serde(
         flatten,
@@ -153,9 +153,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -167,7 +166,7 @@ where
 
 pub mod message_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -310,10 +309,7 @@ where
     St::Text: message_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> MessageBuilder<message_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> MessageBuilder<message_state::SetText<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
@@ -351,10 +347,10 @@ where
 }
 
 fn lexicon_doc_zip_viruus_chat_message() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zip.viruus.chat.message"),
@@ -363,27 +359,25 @@ fn lexicon_doc_zip_viruus_chat_message() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A single chat message in a whoossh channel."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A single chat message in a whoossh channel.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("text"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("channel")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("text"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("channel"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("channel"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The channel the message was sent in."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The channel the message was sent in.",
+                                    )),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -391,11 +385,9 @@ fn lexicon_doc_zip_viruus_chat_message() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp of when the message was sent.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp of when the message was sent.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -403,9 +395,7 @@ fn lexicon_doc_zip_viruus_chat_message() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The message content."),
-                                    ),
+                                    description: Some(CowStr::new_static("The message content.")),
                                     max_length: Some(500usize),
                                     max_graphemes: Some(500usize),
                                     ..Default::default()

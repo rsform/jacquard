@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,26 +24,29 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::level;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::level;
+use serde::{Deserialize, Serialize};
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
-    ///Signing algorithm (ES256)
+    /// Signing algorithm (ES256)
     pub alg: S,
-    ///Key identifier for the signing key
+    /// Key identifier for the signing key
     pub kid: S,
-    ///Unique random nonce to prevent replay
+    /// Unique random nonce to prevent replay
     pub nonce: S,
-    ///Base64-encoded ES256 signature
+    /// Base64-encoded ES256 signature
     pub sig: S,
-    ///When the record was signed
+    /// When the record was signed
     pub signed_at: Datetime,
-    ///Signature schema version
+    /// Signature schema version
     pub version: i64,
     #[serde(
         flatten,
@@ -57,12 +60,15 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
 /// Journey info from previous level
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct JourneyData<S: BosStr = DefaultStr> {
-    ///Days taken to advance from previous level
+    /// Days taken to advance from previous level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub days_from_previous_level: Option<i64>,
-    ///XP gained since previous level
+    /// XP gained since previous level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_from_previous_level: Option<i64>,
     #[serde(
@@ -77,21 +83,24 @@ pub struct JourneyData<S: BosStr = DefaultStr> {
 /// Player state at the moment of leveling up
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LevelSnapshot<S: BosStr = DefaultStr> {
-    ///Total days played at time of level-up
+    /// Total days played at time of level-up
     #[serde(skip_serializing_if = "Option::is_none")]
     pub days_played: Option<i64>,
-    ///Total items at time of level-up
+    /// Total items at time of level-up
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_total: Option<i64>,
-    ///Total posts read all-time at level-up
+    /// Total posts read all-time at level-up
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_read_total: Option<i64>,
-    ///Total specimens documented at time of level-up
+    /// Total specimens documented at time of level-up
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_documented: Option<i64>,
-    ///Total XP at time of level-up
+    /// Total XP at time of level-up
     pub total_xp: i64,
     #[serde(
         flatten,
@@ -112,11 +121,11 @@ pub struct LevelSnapshot<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Level<S: BosStr = DefaultStr> {
-    ///When the level was reached
+    /// When the level was reached
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub journey: Option<level::JourneyData<S>>,
-    ///The level that was reached
+    /// The level that was reached
     pub level: i64,
     pub signature: level::ChronicleSignature<S>,
     pub snapshot: level::LevelSnapshot<S>,
@@ -324,15 +333,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -443,21 +451,22 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<
-    St: chronicle_signature_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<
-        chronicle_signature_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -628,10 +637,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChronicleSignature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -645,10 +651,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_level() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.level"),
@@ -657,63 +663,58 @@ fn lexicon_doc_net_anisota_chronicle_level() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "ES256 cryptographic signature proving record authenticity",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
-                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
-                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "ES256 cryptographic signature proving record authenticity",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("sig"),
+                        SmolStr::new_static("alg"),
+                        SmolStr::new_static("kid"),
+                        SmolStr::new_static("signedAt"),
+                        SmolStr::new_static("nonce"),
+                        SmolStr::new_static("version"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Signing algorithm (ES256)"),
-                                ),
+                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Key identifier for the signing key"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Key identifier for the signing key",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique random nonce to prevent replay"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique random nonce to prevent replay",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Base64-encoded ES256 signature"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Base64-encoded ES256 signature",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the record was signed"),
-                                ),
+                                description: Some(CowStr::new_static("When the record was signed")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -732,9 +733,7 @@ fn lexicon_doc_net_anisota_chronicle_level() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("journeyData"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Journey info from previous level"),
-                    ),
+                    description: Some(CowStr::new_static("Journey info from previous level")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -760,9 +759,9 @@ fn lexicon_doc_net_anisota_chronicle_level() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("levelSnapshot"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Player state at the moment of leveling up"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Player state at the moment of leveling up",
+                    )),
                     required: Some(vec![SmolStr::new_static("totalXP")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -887,9 +886,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -900,15 +898,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod level_snapshot_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -939,12 +936,15 @@ pub mod level_snapshot_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LevelSnapshotBuilder<
-    St: level_snapshot_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct LevelSnapshotBuilder<St: level_snapshot_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _fields: (
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1072,10 +1072,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LevelSnapshot<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LevelSnapshot<S> {
         LevelSnapshot {
             days_played: self._fields.0,
             items_total: self._fields.1,
@@ -1094,9 +1091,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1108,7 +1104,7 @@ where
 
 pub mod level_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1267,10 +1263,7 @@ where
     St::Level: level_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(
-        mut self,
-        value: impl Into<i64>,
-    ) -> LevelBuilder<level_state::SetLevel<St>, S> {
+    pub fn level(mut self, value: impl Into<i64>) -> LevelBuilder<level_state::SetLevel<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LevelBuilder {
             _state: PhantomData,

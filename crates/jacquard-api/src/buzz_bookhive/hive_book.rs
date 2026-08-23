@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::buzz_bookhive::BookIdentifiers;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::buzz_bookhive::BookIdentifiers;
+use serde::{Deserialize, Serialize};
 /// A book within the hive
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,38 +38,38 @@ use crate::buzz_bookhive::BookIdentifiers;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct HiveBook<S: BosStr = DefaultStr> {
-    ///The authors of the book (tab separated)
+    /// The authors of the book (tab separated)
     pub authors: S,
-    ///URL to full-size cover image
+    /// URL to full-size cover image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover: Option<S>,
     pub created_at: Datetime,
-    ///Book description/summary
+    /// Book description/summary
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The book's hive id, used to correlate user's books with the hive
+    /// The book's hive id, used to correlate user's books with the hive
     pub id: S,
-    ///External identifiers for the book
+    /// External identifiers for the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identifiers: Option<BookIdentifiers<S>>,
-    ///Average rating (0-1000)
+    /// Average rating (0-1000)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
-    ///Number of ratings
+    /// Number of ratings
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ratings_count: Option<i64>,
-    ///The source service name (e.g. Goodreads)
+    /// The source service name (e.g. Goodreads)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<S>,
-    ///ID of the book in the source service
+    /// ID of the book in the source service
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_id: Option<S>,
-    ///URL to the book on the source service
+    /// URL to the book on the source service
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_url: Option<S>,
-    ///URL to thumbnail image
+    /// URL to thumbnail image
     pub thumbnail: S,
-    ///The title of the book
+    /// The title of the book
     pub title: S,
     pub updated_at: Datetime,
     #[serde(
@@ -219,9 +219,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -233,7 +232,7 @@ where
 
 pub mod hive_book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,20 +384,7 @@ impl HiveBookBuilder<hive_book_state::Empty, DefaultStr> {
         HiveBookBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -411,20 +397,7 @@ impl<S: BosStr> HiveBookBuilder<hive_book_state::Empty, S> {
         HiveBookBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -501,10 +474,7 @@ where
     St::Id: hive_book_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> HiveBookBuilder<hive_book_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<S>) -> HiveBookBuilder<hive_book_state::SetId<St>, S> {
         self._fields.4 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
@@ -702,10 +672,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_hiveBook() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.hiveBook"),

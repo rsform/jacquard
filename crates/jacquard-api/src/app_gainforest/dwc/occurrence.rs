@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,237 +37,237 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Occurrence<S: BosStr = DefaultStr> {
-    ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
+    /// Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_media: Option<S>,
-    ///Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
+    /// Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_occurrences: Option<S>,
-    ///Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
+    /// Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_references: Option<S>,
-    ///Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
+    /// Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_sequences: Option<S>,
-    ///Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
+    /// Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio_evidence: Option<Data<S>>,
-    ///The specific nature of the data record. Must be one of the Darwin Core class names.
+    /// The specific nature of the data record. Must be one of the Darwin Core class names.
     pub basis_of_record: OccurrenceBasisOfRecord<S>,
-    ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
+    /// The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub behavior: Option<S>,
-    ///The full scientific name of the class.
+    /// The full scientific name of the class.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub class: Option<S>,
-    ///The name, acronym, or code identifying the collection or dataset from which the record was derived.
+    /// The name, acronym, or code identifying the collection or dataset from which the record was derived.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection_code: Option<S>,
-    ///Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
+    /// Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coordinate_uncertainty_in_meters: Option<i64>,
-    ///The name of the country or major administrative unit.
+    /// The name of the country or major administrative unit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country: Option<S>,
-    ///The standard code for the country (ISO 3166-1 alpha-2).
+    /// The standard code for the country (ISO 3166-1 alpha-2).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<S>,
-    ///The full, unabbreviated name of the next smaller administrative region than stateProvince.
+    /// The full, unabbreviated name of the next smaller administrative region than stateProvince.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub county: Option<S>,
-    ///Timestamp of record creation in the ATProto PDS.
+    /// Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
-    ///A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
+    /// A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_generalizations: Option<S>,
-    ///The name identifying the dataset from which the record was derived.
+    /// The name identifying the dataset from which the record was derived.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dataset_name: Option<S>,
-    ///The date on which the identification was made. ISO 8601 format.
+    /// The date on which the identification was made. ISO 8601 format.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_identified: Option<S>,
-    ///The Dublin Core type class that best describes the resource (dc:type).
+    /// The Dublin Core type class that best describes the resource (dc:type).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dc_type: Option<OccurrenceDcType<S>>,
-    ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
+    /// Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub decimal_latitude: Option<S>,
-    ///Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
+    /// Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub decimal_longitude: Option<S>,
-    ///Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
+    /// Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dynamic_properties: Option<S>,
-    ///The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
+    /// The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
     pub event_date: S,
-    ///Identifier for the sampling event. Can be used to group occurrences from the same event.
+    /// Identifier for the sampling event. Can be used to group occurrences from the same event.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_id: Option<S>,
-    ///AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
+    /// AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_ref: Option<AtUri<S>>,
-    ///The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
+    /// The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_time: Option<S>,
-    ///The full scientific name of the family.
+    /// The full scientific name of the family.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub family: Option<S>,
-    ///Notes or reference to notes taken in the field about the event.
+    /// Notes or reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub field_notes: Option<S>,
-    ///GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
+    /// GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gbif_taxon_key: Option<S>,
-    ///The full scientific name of the genus.
+    /// The full scientific name of the genus.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub genus: Option<S>,
-    ///The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
+    /// The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub geodetic_datum: Option<S>,
-    ///A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
+    /// A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub habitat: Option<S>,
-    ///A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
+    /// A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub higher_classification: Option<S>,
-    ///A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
+    /// A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identification_qualifier: Option<S>,
-    ///Comments or notes about the identification.
+    /// Comments or notes about the identification.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identification_remarks: Option<S>,
-    ///Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
+    /// Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identified_by: Option<S>,
-    ///Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
+    /// Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identified_by_id: Option<S>,
-    ///Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
+    /// Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image_evidence: Option<Data<S>>,
-    ///The number of individuals present at the time of the occurrence.
+    /// The number of individuals present at the time of the occurrence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub individual_count: Option<i64>,
-    ///A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
+    /// A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub information_withheld: Option<S>,
-    ///The name of the lowest or terminal infraspecific epithet.
+    /// The name of the lowest or terminal infraspecific epithet.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infraspecific_epithet: Option<S>,
-    ///The name or acronym of the institution having custody of the object(s) or information in the record.
+    /// The name or acronym of the institution having custody of the object(s) or information in the record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub institution_code: Option<S>,
-    ///The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
+    /// The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub kingdom: Option<S>,
-    ///A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
+    /// A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub license: Option<S>,
-    ///The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
+    /// The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub life_stage: Option<S>,
-    ///The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
+    /// The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locality: Option<S>,
-    ///Identifier for the location (e.g., a reference to a named site).
+    /// Identifier for the location (e.g., a reference to a named site).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_id: Option<S>,
-    ///Comments about the location.
+    /// Comments about the location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location_remarks: Option<S>,
-    ///The greater depth of a range of depth below the local surface (in meters).
+    /// The greater depth of a range of depth below the local surface (in meters).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_depth_in_meters: Option<i64>,
-    ///The upper limit of the range of elevation (in meters above sea level).
+    /// The upper limit of the range of elevation (in meters above sea level).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_elevation_in_meters: Option<i64>,
-    ///The lesser depth of a range of depth below the local surface (in meters).
+    /// The lesser depth of a range of depth below the local surface (in meters).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum_depth_in_meters: Option<i64>,
-    ///The lower limit of the range of elevation (in meters above sea level).
+    /// The lower limit of the range of elevation (in meters above sea level).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum_elevation_in_meters: Option<i64>,
-    ///The full, unabbreviated name of the next smaller administrative region than county.
+    /// The full, unabbreviated name of the next smaller administrative region than county.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub municipality: Option<S>,
-    ///The nomenclatural code under which the scientificName is constructed.
+    /// The nomenclatural code under which the scientificName is constructed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nomenclatural_code: Option<OccurrenceNomenclaturalCode<S>>,
-    ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
+    /// A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurrence_id: Option<S>,
-    ///Comments or notes about the occurrence.
+    /// Comments or notes about the occurrence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurrence_remarks: Option<S>,
-    ///Statement about the presence or absence of a taxon at a location.
+    /// Statement about the presence or absence of a taxon at a location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurrence_status: Option<OccurrenceOccurrenceStatus<S>>,
-    ///The full scientific name of the order.
+    /// The full scientific name of the order.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<S>,
-    ///A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
+    /// A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organism_quantity: Option<S>,
-    ///The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
+    /// The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organism_quantity_type: Option<S>,
-    ///The full scientific name of the phylum or division.
+    /// The full scientific name of the phylum or division.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phylum: Option<S>,
-    ///Previous assignments of names to the occurrence. Pipe-delimited.
+    /// Previous assignments of names to the occurrence. Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub previous_identifications: Option<S>,
-    ///Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
+    /// Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recorded_by: Option<S>,
-    ///Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
+    /// Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recorded_by_id: Option<S>,
-    ///A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
+    /// A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub references: Option<UriValue<S>>,
-    ///The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
+    /// The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reproductive_condition: Option<S>,
-    ///Person or organization owning or managing rights over the resource.
+    /// Person or organization owning or managing rights over the resource.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rights_holder: Option<S>,
-    ///The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
+    /// The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling_effort: Option<S>,
-    ///The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
+    /// The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling_protocol: Option<S>,
-    ///The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
+    /// The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
     pub scientific_name: S,
-    ///The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
+    /// The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scientific_name_authorship: Option<S>,
-    ///The sex of the biological individual(s).
+    /// The sex of the biological individual(s).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sex: Option<OccurrenceSex<S>>,
-    ///The name of the species epithet of the scientificName.
+    /// The name of the species epithet of the scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specific_epithet: Option<S>,
-    ///Spectrogram image showing frequency analysis of audio recording.
+    /// Spectrogram image showing frequency analysis of audio recording.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spectrogram_evidence: Option<Data<S>>,
-    ///The name of the next smaller administrative region than country.
+    /// The name of the next smaller administrative region than country.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state_province: Option<S>,
-    ///The taxonomic rank of the most specific name in scientificName.
+    /// The taxonomic rank of the most specific name in scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub taxon_rank: Option<OccurrenceTaxonRank<S>>,
-    ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
+    /// The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub taxonomic_status: Option<S>,
-    ///The original textual description of the place as provided by the recorder.
+    /// The original textual description of the place as provided by the recorder.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verbatim_locality: Option<S>,
-    ///A common or vernacular name for the taxon.
+    /// A common or vernacular name for the taxon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vernacular_name: Option<S>,
-    ///Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
+    /// Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub video_evidence: Option<Data<S>>,
     #[serde(
@@ -369,33 +369,19 @@ where
     type Output = OccurrenceBasisOfRecord<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            OccurrenceBasisOfRecord::HumanObservation => {
-                OccurrenceBasisOfRecord::HumanObservation
-            }
+            OccurrenceBasisOfRecord::HumanObservation => OccurrenceBasisOfRecord::HumanObservation,
             OccurrenceBasisOfRecord::MachineObservation => {
                 OccurrenceBasisOfRecord::MachineObservation
             }
             OccurrenceBasisOfRecord::PreservedSpecimen => {
                 OccurrenceBasisOfRecord::PreservedSpecimen
             }
-            OccurrenceBasisOfRecord::LivingSpecimen => {
-                OccurrenceBasisOfRecord::LivingSpecimen
-            }
-            OccurrenceBasisOfRecord::FossilSpecimen => {
-                OccurrenceBasisOfRecord::FossilSpecimen
-            }
-            OccurrenceBasisOfRecord::MaterialSample => {
-                OccurrenceBasisOfRecord::MaterialSample
-            }
-            OccurrenceBasisOfRecord::MaterialEntity => {
-                OccurrenceBasisOfRecord::MaterialEntity
-            }
-            OccurrenceBasisOfRecord::MaterialCitation => {
-                OccurrenceBasisOfRecord::MaterialCitation
-            }
-            OccurrenceBasisOfRecord::Other(v) => {
-                OccurrenceBasisOfRecord::Other(v.into_static())
-            }
+            OccurrenceBasisOfRecord::LivingSpecimen => OccurrenceBasisOfRecord::LivingSpecimen,
+            OccurrenceBasisOfRecord::FossilSpecimen => OccurrenceBasisOfRecord::FossilSpecimen,
+            OccurrenceBasisOfRecord::MaterialSample => OccurrenceBasisOfRecord::MaterialSample,
+            OccurrenceBasisOfRecord::MaterialEntity => OccurrenceBasisOfRecord::MaterialEntity,
+            OccurrenceBasisOfRecord::MaterialCitation => OccurrenceBasisOfRecord::MaterialCitation,
+            OccurrenceBasisOfRecord::Other(v) => OccurrenceBasisOfRecord::Other(v.into_static()),
         }
     }
 }
@@ -556,8 +542,7 @@ impl<S: BosStr> Serialize for OccurrenceNomenclaturalCode<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for OccurrenceNomenclaturalCode<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceNomenclaturalCode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -641,8 +626,7 @@ impl<S: BosStr> Serialize for OccurrenceOccurrenceStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for OccurrenceOccurrenceStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceOccurrenceStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1782,9 +1766,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1796,7 +1779,7 @@ where
 
 pub mod occurrence_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1975,85 +1958,12 @@ impl OccurrenceBuilder<occurrence_state::Empty, DefaultStr> {
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2066,85 +1976,12 @@ impl<S: BosStr> OccurrenceBuilder<occurrence_state::Empty, S> {
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2276,10 +2113,7 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
-    pub fn coordinate_uncertainty_in_meters(
-        mut self,
-        value: impl Into<Option<i64>>,
-    ) -> Self {
+    pub fn coordinate_uncertainty_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -2903,10 +2737,7 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
-    pub fn maybe_occurrence_status(
-        mut self,
-        value: Option<OccurrenceOccurrenceStatus<S>>,
-    ) -> Self {
+    pub fn maybe_occurrence_status(mut self, value: Option<OccurrenceOccurrenceStatus<S>>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -3154,10 +2985,7 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `taxonRank` field (optional)
-    pub fn taxon_rank(
-        mut self,
-        value: impl Into<Option<OccurrenceTaxonRank<S>>>,
-    ) -> Self {
+    pub fn taxon_rank(mut self, value: impl Into<Option<OccurrenceTaxonRank<S>>>) -> Self {
         self._fields.74 = value.into();
         self
     }
@@ -3314,10 +3142,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Occurrence<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Occurrence<S> {
         Occurrence {
             associated_media: self._fields.0,
             associated_occurrences: self._fields.1,
@@ -3404,10 +3229,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_dwc_occurrence() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.dwc.occurrence"),

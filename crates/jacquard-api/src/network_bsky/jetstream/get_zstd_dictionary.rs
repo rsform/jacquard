@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -25,33 +25,27 @@ pub struct GetZstdDictionary {
     pub id: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetZstdDictionaryOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetZstdDictionaryError {
     /// No dictionary with the given ID is available on this server.
     #[serde(rename = "DictionaryNotFound")]
-    DictionaryNotFound(Option<SmolStr>),
+    DictionaryNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetZstdDictionaryError {
@@ -124,7 +118,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetZstdDictionaryRequest {
 
 pub mod get_zstd_dictionary_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,8 +187,6 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> GetZstdDictionary {
-        GetZstdDictionary {
-            id: self._fields.0,
-        }
+        GetZstdDictionary { id: self._fields.0 }
     }
 }

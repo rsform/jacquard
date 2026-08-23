@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_bsky::jetstream::list_segments;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_bsky::jetstream::list_segments;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListSegments<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -36,9 +39,11 @@ pub struct ListSegments<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListSegmentsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -47,25 +52,27 @@ pub struct ListSegmentsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Segment<S: BosStr = DefaultStr> {
-    ///Segment-format xxh3 metadata checksum as 16-char hex; equals the getSegment ETag.
+    /// Segment-format xxh3 metadata checksum as 16-char hex; equals the getSegment ETag.
     pub checksum: S,
-    ///Number of events in the segment.
+    /// Number of events in the segment.
     pub event_count: i64,
-    ///Zero-based segment index.
+    /// Zero-based segment index.
     pub index: i64,
     pub max_seq: i64,
-    ///Latest witnessed-at, unix microseconds.
+    /// Latest witnessed-at, unix microseconds.
     pub max_witnessed_at: i64,
     pub min_seq: i64,
-    ///Earliest witnessed-at, unix microseconds.
+    /// Earliest witnessed-at, unix microseconds.
     pub min_witnessed_at: i64,
-    ///Segment filename; pass to getSegment.
+    /// Segment filename; pass to getSegment.
     pub name: S,
-    ///File size in bytes.
+    /// File size in bytes.
     pub size_bytes: i64,
     #[serde(
         flatten,
@@ -125,7 +132,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_segments_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -231,15 +238,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod segment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -613,10 +619,7 @@ where
     St::Name: segment_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> SegmentBuilder<segment_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> SegmentBuilder<segment_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -691,10 +694,10 @@ where
 }
 
 fn lexicon_doc_network_bsky_jetstream_listSegments() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.bsky.jetstream.listSegments"),
@@ -703,33 +706,29 @@ fn lexicon_doc_network_bsky_jetstream_listSegments() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Opaque pagination cursor from a previous response.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Opaque pagination cursor from a previous response.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A KidLisp code snippet from Aesthetic Computer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,13 +37,13 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Kidlisp<S: BosStr = DefaultStr> {
-    ///Short alphanumeric code for easy lookup
+    /// Short alphanumeric code for easy lookup
     pub code: S,
-    ///MongoDB ObjectId reference for bidirectional sync
+    /// MongoDB ObjectId reference for bidirectional sync
     pub r#ref: S,
-    ///The KidLisp source code
+    /// The KidLisp source code
     pub source: S,
-    ///Creation timestamp (ISO 8601)
+    /// Creation timestamp (ISO 8601)
     pub when: Datetime,
     #[serde(
         flatten,
@@ -153,9 +153,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -167,7 +166,7 @@ where
 
 pub mod kidlisp_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -288,10 +287,7 @@ where
     St::Code: kidlisp_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(
-        mut self,
-        value: impl Into<S>,
-    ) -> KidlispBuilder<kidlisp_state::SetCode<St>, S> {
+    pub fn code(mut self, value: impl Into<S>) -> KidlispBuilder<kidlisp_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -307,10 +303,7 @@ where
     St::Ref: kidlisp_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> KidlispBuilder<kidlisp_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> KidlispBuilder<kidlisp_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         KidlispBuilder {
             _state: PhantomData,
@@ -389,10 +382,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.kidlisp"),
@@ -401,30 +394,26 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A KidLisp code snippet from Aesthetic Computer",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A KidLisp code snippet from Aesthetic Computer",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("source"), SmolStr::new_static("code"),
-                                SmolStr::new_static("when"), SmolStr::new_static("ref")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("source"),
+                            SmolStr::new_static("code"),
+                            SmolStr::new_static("when"),
+                            SmolStr::new_static("ref"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("code"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Short alphanumeric code for easy lookup",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Short alphanumeric code for easy lookup",
+                                    )),
                                     max_length: Some(10usize),
                                     ..Default::default()
                                 }),
@@ -432,11 +421,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("ref"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "MongoDB ObjectId reference for bidirectional sync",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "MongoDB ObjectId reference for bidirectional sync",
+                                    )),
                                     max_length: Some(24usize),
                                     ..Default::default()
                                 }),
@@ -444,9 +431,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("source"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The KidLisp source code"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The KidLisp source code",
+                                    )),
                                     max_length: Some(50000usize),
                                     ..Default::default()
                                 }),
@@ -454,9 +441,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("when"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Creation timestamp (ISO 8601)"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Creation timestamp (ISO 8601)",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

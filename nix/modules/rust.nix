@@ -13,7 +13,7 @@
     , ...
     }:
     let
-      inherit (pkgs.stdenv) isDarwin;
+      isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
       inherit (pkgs.darwin) apple_sdk;
 
       # Common configuration for all crates

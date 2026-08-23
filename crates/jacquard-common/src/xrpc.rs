@@ -44,7 +44,7 @@ use core::error::Error;
 use core::fmt::{self, Debug};
 use core::marker::PhantomData;
 use http::{
-    HeaderName, HeaderValue, Request, StatusCode,
+    HeaderMap, HeaderName, HeaderValue, Request, StatusCode,
     header::{AUTHORIZATION, CONTENT_TYPE},
 };
 use serde::de::DeserializeOwned;
@@ -550,30 +550,33 @@ pub fn process_response<Resp>(http_response: http::Response<Vec<u8>>) -> XrpcRes
 where
     Resp: XrpcResp,
 {
-    let status = http_response.status();
+    let (parts, body) = http_response.into_parts();
+    let status = parts.status;
 
     // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
     // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
     #[allow(deprecated)]
     if status.as_u16() == 401 {
-        if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
+        if let Some(hv) = parts.headers.get(http::header::WWW_AUTHENTICATE) {
             return Err(
                 crate::error::ClientError::auth(crate::error::AuthError::Other(hv.clone()))
+                    .with_headers(parts.headers)
                     .for_nsid(Resp::NSID),
             );
         }
     }
-    let buffer = Bytes::from(http_response.into_body());
+    let buffer = Bytes::from(body);
 
     if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
         return Err(crate::error::ClientError::from(crate::error::HttpError {
             status,
+            headers: parts.headers,
             body: Some(buffer),
         })
         .for_nsid(Resp::NSID));
     }
 
-    Ok(Response::new(buffer, status))
+    Ok(Response::new(buffer, status, parts.headers))
 }
 
 /// HTTP headers commonly used in XRPC requests
@@ -743,27 +746,34 @@ where
     _marker: PhantomData<fn() -> Resp>,
     buffer: Bytes,
     status: StatusCode,
+    headers: HeaderMap,
 }
 
 impl<R> Response<R>
 where
     R: XrpcResp,
 {
-    /// Create a new response from a buffer and status code
-    pub fn new(buffer: Bytes, status: StatusCode) -> Self {
+    /// Create a new response from a buffer, status code, and response headers.
+    pub fn new(buffer: Bytes, status: StatusCode, headers: HeaderMap) -> Self {
         Self {
             buffer,
             status,
+            headers,
             _marker: PhantomData,
         }
     }
 
-    /// Get the HTTP status code
+    /// Get the HTTP status code.
     pub fn status(&self) -> StatusCode {
         self.status
     }
 
-    /// Get the raw buffer
+    /// Get the HTTP response headers.
+    pub fn headers(&self) -> &HeaderMap {
+        &self.headers
+    }
+
+    /// Get the raw buffer.
     pub fn buffer(&self) -> &Bytes {
         &self.buffer
     }
@@ -892,6 +902,7 @@ where
         Response {
             buffer: self.buffer,
             status: self.status,
+            headers: self.headers,
             _marker: PhantomData,
         }
     }
@@ -1180,7 +1191,8 @@ mod tests {
     fn generic_error_carries_context() {
         let body = serde_json::json!({"error":"InvalidRequest","message":"missing"});
         let buf = Bytes::from(serde_json::to_vec(&body).unwrap());
-        let resp: Response<DummyResp> = Response::new(buf, StatusCode::BAD_REQUEST);
+        let resp: Response<DummyResp> =
+            Response::new(buf, StatusCode::BAD_REQUEST, HeaderMap::new());
         match resp.parse::<SmolStr>().unwrap_err() {
             XrpcError::Generic(g) => {
                 assert_eq!(g.error.as_str(), "InvalidRequest");
@@ -1194,6 +1206,37 @@ mod tests {
     }
 
     #[test]
+    fn process_response_preserves_headers_on_xrpc_responses() {
+        let response = http::Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .header("retry-after", "7")
+            .body(br#"{"error":"InvalidRequest","message":"missing"}"#.to_vec())
+            .unwrap();
+        let response: Response<DummyResp> = process_response(response).unwrap();
+
+        assert_eq!(response.headers().get("retry-after").unwrap(), "7");
+    }
+
+    #[test]
+    fn process_response_preserves_headers_on_http_errors() {
+        let response = http::Response::builder()
+            .status(StatusCode::TOO_MANY_REQUESTS)
+            .header("retry-after", "7")
+            .body(Vec::new())
+            .unwrap();
+        let error = match process_response::<DummyResp>(response) {
+            Ok(_) => panic!("expected HTTP error"),
+            Err(error) => error,
+        };
+        let http_error = error
+            .source_err()
+            .and_then(|source| source.downcast_ref::<crate::error::HttpError>())
+            .expect("HTTP error source");
+
+        assert_eq!(http_error.headers.get("retry-after").unwrap(), "7");
+    }
+
+    #[test]
     fn auth_error_mapping() {
         for (code, expect) in [
             ("ExpiredToken", AuthError::TokenExpired),
@@ -1201,7 +1244,8 @@ mod tests {
         ] {
             let body = serde_json::json!({"error": code});
             let buf = Bytes::from(serde_json::to_vec(&body).unwrap());
-            let resp: Response<DummyResp> = Response::new(buf, StatusCode::UNAUTHORIZED);
+            let resp: Response<DummyResp> =
+                Response::new(buf, StatusCode::UNAUTHORIZED, HeaderMap::new());
             match resp.parse::<SmolStr>().unwrap_err() {
                 XrpcError::Auth(e) => match (e, expect) {
                     (AuthError::TokenExpired, AuthError::TokenExpired) => {}

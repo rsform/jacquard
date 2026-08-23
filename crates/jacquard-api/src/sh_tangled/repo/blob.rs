@@ -10,32 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::repo::blob;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::repo::blob;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LastCommit<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<blob::Signature<S>>,
-    ///Commit hash
+    /// Commit hash
     pub hash: S,
-    ///Commit message
+    /// Commit message
     pub message: S,
-    ///Commit timestamp
+    /// Commit timestamp
     pub when: Datetime,
     #[serde(
         flatten,
@@ -46,9 +49,11 @@ pub struct LastCommit<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Blob<S: BosStr = DefaultStr> {
     pub path: S,
     ///  Defaults to `false`.
@@ -59,34 +64,36 @@ pub struct Blob<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlobOutput<S: BosStr = DefaultStr> {
-    ///File content (base64 encoded for binary files)
+    /// File content (base64 encoded for binary files)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
-    ///Content encoding
+    /// Content encoding
     #[serde(skip_serializing_if = "Option::is_none")]
     pub encoding: Option<BlobOutputEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_too_large: Option<bool>,
-    ///Whether the file is binary
+    /// Whether the file is binary
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_binary: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_commit: Option<blob::LastCommit<S>>,
-    ///MIME type of the file
+    /// MIME type of the file
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mime_type: Option<S>,
-    ///The file path
+    /// The file path
     pub path: S,
-    ///The git reference used
+    /// The git reference used
     pub r#ref: S,
-    ///File size in bytes
+    /// File size in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
-    ///Submodule information if path is a submodule
+    /// Submodule information if path is a submodule
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submodule: Option<blob::Submodule<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -172,35 +179,30 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum BlobError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<SmolStr>),
+    RepoNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<SmolStr>),
+    RefNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// File not found at the specified path
     #[serde(rename = "FileNotFound")]
-    FileNotFound(Option<SmolStr>),
+    FileNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<SmolStr>),
+    InvalidRequest(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for BlobError {
@@ -245,15 +247,17 @@ impl core::fmt::Display for BlobError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Signature<S: BosStr = DefaultStr> {
-    ///Author email
+    /// Author email
     pub email: S,
-    ///Author name
+    /// Author name
     pub name: S,
-    ///Author timestamp
+    /// Author timestamp
     pub when: Datetime,
     #[serde(
         flatten,
@@ -264,16 +268,18 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Submodule<S: BosStr = DefaultStr> {
-    ///Branch to track in the submodule
+    /// Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<S>,
-    ///Submodule name
+    /// Submodule name
     pub name: S,
-    ///Submodule repository URL
+    /// Submodule repository URL
     pub url: S,
     #[serde(
         flatten,
@@ -364,15 +370,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod last_commit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -431,7 +436,12 @@ pub mod last_commit_state {
 /// Builder for constructing an instance of this type.
 pub struct LastCommitBuilder<St: last_commit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<blob::Signature<S>>, Option<S>, Option<S>, Option<Datetime>),
+    _fields: (
+        Option<blob::Signature<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -559,10 +569,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LastCommit<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LastCommit<S> {
         LastCommit {
             author: self._fields.0,
             hash: self._fields.1.unwrap(),
@@ -574,10 +581,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.blob"),
@@ -586,12 +593,11 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("lastCommit"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("hash"), SmolStr::new_static("message"),
-                            SmolStr::new_static("when")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("hash"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("when"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -632,70 +638,62 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(
-                                vec![
-                                    SmolStr::new_static("repo"), SmolStr::new_static("ref"),
-                                    SmolStr::new_static("path")
-                                ],
-                            ),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("path"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Path to the file within the repository"),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("raw"),
-                                    LexXrpcParametersProperty::Boolean(LexBoolean {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("ref"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Git reference (branch, tag, or commit SHA)",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("repo"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("DID of the repository"),
-                                        ),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![
+                            SmolStr::new_static("repo"),
+                            SmolStr::new_static("ref"),
+                            SmolStr::new_static("path"),
+                        ]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("path"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Path to the file within the repository",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("raw"),
+                                LexXrpcParametersProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("ref"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Git reference (branch, tag, or commit SHA)",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("repo"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("DID of the repository")),
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("email"),
-                            SmolStr::new_static("when")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("email"),
+                        SmolStr::new_static("when"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -729,18 +727,19 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("submodule"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("url")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("url"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Branch to track in the submodule"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Branch to track in the submodule",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -754,9 +753,7 @@ fn lexicon_doc_sh_tangled_repo_blob() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Submodule repository URL"),
-                                ),
+                                description: Some(CowStr::new_static("Submodule repository URL")),
                                 ..Default::default()
                             }),
                         );
@@ -777,7 +774,7 @@ fn _default_raw() -> Option<bool> {
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -882,10 +879,7 @@ where
     St::Path: blob_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(
-        mut self,
-        value: impl Into<S>,
-    ) -> BlobBuilder<blob_state::SetPath<St>, S> {
+    pub fn path(mut self, value: impl Into<S>) -> BlobBuilder<blob_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -914,10 +908,7 @@ where
     St::Ref: blob_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> BlobBuilder<blob_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> BlobBuilder<blob_state::SetRef<St>, S> {
         self._fields.2 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -933,10 +924,7 @@ where
     St::Repo: blob_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> BlobBuilder<blob_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> BlobBuilder<blob_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -971,15 +959,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1152,10 +1139,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Signature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1172,8 +1156,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

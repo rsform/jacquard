@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::moderation::SubjectStatusView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::moderation::SubjectStatusView;
+use serde::{Deserialize, Serialize};
 /// If specified, only subjects with the given age assurance state will be returned.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -74,8 +74,7 @@ impl<S: BosStr> Serialize for QueryStatusesAgeAssuranceState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryStatusesAgeAssuranceState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryStatusesAgeAssuranceState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -99,21 +98,11 @@ where
     type Output = QueryStatusesAgeAssuranceState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            QueryStatusesAgeAssuranceState::Pending => {
-                QueryStatusesAgeAssuranceState::Pending
-            }
-            QueryStatusesAgeAssuranceState::Assured => {
-                QueryStatusesAgeAssuranceState::Assured
-            }
-            QueryStatusesAgeAssuranceState::Unknown => {
-                QueryStatusesAgeAssuranceState::Unknown
-            }
-            QueryStatusesAgeAssuranceState::Reset => {
-                QueryStatusesAgeAssuranceState::Reset
-            }
-            QueryStatusesAgeAssuranceState::Blocked => {
-                QueryStatusesAgeAssuranceState::Blocked
-            }
+            QueryStatusesAgeAssuranceState::Pending => QueryStatusesAgeAssuranceState::Pending,
+            QueryStatusesAgeAssuranceState::Assured => QueryStatusesAgeAssuranceState::Assured,
+            QueryStatusesAgeAssuranceState::Unknown => QueryStatusesAgeAssuranceState::Unknown,
+            QueryStatusesAgeAssuranceState::Reset => QueryStatusesAgeAssuranceState::Reset,
+            QueryStatusesAgeAssuranceState::Blocked => QueryStatusesAgeAssuranceState::Blocked,
             QueryStatusesAgeAssuranceState::Other(v) => {
                 QueryStatusesAgeAssuranceState::Other(v.into_static())
             }
@@ -175,8 +164,7 @@ impl<S: BosStr> Serialize for QueryStatusesReviewState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryStatusesReviewState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryStatusesReviewState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -201,20 +189,13 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             QueryStatusesReviewState::ReviewOpen => QueryStatusesReviewState::ReviewOpen,
-            QueryStatusesReviewState::ReviewClosed => {
-                QueryStatusesReviewState::ReviewClosed
-            }
-            QueryStatusesReviewState::ReviewEscalated => {
-                QueryStatusesReviewState::ReviewEscalated
-            }
+            QueryStatusesReviewState::ReviewClosed => QueryStatusesReviewState::ReviewClosed,
+            QueryStatusesReviewState::ReviewEscalated => QueryStatusesReviewState::ReviewEscalated,
             QueryStatusesReviewState::ReviewNone => QueryStatusesReviewState::ReviewNone,
-            QueryStatusesReviewState::Other(v) => {
-                QueryStatusesReviewState::Other(v.into_static())
-            }
+            QueryStatusesReviewState::Other(v) => QueryStatusesReviewState::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryStatusesSortDirection<S: BosStr = DefaultStr> {
@@ -262,8 +243,7 @@ impl<S: BosStr> Serialize for QueryStatusesSortDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryStatusesSortDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryStatusesSortDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -295,7 +275,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryStatusesSortField<S: BosStr = DefaultStr> {
@@ -376,24 +355,16 @@ where
     type Output = QueryStatusesSortField<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            QueryStatusesSortField::LastReviewedAt => {
-                QueryStatusesSortField::LastReviewedAt
-            }
-            QueryStatusesSortField::LastReportedAt => {
-                QueryStatusesSortField::LastReportedAt
-            }
+            QueryStatusesSortField::LastReviewedAt => QueryStatusesSortField::LastReviewedAt,
+            QueryStatusesSortField::LastReportedAt => QueryStatusesSortField::LastReportedAt,
             QueryStatusesSortField::ReportedRecordsCount => {
                 QueryStatusesSortField::ReportedRecordsCount
             }
             QueryStatusesSortField::TakendownRecordsCount => {
                 QueryStatusesSortField::TakendownRecordsCount
             }
-            QueryStatusesSortField::PriorityScore => {
-                QueryStatusesSortField::PriorityScore
-            }
-            QueryStatusesSortField::Other(v) => {
-                QueryStatusesSortField::Other(v.into_static())
-            }
+            QueryStatusesSortField::PriorityScore => QueryStatusesSortField::PriorityScore,
+            QueryStatusesSortField::Other(v) => QueryStatusesSortField::Other(v.into_static()),
         }
     }
 }
@@ -449,8 +420,7 @@ impl<S: BosStr> Serialize for QueryStatusesSubjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryStatusesSubjectType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryStatusesSubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -476,19 +446,17 @@ where
         match self {
             QueryStatusesSubjectType::Account => QueryStatusesSubjectType::Account,
             QueryStatusesSubjectType::Record => QueryStatusesSubjectType::Record,
-            QueryStatusesSubjectType::Conversation => {
-                QueryStatusesSubjectType::Conversation
-            }
-            QueryStatusesSubjectType::Other(v) => {
-                QueryStatusesSubjectType::Other(v.into_static())
-            }
+            QueryStatusesSubjectType::Conversation => QueryStatusesSubjectType::Conversation,
+            QueryStatusesSubjectType::Other(v) => QueryStatusesSubjectType::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryStatuses<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_assurance_state: Option<QueryStatusesAgeAssuranceState<S>>,
@@ -572,9 +540,11 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     pub takendown: Option<bool>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryStatusesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -615,21 +585,23 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    QueryStatusesSortDirection<S>,
-> {
-    Some(<QueryStatusesSortDirection<S>>::from_value(S::from_static("desc")))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<QueryStatusesSortDirection<S>> {
+    Some(<QueryStatusesSortDirection<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }
 
-fn _default_sort_field<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    QueryStatusesSortField<S>,
-> {
-    Some(<QueryStatusesSortField<S>>::from_value(S::from_static("lastReportedAt")))
+fn _default_sort_field<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<QueryStatusesSortField<S>> {
+    Some(<QueryStatusesSortField<S>>::from_value(S::from_static(
+        "lastReportedAt",
+    )))
 }
 
 pub mod query_statuses_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -647,10 +619,7 @@ pub mod query_statuses_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QueryStatusesBuilder<
-    St: query_statuses_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct QueryStatusesBuilder<St: query_statuses_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<QueryStatusesAgeAssuranceState<S>>,
@@ -713,42 +682,9 @@ impl QueryStatusesBuilder<query_statuses_state::Empty, DefaultStr> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -761,42 +697,9 @@ impl<S: BosStr> QueryStatusesBuilder<query_statuses_state::Empty, S> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -954,10 +857,7 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `ignoreSubjects` field (optional)
-    pub fn ignore_subjects(
-        mut self,
-        value: impl Into<Option<Vec<UriValue<S>>>>,
-    ) -> Self {
+    pub fn ignore_subjects(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
@@ -1165,18 +1065,12 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `reviewState` field (optional)
-    pub fn review_state(
-        mut self,
-        value: impl Into<Option<QueryStatusesReviewState<S>>>,
-    ) -> Self {
+    pub fn review_state(mut self, value: impl Into<Option<QueryStatusesReviewState<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `reviewState` field to an Option value (optional)
-    pub fn maybe_review_state(
-        mut self,
-        value: Option<QueryStatusesReviewState<S>>,
-    ) -> Self {
+    pub fn maybe_review_state(mut self, value: Option<QueryStatusesReviewState<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -1218,10 +1112,7 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<QueryStatusesSortDirection<S>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<QueryStatusesSortDirection<S>>) -> Self {
         self._fields.30 = value;
         self
     }
@@ -1229,10 +1120,7 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `sortField` field (optional)
-    pub fn sort_field(
-        mut self,
-        value: impl Into<Option<QueryStatusesSortField<S>>>,
-    ) -> Self {
+    pub fn sort_field(mut self, value: impl Into<Option<QueryStatusesSortField<S>>>) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -1258,18 +1146,12 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(
-        mut self,
-        value: impl Into<Option<QueryStatusesSubjectType<S>>>,
-    ) -> Self {
+    pub fn subject_type(mut self, value: impl Into<Option<QueryStatusesSubjectType<S>>>) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(
-        mut self,
-        value: Option<QueryStatusesSubjectType<S>>,
-    ) -> Self {
+    pub fn maybe_subject_type(mut self, value: Option<QueryStatusesSubjectType<S>>) -> Self {
         self._fields.33 = value;
         self
     }

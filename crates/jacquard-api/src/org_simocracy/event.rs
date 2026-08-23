@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Tracks user interactions — chat messages, senate hearings launched, and individual sim comments during hearings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,26 +37,26 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Event<S: BosStr = DefaultStr> {
-    ///DID of the user who triggered the event
+    /// DID of the user who triggered the event
     pub actor_did: S,
-    ///The actual content — sim response for chat, sim opinion for comment
+    /// The actual content — sim response for chat, sim opinion for comment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
     pub created_at: Datetime,
-    ///Title of the proposal (for hearing/comment events)
+    /// Title of the proposal (for hearing/comment events)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub proposal_title: Option<S>,
-    ///Hearing round: 1=evaluation, 2=response, 3=summary (for comment events)
+    /// Hearing round: 1=evaluation, 2=response, 3=summary (for comment events)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub round: Option<i64>,
-    ///Names of sims involved
+    /// Names of sims involved
     pub sim_names: Vec<S>,
-    ///AT-URIs of sims involved
+    /// AT-URIs of sims involved
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sim_uris: Option<Vec<S>>,
-    ///Event type: chat, hearing, or comment
+    /// Event type: chat, hearing, or comment
     pub r#type: S,
-    ///User's message that prompted the response (for chat events)
+    /// User's message that prompted the response (for chat events)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_message: Option<S>,
     #[serde(
@@ -191,9 +191,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -205,7 +204,7 @@ where
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,10 +444,7 @@ where
     St::Type: event_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(
-        mut self,
-        value: impl Into<S>,
-    ) -> EventBuilder<event_state::SetType<St>, S> {
+    pub fn r#type(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetType<St>, S> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -512,10 +508,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_event() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.event"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// Record containing a bookmarked item, or 'clip'.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,29 +38,29 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Clip<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when the bookmark is created
+    /// Client-declared timestamp when the bookmark is created
     pub created_at: Datetime,
-    ///A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
+    /// A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
     pub description: S,
-    ///Indicates human language of the given URL
+    /// Indicates human language of the given URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<Language>>,
-    ///User-written notes for the bookmark. Public and personal.
+    /// User-written notes for the bookmark. Public and personal.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<S>,
-    ///An array of tags. A format of solely alphanumeric characters and dashes should be used.
+    /// An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<StrongRef<S>>>,
-    ///The title of the bookmark. If left empty, reuse the URL.
+    /// The title of the bookmark. If left empty, reuse the URL.
     pub title: S,
-    ///Whether the bookmark can be used for feed indexing and aggregation  Defaults to `false`.
+    /// Whether the bookmark can be used for feed indexing and aggregation  Defaults to `false`.
     #[serde(default = "_default_clip_unlisted")]
     pub unlisted: bool,
-    ///Whether the bookmark has been read by the user  Defaults to `true`.
+    /// Whether the bookmark has been read by the user  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_clip_unread")]
     pub unread: Option<bool>,
-    ///The URL of the bookmark. Cannot be left empty or be modified after creation.
+    /// The URL of the bookmark. Cannot be left empty or be modified after creation.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -241,9 +241,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -263,7 +262,7 @@ fn _default_clip_unread() -> Option<bool> {
 
 pub mod clip_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -489,10 +488,7 @@ where
     St::Title: clip_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ClipBuilder<clip_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> ClipBuilder<clip_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
@@ -540,10 +536,7 @@ where
     St::Url: clip_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> ClipBuilder<clip_state::SetUrl<St>, S> {
+    pub fn url(mut self, value: impl Into<UriValue<S>>) -> ClipBuilder<clip_state::SetUrl<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
@@ -595,10 +588,10 @@ where
 }
 
 fn lexicon_doc_social_clippr_feed_clip() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.clippr.feed.clip"),

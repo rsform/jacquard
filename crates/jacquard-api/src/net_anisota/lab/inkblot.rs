@@ -8,13 +8,12 @@
 //! Generated bindings for the `net.anisota.lab.inkblot` Lexicon namespace/module.
 pub mod perception;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,7 +29,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A symmetric Rorschach-style inkblot crafted in the Anisota Lab's Social Inkblot Test and saved to the owner's library. The blot is fully reproducible from its integer 'seed' and its generation 'params'; 'palette' names the ink colour. A rendered PNG data URL is stored in 'image' so the blot can be shown anywhere (including by other people viewing the social gallery) without re-running the generator. Inkblots carry no user-supplied name: the record's TID rkey is its identifier and display name everywhere it is shown.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -41,17 +40,17 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Inkblot<S: BosStr = DefaultStr> {
-    ///When the inkblot was saved
+    /// When the inkblot was saved
     pub created_at: Datetime,
-    ///A rendered still of the blot as an image data URL (PNG, or WebP when a denser blot needs the more compact encoding to stay sharp within the size cap), for display
+    /// A rendered still of the blot as an image data URL (PNG, or WebP when a denser blot needs the more compact encoding to stay sharp within the size cap), for display
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<S>,
-    ///Ink palette id (classic, sepia, indigo, blood, moss)
+    /// Ink palette id (classic, sepia, indigo, blood, moss)
     pub palette: S,
-    ///The generation parameters (complexity, blobiness, spread, spatter, radial)
+    /// The generation parameters (complexity, blobiness, spread, spatter, radial)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub params: Option<Data<S>>,
-    ///The deterministic RNG seed that reproduces the blot
+    /// The deterministic RNG seed that reproduces the blot
     pub seed: i64,
     #[serde(
         flatten,
@@ -149,9 +148,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -163,7 +161,7 @@ where
 
 pub mod inkblot_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -222,7 +220,13 @@ pub mod inkblot_state {
 /// Builder for constructing an instance of this type.
 pub struct InkblotBuilder<St: inkblot_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<Data<S>>, Option<i64>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -332,10 +336,7 @@ where
     St::Seed: inkblot_state::IsUnset,
 {
     /// Set the `seed` field (required)
-    pub fn seed(
-        mut self,
-        value: impl Into<i64>,
-    ) -> InkblotBuilder<inkblot_state::SetSeed<St>, S> {
+    pub fn seed(mut self, value: impl Into<i64>) -> InkblotBuilder<inkblot_state::SetSeed<St>, S> {
         self._fields.4 = Option::Some(value.into());
         InkblotBuilder {
             _state: PhantomData,
@@ -377,10 +378,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_inkblot() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.inkblot"),

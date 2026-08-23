@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::app_certified::Did;
 use crate::com_atproto::repo::strong_ref::StrongRef;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Measurement data related to one or more records (e.g. activities, projects, etc.).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,43 +40,43 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Measurement<S: BosStr = DefaultStr> {
-    ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
+    /// Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
+    /// Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment_facets: Option<Vec<Facet<S>>>,
-    ///Client-declared timestamp when this record was originally created
+    /// Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
-    ///The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
+    /// The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
-    ///URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
+    /// URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evidence_uri: Option<Vec<UriValue<S>>>,
-    ///Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
+    /// Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locations: Option<Vec<StrongRef<S>>>,
-    ///DIDs of the entities that performed this measurement
+    /// DIDs of the entities that performed this measurement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurers: Option<Vec<Did<S>>>,
-    ///Short identifier for the measurement methodology
+    /// Short identifier for the measurement methodology
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method_type: Option<S>,
-    ///URI to methodology documentation, standard protocol, or measurement procedure
+    /// URI to methodology documentation, standard protocol, or measurement procedure
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method_uri: Option<UriValue<S>>,
-    ///The metric being measured, e.g. forest area restored, number of users, etc.
+    /// The metric being measured, e.g. forest area restored, number of users, etc.
     pub metric: S,
-    ///The start date and time when the measurement began.
+    /// The start date and time when the measurement began.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_date: Option<Datetime>,
-    ///Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
+    /// Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subjects: Option<Vec<StrongRef<S>>>,
-    ///The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
+    /// The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
     pub unit: S,
-    ///The measured value as a numeric string (e.g. '1234.56')
+    /// The measured value as a numeric string (e.g. '1234.56')
     pub value: S,
     #[serde(
         flatten,
@@ -258,9 +258,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -272,7 +271,7 @@ where
 
 pub mod measurement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,20 +385,7 @@ impl MeasurementBuilder<measurement_state::Empty, DefaultStr> {
         MeasurementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -412,20 +398,7 @@ impl<S: BosStr> MeasurementBuilder<measurement_state::Empty, S> {
         MeasurementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -667,10 +640,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Measurement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Measurement<S> {
         Measurement {
             comment: self._fields.0,
             comment_facets: self._fields.1,
@@ -692,10 +662,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_context_measurement() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.context.measurement"),

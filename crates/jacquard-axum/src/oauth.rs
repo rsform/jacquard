@@ -15,7 +15,7 @@
 //!   cookies keyed by OAuth state.
 //!
 //! The private browser session cookie stores only an encoded
-//! [`SessionKey`](jacquard::common::session::SessionKey), never OAuth tokens.
+//! [`SessionKey`], never OAuth tokens.
 
 use std::{fmt, str::FromStr, sync::Arc};
 

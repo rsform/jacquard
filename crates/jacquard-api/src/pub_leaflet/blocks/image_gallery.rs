@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::pub_leaflet::blocks::image_gallery;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::pub_leaflet::blocks::image_gallery;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -40,11 +43,13 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Image<S: BosStr = DefaultStr> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     pub aspect_ratio: image_gallery::AspectRatio<S>,
@@ -58,17 +63,19 @@ pub struct Image<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageGallery<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<ImageGalleryFormat<S>>,
-    ///Gap between images in pixels.
+    /// Gap between images in pixels.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gap: Option<i64>,
     pub images: Vec<image_gallery::Image<S>>,
-    ///Max width per image in grid view (px); drives how many columns fit.
+    /// Max width per image in grid view (px); drives how many columns fit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_width: Option<i64>,
     #[serde(
@@ -79,7 +86,6 @@ pub struct ImageGallery<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ImageGalleryFormat<S: BosStr = DefaultStr> {
@@ -206,19 +212,16 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -254,15 +257,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -400,10 +402,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -413,10 +412,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_imageGallery() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.imageGallery"),
@@ -425,9 +424,10 @@ fn lexicon_doc_pub_leaflet_blocks_imageGallery() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -451,23 +451,19 @@ fn lexicon_doc_pub_leaflet_blocks_imageGallery() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("image"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("image"),
-                            SmolStr::new_static("aspectRatio")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("image"),
+                        SmolStr::new_static("aspectRatio"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Alt text description of the image, for accessibility.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alt text description of the image, for accessibility.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -480,7 +476,9 @@ fn lexicon_doc_pub_leaflet_blocks_imageGallery() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -496,7 +494,9 @@ fn lexicon_doc_pub_leaflet_blocks_imageGallery() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("format"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("gap"),
@@ -538,15 +538,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -591,7 +590,11 @@ pub mod image_state {
 /// Builder for constructing an instance of this type.
 pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<image_gallery::AspectRatio<S>>, Option<BlobRef<S>>),
+    _fields: (
+        Option<S>,
+        Option<image_gallery::AspectRatio<S>>,
+        Option<BlobRef<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -715,15 +718,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_gallery_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -875,10 +877,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageGallery<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageGallery<S> {
         ImageGallery {
             format: self._fields.0,
             gap: self._fields.1,

@@ -8,29 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::feed::GeneratorView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::feed::GeneratorView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedGenerator<S: BosStr = DefaultStr> {
     pub feed: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedGeneratorOutput<S: BosStr = DefaultStr> {
-    ///Indicates whether the feed generator service has been online recently, or else seems to be inactive.
+    /// Indicates whether the feed generator service has been online recently, or else seems to be inactive.
     pub is_online: bool,
-    ///Indicates whether the feed generator service is compatible with the record declaration.
+    /// Indicates whether the feed generator service is compatible with the record declaration.
     pub is_valid: bool,
     pub view: GeneratorView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -67,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorRequest {
 
 pub mod get_feed_generator_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,10 +103,7 @@ pub mod get_feed_generator_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedGeneratorBuilder<
-    St: get_feed_generator_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetFeedGeneratorBuilder<St: get_feed_generator_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -109,10 +111,7 @@ pub struct GetFeedGeneratorBuilder<
 
 impl GetFeedGenerator<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetFeedGeneratorBuilder<
-        get_feed_generator_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetFeedGeneratorBuilder<get_feed_generator_state::Empty, DefaultStr> {
         GetFeedGeneratorBuilder::new()
     }
 }

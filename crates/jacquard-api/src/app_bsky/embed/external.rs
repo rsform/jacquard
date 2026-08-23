@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,17 +22,20 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
+use crate::app_bsky::embed::external;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::app_bsky::embed::external;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// RGB color definition, inspired by site.standard.theme.color#rgb
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ColorRgb<S: BosStr = DefaultStr> {
     pub b: i64,
     pub g: i64,
@@ -46,11 +49,13 @@ pub struct ColorRgb<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct External<S: BosStr = DefaultStr> {
-    ///StrongRefs (uri+cid) of the Atmosphere records that backed this view.
+    /// StrongRefs (uri+cid) of the Atmosphere records that backed this view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_refs: Option<Vec<StrongRef<S>>>,
     pub description: S,
@@ -70,7 +75,10 @@ pub struct External<S: BosStr = DefaultStr> {
 /// A representation of some externally linked content (eg, a URL and 'card'), embedded in a Bluesky record (eg, a post).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExternalRecord<S: BosStr = DefaultStr> {
     pub external: external::External<S>,
     #[serde(
@@ -82,9 +90,11 @@ pub struct ExternalRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
     pub external: external::ViewExternal<S>,
     #[serde(
@@ -96,23 +106,25 @@ pub struct View<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewExternal<S: BosStr = DefaultStr> {
-    ///Profiles of the owners of the Atmosphere records that backed this view.
+    /// Profiles of the owners of the Atmosphere records that backed this view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_profiles: Option<Vec<ProfileViewBasic<S>>>,
-    ///StrongRefs (uri+cid) of the Atmosphere records that backed this view.
+    /// StrongRefs (uri+cid) of the Atmosphere records that backed this view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_refs: Option<Vec<StrongRef<S>>>,
-    ///When the external content was created, if available. Example: a publication date, for an article.
+    /// When the external content was created, if available. Example: a publication date, for an article.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub description: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<Vec<Label<S>>>,
-    ///Estimated reading time in minutes, if applicable and available.
+    /// Estimated reading time in minutes, if applicable and available.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reading_time: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -120,7 +132,7 @@ pub struct ViewExternal<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<UriValue<S>>,
     pub title: S,
-    ///When the external content was updated, if available.
+    /// When the external content was updated, if available.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     pub uri: UriValue<S>,
@@ -136,17 +148,20 @@ pub struct ViewExternal<S: BosStr = DefaultStr> {
 /// The source of an external embed, such as a standard.site publication.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewExternalSource<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Fully-qualified URL where an icon representing the source can be fetched. For example, CDN location provided by the App View.
+    /// Fully-qualified URL where an icon representing the source can be fetched. For example, CDN location provided by the App View.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub theme: Option<external::ViewExternalSourceTheme<S>>,
     pub title: S,
-    ///URI of the source, if available. Example: the https:// URL of a site.standard.publication record.
+    /// URI of the source, if available. Example: the https:// URL of a site.standard.publication record.
     pub uri: UriValue<S>,
     #[serde(
         flatten,
@@ -160,7 +175,10 @@ pub struct ViewExternalSource<S: BosStr = DefaultStr> {
 /// The theme colors of an external source, such as a site.standard.publication. These colors may be used when rendering an embed from that source.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewExternalSourceTheme<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent_foreground_rgb: Option<external::ColorRgb<S>>,
@@ -281,19 +299,16 @@ impl<S: BosStr> LexiconSchema for External<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -389,15 +404,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod color_rgb_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -502,10 +516,7 @@ where
     St::B: color_rgb_state::IsUnset,
 {
     /// Set the `b` field (required)
-    pub fn b(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorRgbBuilder<color_rgb_state::SetB<St>, S> {
+    pub fn b(mut self, value: impl Into<i64>) -> ColorRgbBuilder<color_rgb_state::SetB<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ColorRgbBuilder {
             _state: PhantomData,
@@ -521,10 +532,7 @@ where
     St::G: color_rgb_state::IsUnset,
 {
     /// Set the `g` field (required)
-    pub fn g(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorRgbBuilder<color_rgb_state::SetG<St>, S> {
+    pub fn g(mut self, value: impl Into<i64>) -> ColorRgbBuilder<color_rgb_state::SetG<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ColorRgbBuilder {
             _state: PhantomData,
@@ -540,10 +548,7 @@ where
     St::R: color_rgb_state::IsUnset,
 {
     /// Set the `r` field (required)
-    pub fn r(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorRgbBuilder<color_rgb_state::SetR<St>, S> {
+    pub fn r(mut self, value: impl Into<i64>) -> ColorRgbBuilder<color_rgb_state::SetR<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ColorRgbBuilder {
             _state: PhantomData,
@@ -581,10 +586,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_embed_external() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.embed.external"),
@@ -593,17 +598,14 @@ fn lexicon_doc_app_bsky_embed_external() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("colorRGB"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "RGB color definition, inspired by site.standard.theme.color#rgb",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("r"), SmolStr::new_static("g"),
-                            SmolStr::new_static("b")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "RGB color definition, inspired by site.standard.theme.color#rgb",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("r"),
+                        SmolStr::new_static("g"),
+                        SmolStr::new_static("b"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -963,15 +965,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1078,10 +1079,7 @@ impl<S: BosStr> ExternalBuilder<external_state::Empty, S> {
 
 impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `associatedRefs` field (optional)
-    pub fn associated_refs(
-        mut self,
-        value: impl Into<Option<Vec<StrongRef<S>>>>,
-    ) -> Self {
+    pub fn associated_refs(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -1200,15 +1198,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod external_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1239,10 +1236,7 @@ pub mod external_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExternalRecordBuilder<
-    St: external_record_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ExternalRecordBuilder<St: external_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<external::External<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -1316,10 +1310,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ExternalRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ExternalRecord<S> {
         ExternalRecord {
             external: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1334,15 +1325,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1462,15 +1452,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1564,7 +1553,9 @@ impl ViewExternalBuilder<view_external_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ViewExternalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1575,7 +1566,9 @@ impl<S: BosStr> ViewExternalBuilder<view_external_state::Empty, S> {
     pub fn builder() -> Self {
         ViewExternalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1591,10 +1584,7 @@ impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
         self
     }
     /// Set the `associatedProfiles` field to an Option value (optional)
-    pub fn maybe_associated_profiles(
-        mut self,
-        value: Option<Vec<ProfileViewBasic<S>>>,
-    ) -> Self {
+    pub fn maybe_associated_profiles(mut self, value: Option<Vec<ProfileViewBasic<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1602,10 +1592,7 @@ impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
 
 impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
     /// Set the `associatedRefs` field (optional)
-    pub fn associated_refs(
-        mut self,
-        value: impl Into<Option<Vec<StrongRef<S>>>>,
-    ) -> Self {
+    pub fn associated_refs(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1676,18 +1663,12 @@ impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
 
 impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
     /// Set the `source` field (optional)
-    pub fn source(
-        mut self,
-        value: impl Into<Option<external::ViewExternalSource<S>>>,
-    ) -> Self {
+    pub fn source(mut self, value: impl Into<Option<external::ViewExternalSource<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(
-        mut self,
-        value: Option<external::ViewExternalSource<S>>,
-    ) -> Self {
+    pub fn maybe_source(mut self, value: Option<external::ViewExternalSource<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1782,10 +1763,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewExternal<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewExternal<S> {
         ViewExternal {
             associated_profiles: self._fields.0,
             associated_refs: self._fields.1,
@@ -1810,15 +1788,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_external_source_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1861,10 +1838,8 @@ pub mod view_external_source_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewExternalSourceBuilder<
-    St: view_external_source_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ViewExternalSourceBuilder<St: view_external_source_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1878,10 +1853,7 @@ pub struct ViewExternalSourceBuilder<
 
 impl ViewExternalSource<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ViewExternalSourceBuilder<
-        view_external_source_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ViewExternalSourceBuilder<view_external_source_state::Empty, DefaultStr> {
         ViewExternalSourceBuilder::new()
     }
 }
@@ -1943,18 +1915,12 @@ impl<St: view_external_source_state::State, S: BosStr> ViewExternalSourceBuilder
 
 impl<St: view_external_source_state::State, S: BosStr> ViewExternalSourceBuilder<St, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(
-        mut self,
-        value: impl Into<Option<external::ViewExternalSourceTheme<S>>>,
-    ) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<external::ViewExternalSourceTheme<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(
-        mut self,
-        value: Option<external::ViewExternalSourceTheme<S>>,
-    ) -> Self {
+    pub fn maybe_theme(mut self, value: Option<external::ViewExternalSourceTheme<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2016,10 +1982,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewExternalSource<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewExternalSource<S> {
         ViewExternalSource {
             description: self._fields.0,
             icon: self._fields.1,
@@ -2038,8 +2001,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

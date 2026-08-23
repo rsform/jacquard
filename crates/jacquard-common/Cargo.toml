@@ -2,7 +2,7 @@
 name = "jacquard-common"
 description = "Core AT Protocol types and utilities for Jacquard"
 edition.workspace = true
-version = "0.12.1"
+version = "0.13.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -74,7 +74,7 @@ reqwest-deflate = ["reqwest-client", "reqwest/deflate"]
 reqwest-zstd = ["reqwest-client", "reqwest/zstd"]
 reqwest-compression = ["reqwest-gzip", "reqwest-brotli", "reqwest-deflate", "reqwest-zstd"]
 tracing = ["std", "dep:tracing"]
-streaming = ["n0-future", "futures"]
+streaming = ["n0-future", "futures", "futures/std"]
 websocket = ["streaming", "tokio-tungstenite-wasm", "dep:ciborium", "dep:ciborium-io"]
 zstd = ["dep:zstd"]
 jss = ["dep:xxhash-rust"]
@@ -117,7 +117,7 @@ tokio = { workspace = true, default-features = false, features = ["sync"], optio
 # Streaming support (optional)
 n0-future = { workspace = true, optional = true }
 futures = { version = "0.3", optional = true, default-features = false, features = ["alloc"] }
-tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", default-features = false, optional = true }
+tokio-tungstenite-wasm = { package = "tokio-tungstenite-wasm-jacquard", version = "0.6.99", path = "../tokio-tungstenite-wasm", default-features = false, optional = true }
 ciborium = { version = "0.2.0", default-features = false, optional = true }
 ciborium-io = { version = "0.2.0", default-features = false, optional = true }
 zstd = { workspace = true, optional = true }
@@ -130,15 +130,17 @@ regex = { version = "1.11.3", default-features = false, features = ["perf-litera
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
+getrandom_03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 chrono = { workspace = true, features = ["wasmbind"] }
 getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 regex-lite = "0.1"
 #ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
-tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = [], optional = true }
+tokio-tungstenite-wasm = { package = "tokio-tungstenite-wasm-jacquard", version = "0.6.99", path = "../tokio-tungstenite-wasm", features = [], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { workspace = true, default-features = false, features = ["fs", "sync"], optional = true }
 tokio-util = { version = "0.7.16", features = ["io"], optional = true }
-tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = ["rustls-tls-native-roots"], optional = true }
+tokio-tungstenite-wasm = { package = "tokio-tungstenite-wasm-jacquard", version = "0.6.99", path = "../tokio-tungstenite-wasm", features = ["rustls-tls-native-roots"], optional = true }
 
 
 [dependencies.ed25519-dalek]
@@ -163,4 +165,4 @@ tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 futures-lite = "2.6"
 
 [package.metadata.docs.rs]
-features = [ "crypto-k256", "crypto-ed25519", "crypto-p256",  "websocket", "zstd", "service-auth", "reqwest-client", "crypto"]
+features = [ "crypto-k256", "crypto-ed25519", "crypto-p256",  "websocket", "zstd", "service-auth", "reqwest-client", "reqwest-stream", "crypto"]

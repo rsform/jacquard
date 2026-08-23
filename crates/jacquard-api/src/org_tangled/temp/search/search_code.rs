@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,20 +21,23 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::org_tangled::temp::search::search_code;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::org_tangled::temp::search::search_code;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Chunk<S: BosStr = DefaultStr> {
-    ///Source lines for this match chunk.
+    /// Source lines for this match chunk.
     pub content: S,
-    ///Byte-offset ranges within content that match the query.
+    /// Byte-offset ranges within content that match the query.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub highlights: Option<Vec<search_code::Highlight<S>>>,
-    ///1-based line number of the first line in content.
+    /// 1-based line number of the first line in content.
     pub line_start: i64,
     #[serde(
         flatten,
@@ -45,17 +48,19 @@ pub struct Chunk<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FileResult<S: BosStr = DefaultStr> {
     pub chunks: Vec<search_code::Chunk<S>>,
-    ///Detected programming language.
+    /// Detected programming language.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
-    ///File path relative to repository root.
+    /// File path relative to repository root.
     pub path: S,
-    ///DID of the repository as minted by the knot.
+    /// DID of the repository as minted by the knot.
     pub repo_did: Did<S>,
     #[serde(
         flatten,
@@ -66,13 +71,15 @@ pub struct FileResult<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Highlight<S: BosStr = DefaultStr> {
-    ///End byte offset (exclusive) within the chunk content string.
+    /// End byte offset (exclusive) within the chunk content string.
     pub end: i64,
-    ///Start byte offset within the chunk content string.
+    /// Start byte offset within the chunk content string.
     pub start: i64,
     #[serde(
         flatten,
@@ -83,9 +90,11 @@ pub struct Highlight<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchCode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -99,9 +108,11 @@ pub struct SearchCode<S: BosStr = DefaultStr> {
     pub repo_did: Option<Did<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchCodeOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -190,15 +201,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chunk_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -243,7 +253,11 @@ pub mod chunk_state {
 /// Builder for constructing an instance of this type.
 pub struct ChunkBuilder<St: chunk_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Vec<search_code::Highlight<S>>>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<Vec<search_code::Highlight<S>>>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -289,10 +303,7 @@ where
     St::Content: chunk_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> ChunkBuilder<chunk_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> ChunkBuilder<chunk_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ChunkBuilder {
             _state: PhantomData,
@@ -304,18 +315,12 @@ where
 
 impl<St: chunk_state::State, S: BosStr> ChunkBuilder<St, S> {
     /// Set the `highlights` field (optional)
-    pub fn highlights(
-        mut self,
-        value: impl Into<Option<Vec<search_code::Highlight<S>>>>,
-    ) -> Self {
+    pub fn highlights(mut self, value: impl Into<Option<Vec<search_code::Highlight<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `highlights` field to an Option value (optional)
-    pub fn maybe_highlights(
-        mut self,
-        value: Option<Vec<search_code::Highlight<S>>>,
-    ) -> Self {
+    pub fn maybe_highlights(mut self, value: Option<Vec<search_code::Highlight<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -367,10 +372,10 @@ where
 }
 
 fn lexicon_doc_org_tangled_temp_search_searchCode() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.tangled.temp.search.searchCode"),
@@ -379,32 +384,28 @@ fn lexicon_doc_org_tangled_temp_search_searchCode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chunk"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("lineStart")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("content"),
+                        SmolStr::new_static("lineStart"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Source lines for this match chunk."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Source lines for this match chunk.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("highlights"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Byte-offset ranges within content that match the query.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Byte-offset ranges within content that match the query.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#highlight"),
                                     ..Default::default()
@@ -426,12 +427,11 @@ fn lexicon_doc_org_tangled_temp_search_searchCode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("fileResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("repoDid"), SmolStr::new_static("path"),
-                            SmolStr::new_static("chunks")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("repoDid"),
+                        SmolStr::new_static("path"),
+                        SmolStr::new_static("chunks"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -448,29 +448,27 @@ fn lexicon_doc_org_tangled_temp_search_searchCode() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("language"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Detected programming language."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Detected programming language.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("path"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("File path relative to repository root."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "File path relative to repository root.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("repoDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the repository as minted by the knot.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the repository as minted by the knot.",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -483,9 +481,10 @@ fn lexicon_doc_org_tangled_temp_search_searchCode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("highlight"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("start"), SmolStr::new_static("end")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("start"),
+                        SmolStr::new_static("end"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -580,15 +579,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod file_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -647,7 +645,12 @@ pub mod file_result_state {
 /// Builder for constructing an instance of this type.
 pub struct FileResultBuilder<St: file_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<search_code::Chunk<S>>>, Option<S>, Option<S>, Option<Did<S>>),
+    _fields: (
+        Option<Vec<search_code::Chunk<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -775,10 +778,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FileResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FileResult<S> {
         FileResult {
             chunks: self._fields.0.unwrap(),
             language: self._fields.1,
@@ -796,15 +796,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod highlight_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -942,10 +941,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Highlight<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Highlight<S> {
         Highlight {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),
@@ -956,7 +952,7 @@ where
 
 pub mod search_code_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1074,10 +1070,7 @@ where
     St::Q: search_code_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(
-        mut self,
-        value: impl Into<S>,
-    ) -> SearchCodeBuilder<search_code_state::SetQ<St>, S> {
+    pub fn q(mut self, value: impl Into<S>) -> SearchCodeBuilder<search_code_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchCodeBuilder {
             _state: PhantomData,

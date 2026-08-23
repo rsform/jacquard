@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record pinning a chat message for prominent display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,15 +37,15 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct PinnedRecord<S: BosStr = DefaultStr> {
-    ///When this pin was created.
+    /// When this pin was created.
     pub created_at: Datetime,
-    ///Optional expiration time. If set, the pin is considered inactive after this time.
+    /// Optional expiration time. If set, the pin is considered inactive after this time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    ///DID of the user who pinned the message.
+    /// DID of the user who pinned the message.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pinned_by: Option<Did<S>>,
-    ///AT-URI of the pinned chat message.
+    /// AT-URI of the pinned chat message.
     pub pinned_message: AtUri<S>,
     #[serde(
         flatten,
@@ -122,9 +122,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -136,7 +135,7 @@ where
 
 pub mod pinned_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,7 +180,12 @@ pub mod pinned_record_state {
 /// Builder for constructing an instance of this type.
 pub struct PinnedRecordBuilder<St: pinned_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Datetime>, Option<Did<S>>, Option<AtUri<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Did<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -302,10 +306,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PinnedRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PinnedRecord<S> {
         PinnedRecord {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,
@@ -317,10 +318,10 @@ where
 }
 
 fn lexicon_doc_place_stream_chat_pinnedRecord() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.chat.pinnedRecord"),

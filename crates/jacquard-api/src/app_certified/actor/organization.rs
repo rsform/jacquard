@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_certified::actor::organization;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::app_certified::actor::organization;
+use serde::{Deserialize, Serialize};
 /// Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,18 +39,18 @@ use crate::app_certified::actor::organization;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Organization<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when this record was originally created.
+    /// Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
-    ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
+    /// When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub founded_date: Option<Datetime>,
-    ///A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
+    /// A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<StrongRef<S>>,
-    ///Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
+    /// Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_type: Option<Vec<S>>,
-    ///Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
+    /// Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub urls: Option<Vec<organization::UrlItem<S>>>,
     #[serde(
@@ -76,12 +76,15 @@ pub struct OrganizationGetRecordOutput<S: BosStr = DefaultStr> {
 /// A labeled URL reference.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UrlItem<S: BosStr = DefaultStr> {
-    ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
+    /// Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<S>,
-    ///The URL.
+    /// The URL.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -161,8 +164,7 @@ impl<S: BosStr> LexiconSchema for Organization<S> {
         if let Some(values) = &self.organization_type {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 100usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("organization_type"),
@@ -245,9 +247,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -259,7 +260,7 @@ where
 
 pub mod organization_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -398,10 +399,7 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `urls` field (optional)
-    pub fn urls(
-        mut self,
-        value: impl Into<Option<Vec<organization::UrlItem<S>>>>,
-    ) -> Self {
+    pub fn urls(mut self, value: impl Into<Option<Vec<organization::UrlItem<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -429,10 +427,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Organization<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Organization<S> {
         Organization {
             created_at: self._fields.0.unwrap(),
             founded_date: self._fields.1,
@@ -445,10 +440,10 @@ where
 }
 
 fn lexicon_doc_app_certified_actor_organization() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.actor.organization"),
@@ -587,15 +582,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod url_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

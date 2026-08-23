@@ -8,40 +8,42 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::queue::QueueView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::queue::QueueView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateQueue<S: BosStr = DefaultStr> {
-    ///Collection name for record subjects. Required if subjectTypes includes 'record'.
+    /// Collection name for record subjects. Required if subjectTypes includes 'record'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection: Option<Nsid<S>>,
-    ///Optional description of the queue
+    /// Optional description of the queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Display name for the queue (must be unique)
+    /// Display name for the queue (must be unique)
     pub name: S,
-    ///Policy keys to recommend when actioning reports in this queue
+    /// Policy keys to recommend when actioning reports in this queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recommended_policies: Option<Vec<S>>,
-    ///Report reason types (fully qualified NSIDs)
+    /// Report reason types (fully qualified NSIDs)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub report_types: Option<Vec<S>>,
-    ///Subject types this queue accepts
+    /// Subject types this queue accepts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_types: Option<Vec<CreateQueueSubjectTypes<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateQueueSubjectTypes<S: BosStr = DefaultStr> {
@@ -122,48 +124,41 @@ where
             CreateQueueSubjectTypes::Account => CreateQueueSubjectTypes::Account,
             CreateQueueSubjectTypes::Record => CreateQueueSubjectTypes::Record,
             CreateQueueSubjectTypes::Message => CreateQueueSubjectTypes::Message,
-            CreateQueueSubjectTypes::Conversation => {
-                CreateQueueSubjectTypes::Conversation
-            }
-            CreateQueueSubjectTypes::Other(v) => {
-                CreateQueueSubjectTypes::Other(v.into_static())
-            }
+            CreateQueueSubjectTypes::Conversation => CreateQueueSubjectTypes::Conversation,
+            CreateQueueSubjectTypes::Other(v) => CreateQueueSubjectTypes::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateQueueOutput<S: BosStr = DefaultStr> {
     pub queue: QueueView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateQueueError {
     /// One or more recommended policy keys do not exist in the configured policy list
     #[serde(rename = "InvalidRecommendedPolicies")]
-    InvalidRecommendedPolicies(Option<SmolStr>),
+    InvalidRecommendedPolicies(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The queue configuration conflicts with an existing queue
     #[serde(rename = "ConflictingQueue")]
-    ConflictingQueue(Option<SmolStr>),
+    ConflictingQueue(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateQueueError {
@@ -207,9 +202,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateQueueResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateQueue<S> {
     const NSID: &'static str = "tools.ozone.queue.createQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateQueueResponse;
 }
 
@@ -219,9 +213,8 @@ Path: `/xrpc/tools.ozone.queue.createQueue`. The request payload type is `Create
 pub struct CreateQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateQueueRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.queue.createQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateQueue<S>;
     type Response = CreateQueueResponse;
 }

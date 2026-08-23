@@ -38,34 +38,36 @@ pub mod search_notebooks;
 pub mod theme;
 pub mod update_reading_progress;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::ProfileDataView;
 use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AuthorListView<S: BosStr = DefaultStr> {
     pub index: i64,
     pub record: ProfileDataView<S>,
@@ -80,9 +82,11 @@ pub struct AuthorListView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BookEntryRef<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(
@@ -97,7 +101,10 @@ pub struct BookEntryRef<S: BosStr = DefaultStr> {
 /// An ordered entry in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BookEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -117,7 +124,10 @@ pub struct BookEntryView<S: BosStr = DefaultStr> {
 /// An entry within a chapter context.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChapterEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     pub index: i64,
@@ -137,7 +147,10 @@ pub struct ChapterEntryView<S: BosStr = DefaultStr> {
 /// Hydrated view of a chapter.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChapterView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     pub cid: Cid<S>,
@@ -163,9 +176,12 @@ pub struct ChapterView<S: BosStr = DefaultStr> {
 /// The format of the content. This is used to determine how to render the content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContentFormat<S: BosStr = DefaultStr> {
-    ///The format of the content. This is used to determine how to render the content.  Defaults to `"weaver"`.
+    /// The format of the content. This is used to determine how to render the content.  Defaults to `"weaver"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_format_markdown")]
     pub markdown: Option<ContentFormatMarkdown<S>>,
@@ -260,9 +276,7 @@ where
             ContentFormatMarkdown::Gfm => ContentFormatMarkdown::Gfm,
             ContentFormatMarkdown::Obsidian => ContentFormatMarkdown::Obsidian,
             ContentFormatMarkdown::Weaver => ContentFormatMarkdown::Weaver,
-            ContentFormatMarkdown::Other(v) => {
-                ContentFormatMarkdown::Other(v.into_static())
-            }
+            ContentFormatMarkdown::Other(v) => ContentFormatMarkdown::Other(v.into_static()),
         }
     }
 }
@@ -446,9 +460,7 @@ where
             ContentWarning::Death => ContentWarning::Death,
             ContentWarning::MajorCharacterDeath => ContentWarning::MajorCharacterDeath,
             ContentWarning::SexualContent => ContentWarning::SexualContent,
-            ContentWarning::ExplicitSexualContent => {
-                ContentWarning::ExplicitSexualContent
-            }
+            ContentWarning::ExplicitSexualContent => ContentWarning::ExplicitSexualContent,
             ContentWarning::Language => ContentWarning::Language,
             ContentWarning::SubstanceUse => ContentWarning::SubstanceUse,
             ContentWarning::SelfHarm => ContentWarning::SelfHarm,
@@ -463,7 +475,10 @@ where
 pub type ContentWarnings<S = DefaultStr> = Vec<notebook::ContentWarning<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EntryView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -502,7 +517,10 @@ pub struct EntryView<S: BosStr = DefaultStr> {
 /// Entry with feed-specific context (discovery reason, notebook context).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FeedEntryView<S: BosStr = DefaultStr> {
     pub entry: notebook::EntryView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -521,7 +539,10 @@ pub struct FeedEntryView<S: BosStr = DefaultStr> {
 /// Minimal notebook context for feed display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FeedNotebookContext<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -550,9 +571,11 @@ pub enum FeedReason<S: BosStr = DefaultStr> {
     ReasonSubscription(Box<notebook::ReasonSubscription<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotebookView<S: BosStr = DefaultStr> {
     pub authors: Vec<notebook::AuthorListView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -595,7 +618,10 @@ pub struct NotebookView<S: BosStr = DefaultStr> {
 /// Hydrated view of a page (entries displayed together).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PageView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -622,14 +648,17 @@ pub type Path<S = DefaultStr> = S;
 /// A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PermissionGrant<S: BosStr = DefaultStr> {
     pub did: Did<S>,
-    ///For authority: record createdAt. For invitees: accept createdAt
+    /// For authority: record createdAt. For invitees: accept createdAt
     pub granted_at: Datetime,
-    ///direct = this resource (includes authority), inherited = via notebook invite
+    /// direct = this resource (includes authority), inherited = via notebook invite
     pub scope: PermissionGrantScope<S>,
-    ///For authority: resource URI. For invitees: invite URI
+    /// For authority: resource URI. For invitees: invite URI
     pub source: AtUri<S>,
     #[serde(
         flatten,
@@ -714,9 +743,7 @@ where
         match self {
             PermissionGrantScope::Direct => PermissionGrantScope::Direct,
             PermissionGrantScope::Inherited => PermissionGrantScope::Inherited,
-            PermissionGrantScope::Other(v) => {
-                PermissionGrantScope::Other(v.into_static())
-            }
+            PermissionGrantScope::Other(v) => PermissionGrantScope::Other(v.into_static()),
         }
     }
 }
@@ -724,11 +751,14 @@ where
 /// ACL-style permissions for a resource. Separate from authors (who contributed).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PermissionsState<S: BosStr = DefaultStr> {
-    ///DIDs that can edit this resource
+    /// DIDs that can edit this resource
     pub editors: Vec<notebook::PermissionGrant<S>>,
-    ///DIDs that can view (future use)
+    /// DIDs that can view (future use)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewers: Option<Vec<notebook::PermissionGrant<S>>>,
     #[serde(
@@ -743,13 +773,16 @@ pub struct PermissionsState<S: BosStr = DefaultStr> {
 /// A published version of an entry in a collaborator's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PublishedVersionView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
-    ///If content differs, the version it diverged from
+    /// If content differs, the version it diverged from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub diverged_from: Option<StrongRef<S>>,
-    ///True if this is the 'primary' version (owner's repo)
+    /// True if this is the 'primary' version (owner's repo)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_canonical: Option<bool>,
     pub published_at: Datetime,
@@ -769,9 +802,12 @@ pub struct PublishedVersionView<S: BosStr = DefaultStr> {
 /// Viewer's reading progress (appview-side state, not a record).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReadingProgress<S: BosStr = DefaultStr> {
-    ///Last entry the viewer was reading.
+    /// Last entry the viewer was reading.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_entry: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -792,7 +828,6 @@ pub struct ReadingProgress<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReadingProgressStatus<S: BosStr = DefaultStr> {
@@ -874,16 +909,16 @@ where
             ReadingProgressStatus::Finished => ReadingProgressStatus::Finished,
             ReadingProgressStatus::Abandoned => ReadingProgressStatus::Abandoned,
             ReadingProgressStatus::WantToRead => ReadingProgressStatus::WantToRead,
-            ReadingProgressStatus::Other(v) => {
-                ReadingProgressStatus::Other(v.into_static())
-            }
+            ReadingProgressStatus::Other(v) => ReadingProgressStatus::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReasonBookmark<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -896,9 +931,11 @@ pub struct ReasonBookmark<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReasonLike<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     pub indexed_at: Datetime,
@@ -911,9 +948,11 @@ pub struct ReasonLike<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReasonSubscription<S: BosStr = DefaultStr> {
     pub indexed_at: Datetime,
     #[serde(
@@ -928,7 +967,10 @@ pub struct ReasonSubscription<S: BosStr = DefaultStr> {
 /// View of a rendered and cached notebook entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RenderedView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub css: Option<BlobRef<S>>,
@@ -1409,19 +1451,16 @@ impl<S: BosStr> LexiconSchema for RenderedView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/css"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("css"),
@@ -1449,19 +1488,16 @@ impl<S: BosStr> LexiconSchema for RenderedView<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/html"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("html"),
@@ -1482,15 +1518,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod author_list_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1533,10 +1568,7 @@ pub mod author_list_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorListViewBuilder<
-    St: author_list_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AuthorListViewBuilder<St: author_list_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ProfileDataView<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1645,10 +1677,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AuthorListView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorListView<S> {
         AuthorListView {
             index: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -1659,10 +1688,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.defs"),
@@ -1671,9 +1700,10 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorListView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("record"), SmolStr::new_static("index")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("index"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1686,9 +1716,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("record"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileDataView",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileDataView"),
                                 ..Default::default()
                             }),
                         );
@@ -1726,12 +1754,11 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bookEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An ordered entry in a Weaver notebook."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("entry"), SmolStr::new_static("index")],
-                    ),
+                    description: Some(CowStr::new_static("An ordered entry in a Weaver notebook.")),
+                    required: Some(vec![
+                        SmolStr::new_static("entry"),
+                        SmolStr::new_static("index"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1770,12 +1797,11 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chapterEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An entry within a chapter context."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("entry"), SmolStr::new_static("index")],
-                    ),
+                    description: Some(CowStr::new_static("An entry within a chapter context.")),
+                    required: Some(vec![
+                        SmolStr::new_static("entry"),
+                        SmolStr::new_static("index"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1815,15 +1841,14 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("chapterView"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Hydrated view of a chapter.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("notebook"),
-                            SmolStr::new_static("authors"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("notebook"),
+                        SmolStr::new_static("authors"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1926,18 +1951,14 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("contentRating"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("Author-applied content rating."),
-                    ),
+                    description: Some(CowStr::new_static("Author-applied content rating.")),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("contentWarning"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("Author-applied content warning."),
-                    ),
+                    description: Some(CowStr::new_static("Author-applied content warning.")),
                     ..Default::default()
                 }),
             );
@@ -1955,14 +1976,13 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entryView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("authors"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("authors"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2079,11 +2099,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedEntryView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Entry with feed-specific context (discovery reason, notebook context).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Entry with feed-specific context (discovery reason, notebook context).",
+                    )),
                     required: Some(vec![SmolStr::new_static("entry")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -2117,22 +2135,27 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedNotebookContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Minimal notebook context for feed display."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("title")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Minimal notebook context for feed display.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("title"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("path"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -2152,7 +2175,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                     refs: vec![
                         CowStr::new_static("#reasonLike"),
                         CowStr::new_static("#reasonBookmark"),
-                        CowStr::new_static("#reasonSubscription")
+                        CowStr::new_static("#reasonSubscription"),
                     ],
                     ..Default::default()
                 }),
@@ -2160,14 +2183,13 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notebookView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("authors"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("authors"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2296,19 +2318,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pageView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Hydrated view of a page (entries displayed together).",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("notebook"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Hydrated view of a page (entries displayed together).",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("notebook"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2490,18 +2509,15 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("publishedVersionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A published version of an entry in a collaborator's repo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("publisher"),
-                            SmolStr::new_static("publishedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A published version of an entry in a collaborator's repo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("publisher"),
+                        SmolStr::new_static("publishedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2535,9 +2551,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("publisher"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -2563,20 +2577,18 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("readingProgress"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Viewer's reading progress (appview-side state, not a record).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Viewer's reading progress (appview-side state, not a record).",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("currentEntry"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Last entry the viewer was reading."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Last entry the viewer was reading.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -2612,7 +2624,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -2622,18 +2636,17 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonBookmark"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("by"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("by"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -2652,18 +2665,17 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonLike"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("by"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("by"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -2701,22 +2713,24 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("renderedView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "View of a rendered and cached notebook entry",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "View of a rendered and cached notebook entry",
+                    )),
                     required: Some(vec![SmolStr::new_static("html")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("css"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("html"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -2737,9 +2751,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("title"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("The title of the notebook entry."),
-                    ),
+                    description: Some(CowStr::new_static("The title of the notebook entry.")),
                     max_length: Some(300usize),
                     ..Default::default()
                 }),
@@ -2757,15 +2769,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod book_entry_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2870,10 +2881,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BookEntryRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BookEntryRef<S> {
         BookEntryRef {
             entry: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2888,15 +2896,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod book_entry_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2939,10 +2946,7 @@ pub mod book_entry_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BookEntryViewBuilder<
-    St: book_entry_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BookEntryViewBuilder<St: book_entry_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -3070,10 +3074,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BookEntryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BookEntryView<S> {
         BookEntryView {
             entry: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -3091,15 +3092,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chapter_entry_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3142,10 +3142,7 @@ pub mod chapter_entry_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChapterEntryViewBuilder<
-    St: chapter_entry_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChapterEntryViewBuilder<St: chapter_entry_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -3158,10 +3155,7 @@ pub struct ChapterEntryViewBuilder<
 
 impl ChapterEntryView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChapterEntryViewBuilder<
-        chapter_entry_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChapterEntryViewBuilder<chapter_entry_view_state::Empty, DefaultStr> {
         ChapterEntryViewBuilder::new()
     }
 }
@@ -3276,10 +3270,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChapterEntryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChapterEntryView<S> {
         ChapterEntryView {
             entry: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -3297,15 +3288,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chapter_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3647,10 +3637,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChapterView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChapterView<S> {
         ChapterView {
             authors: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -3673,26 +3660,24 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
-fn _default_content_format_markdown<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    ContentFormatMarkdown<S>,
-> {
-    Some(<ContentFormatMarkdown<S>>::from_value(S::from_static("weaver")))
+fn _default_content_format_markdown<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<ContentFormatMarkdown<S>> {
+    Some(<ContentFormatMarkdown<S>>::from_value(S::from_static(
+        "weaver",
+    )))
 }
 
 impl Default for ContentFormat {
     fn default() -> Self {
         Self {
-            markdown: Some(
-                <ContentFormatMarkdown>::from_value(
-                    jacquard_common::DefaultStr::from_static("weaver"),
-                ),
-            ),
+            markdown: Some(<ContentFormatMarkdown>::from_value(
+                jacquard_common::DefaultStr::from_static("weaver"),
+            )),
             extra_data: Default::default(),
         }
     }
@@ -3705,15 +3690,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod entry_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3846,20 +3830,7 @@ impl EntryViewBuilder<entry_view_state::Empty, DefaultStr> {
         EntryViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -3873,20 +3844,7 @@ impl<S: BosStr> EntryViewBuilder<entry_view_state::Empty, S> {
         EntryViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -3992,18 +3950,12 @@ impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
 
 impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `permissions` field (optional)
-    pub fn permissions(
-        mut self,
-        value: impl Into<Option<notebook::PermissionsState<S>>>,
-    ) -> Self {
+    pub fn permissions(mut self, value: impl Into<Option<notebook::PermissionsState<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `permissions` field to an Option value (optional)
-    pub fn maybe_permissions(
-        mut self,
-        value: Option<notebook::PermissionsState<S>>,
-    ) -> Self {
+    pub fn maybe_permissions(mut self, value: Option<notebook::PermissionsState<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -4030,18 +3982,12 @@ where
 
 impl<St: entry_view_state::State, S: BosStr> EntryViewBuilder<St, S> {
     /// Set the `renderedView` field (optional)
-    pub fn rendered_view(
-        mut self,
-        value: impl Into<Option<notebook::RenderedView<S>>>,
-    ) -> Self {
+    pub fn rendered_view(mut self, value: impl Into<Option<notebook::RenderedView<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `renderedView` field to an Option value (optional)
-    pub fn maybe_rendered_view(
-        mut self,
-        value: Option<notebook::RenderedView<S>>,
-    ) -> Self {
+    pub fn maybe_rendered_view(mut self, value: Option<notebook::RenderedView<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -4168,10 +4114,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> EntryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EntryView<S> {
         EntryView {
             authors: self._fields.0.unwrap(),
             bookmark_count: self._fields.1,
@@ -4200,15 +4143,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod feed_entry_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4239,10 +4181,7 @@ pub mod feed_entry_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeedEntryViewBuilder<
-    St: feed_entry_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct FeedEntryViewBuilder<St: feed_entry_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notebook::EntryView<S>>,
@@ -4354,10 +4293,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FeedEntryView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedEntryView<S> {
         FeedEntryView {
             entry: self._fields.0.unwrap(),
             notebook_context: self._fields.1,
@@ -4374,15 +4310,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod feed_notebook_context_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4436,20 +4371,14 @@ pub struct FeedNotebookContextBuilder<
 
 impl FeedNotebookContext<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FeedNotebookContextBuilder<
-        feed_notebook_context_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> FeedNotebookContextBuilder<feed_notebook_context_state::Empty, DefaultStr> {
         FeedNotebookContextBuilder::new()
     }
 }
 
 impl<S: BosStr> FeedNotebookContext<S> {
     /// Create a new builder for this type
-    pub fn builder() -> FeedNotebookContextBuilder<
-        feed_notebook_context_state::Empty,
-        S,
-    > {
+    pub fn builder() -> FeedNotebookContextBuilder<feed_notebook_context_state::Empty, S> {
         FeedNotebookContextBuilder::builder()
     }
 }
@@ -4476,10 +4405,7 @@ impl<S: BosStr> FeedNotebookContextBuilder<feed_notebook_context_state::Empty, S
     }
 }
 
-impl<
-    St: feed_notebook_context_state::State,
-    S: BosStr,
-> FeedNotebookContextBuilder<St, S> {
+impl<St: feed_notebook_context_state::State, S: BosStr> FeedNotebookContextBuilder<St, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -4546,10 +4472,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FeedNotebookContext<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedNotebookContext<S> {
         FeedNotebookContext {
             path: self._fields.0,
             title: self._fields.1.unwrap(),
@@ -4566,15 +4489,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod notebook_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4709,23 +4631,8 @@ impl NotebookViewBuilder<notebook_view_state::Empty, DefaultStr> {
         NotebookViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4738,23 +4645,8 @@ impl<S: BosStr> NotebookViewBuilder<notebook_view_state::Empty, S> {
         NotebookViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4872,18 +4764,12 @@ impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
 
 impl<St: notebook_view_state::State, S: BosStr> NotebookViewBuilder<St, S> {
     /// Set the `permissions` field (optional)
-    pub fn permissions(
-        mut self,
-        value: impl Into<Option<notebook::PermissionsState<S>>>,
-    ) -> Self {
+    pub fn permissions(mut self, value: impl Into<Option<notebook::PermissionsState<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `permissions` field to an Option value (optional)
-    pub fn maybe_permissions(
-        mut self,
-        value: Option<notebook::PermissionsState<S>>,
-    ) -> Self {
+    pub fn maybe_permissions(mut self, value: Option<notebook::PermissionsState<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -5057,10 +4943,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotebookView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotebookView<S> {
         NotebookView {
             authors: self._fields.0.unwrap(),
             bookmark_count: self._fields.1,
@@ -5091,15 +4974,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod page_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5421,15 +5303,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod permission_grant_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5502,10 +5383,7 @@ pub mod permission_grant_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PermissionGrantBuilder<
-    St: permission_grant_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PermissionGrantBuilder<St: permission_grant_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -5647,10 +5525,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PermissionGrant<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PermissionGrant<S> {
         PermissionGrant {
             did: self._fields.0.unwrap(),
             granted_at: self._fields.1.unwrap(),
@@ -5668,15 +5543,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod permissions_state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5707,10 +5581,7 @@ pub mod permissions_state_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PermissionsStateBuilder<
-    St: permissions_state_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PermissionsStateBuilder<St: permissions_state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<notebook::PermissionGrant<S>>>,
@@ -5776,18 +5647,12 @@ where
 
 impl<St: permissions_state_state::State, S: BosStr> PermissionsStateBuilder<St, S> {
     /// Set the `viewers` field (optional)
-    pub fn viewers(
-        mut self,
-        value: impl Into<Option<Vec<notebook::PermissionGrant<S>>>>,
-    ) -> Self {
+    pub fn viewers(mut self, value: impl Into<Option<Vec<notebook::PermissionGrant<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `viewers` field to an Option value (optional)
-    pub fn maybe_viewers(
-        mut self,
-        value: Option<Vec<notebook::PermissionGrant<S>>>,
-    ) -> Self {
+    pub fn maybe_viewers(mut self, value: Option<Vec<notebook::PermissionGrant<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -5807,10 +5672,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PermissionsState<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PermissionsState<S> {
         PermissionsState {
             editors: self._fields.0.unwrap(),
             viewers: self._fields.1,
@@ -5826,15 +5688,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod published_version_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5926,20 +5787,14 @@ pub struct PublishedVersionViewBuilder<
 
 impl PublishedVersionView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> PublishedVersionViewBuilder<
-        published_version_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> PublishedVersionViewBuilder<published_version_view_state::Empty, DefaultStr> {
         PublishedVersionViewBuilder::new()
     }
 }
 
 impl<S: BosStr> PublishedVersionView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> PublishedVersionViewBuilder<
-        published_version_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> PublishedVersionViewBuilder<published_version_view_state::Empty, S> {
         PublishedVersionViewBuilder::builder()
     }
 }
@@ -5985,10 +5840,7 @@ where
     }
 }
 
-impl<
-    St: published_version_view_state::State,
-    S: BosStr,
-> PublishedVersionViewBuilder<St, S> {
+impl<St: published_version_view_state::State, S: BosStr> PublishedVersionViewBuilder<St, S> {
     /// Set the `divergedFrom` field (optional)
     pub fn diverged_from(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -6001,10 +5853,7 @@ impl<
     }
 }
 
-impl<
-    St: published_version_view_state::State,
-    S: BosStr,
-> PublishedVersionViewBuilder<St, S> {
+impl<St: published_version_view_state::State, S: BosStr> PublishedVersionViewBuilder<St, S> {
     /// Set the `isCanonical` field (optional)
     pub fn is_canonical(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -6026,10 +5875,7 @@ where
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublishedVersionViewBuilder<
-        published_version_view_state::SetPublishedAt<St>,
-        S,
-    > {
+    ) -> PublishedVersionViewBuilder<published_version_view_state::SetPublishedAt<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PublishedVersionViewBuilder {
             _state: PhantomData,
@@ -6058,10 +5904,7 @@ where
     }
 }
 
-impl<
-    St: published_version_view_state::State,
-    S: BosStr,
-> PublishedVersionViewBuilder<St, S> {
+impl<St: published_version_view_state::State, S: BosStr> PublishedVersionViewBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -6139,9 +5982,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -6152,15 +5994,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reason_bookmark_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6203,10 +6044,7 @@ pub mod reason_bookmark_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReasonBookmarkBuilder<
-    St: reason_bookmark_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ReasonBookmarkBuilder<St: reason_bookmark_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ProfileViewBasic<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
@@ -6301,10 +6139,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReasonBookmark<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonBookmark<S> {
         ReasonBookmark {
             by: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -6320,15 +6155,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reason_like_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6466,10 +6300,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReasonLike<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonLike<S> {
         ReasonLike {
             by: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -6485,15 +6316,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reason_subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6524,10 +6354,7 @@ pub mod reason_subscription_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReasonSubscriptionBuilder<
-    St: reason_subscription_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ReasonSubscriptionBuilder<St: reason_subscription_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
     _type: PhantomData<fn() -> S>,
@@ -6535,10 +6362,7 @@ pub struct ReasonSubscriptionBuilder<
 
 impl ReasonSubscription<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ReasonSubscriptionBuilder<
-        reason_subscription_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ReasonSubscriptionBuilder<reason_subscription_state::Empty, DefaultStr> {
         ReasonSubscriptionBuilder::new()
     }
 }
@@ -6604,10 +6428,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReasonSubscription<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonSubscription<S> {
         ReasonSubscription {
             indexed_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -6622,15 +6443,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod rendered_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6749,10 +6569,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RenderedView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RenderedView<S> {
         RenderedView {
             css: self._fields.0,
             html: self._fields.1.unwrap(),

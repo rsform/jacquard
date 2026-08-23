@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A grouping of entries in a notebook, intended to be displayed as a single page.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,11 +40,11 @@ use crate::sh_weaver::notebook::Title;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Page<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when this was originally created.
+    /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub entry_list: Vec<StrongRef<S>>,
-    ///The notebook this page belongs to.
+    /// The notebook this page belongs to.
     pub notebook: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Tags<S>>,
@@ -157,9 +157,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -171,7 +170,7 @@ where
 
 pub mod page_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,10 +384,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_page() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.page"),

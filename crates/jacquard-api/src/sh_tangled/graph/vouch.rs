@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,13 +37,13 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct Vouch<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///Optional list of ATURIs serving as evidence for this vouch (ex. issues, PRs)
+    /// Optional list of ATURIs serving as evidence for this vouch (ex. issues, PRs)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evidences: Option<Vec<AtUri<S>>>,
-    ///Whether this user is being vouched for or denounced  Defaults to `"vouch"`.
+    /// Whether this user is being vouched for or denounced  Defaults to `"vouch"`.
     #[serde(default = "_default_vouch_kind")]
     pub kind: VouchKind<S>,
-    ///The reason for this vouch/denouncement
+    /// The reason for this vouch/denouncement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
     #[serde(
@@ -232,9 +232,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -250,7 +249,7 @@ fn _default_vouch_kind<S: FromStaticStr + BosStr>() -> VouchKind<S> {
 
 pub mod vouch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -295,7 +294,12 @@ pub mod vouch_state {
 /// Builder for constructing an instance of this type.
 pub struct VouchBuilder<St: vouch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Vec<AtUri<S>>>, Option<VouchKind<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<Vec<AtUri<S>>>,
+        Option<VouchKind<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -428,10 +432,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_graph_vouch() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.graph.vouch"),

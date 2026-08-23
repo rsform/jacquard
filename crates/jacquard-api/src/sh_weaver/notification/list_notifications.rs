@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notification::Notification;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notification::Notification;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListNotificationsReasons<S: BosStr = DefaultStr> {
@@ -97,8 +97,7 @@ impl<S: BosStr> Serialize for ListNotificationsReasons<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ListNotificationsReasons<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListNotificationsReasons<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -125,13 +124,9 @@ where
             ListNotificationsReasons::Like => ListNotificationsReasons::Like,
             ListNotificationsReasons::Bookmark => ListNotificationsReasons::Bookmark,
             ListNotificationsReasons::Follow => ListNotificationsReasons::Follow,
-            ListNotificationsReasons::FollowAccept => {
-                ListNotificationsReasons::FollowAccept
-            }
+            ListNotificationsReasons::FollowAccept => ListNotificationsReasons::FollowAccept,
             ListNotificationsReasons::Subscribe => ListNotificationsReasons::Subscribe,
-            ListNotificationsReasons::SubscribeAccept => {
-                ListNotificationsReasons::SubscribeAccept
-            }
+            ListNotificationsReasons::SubscribeAccept => ListNotificationsReasons::SubscribeAccept,
             ListNotificationsReasons::CollaborationInvite => {
                 ListNotificationsReasons::CollaborationInvite
             }
@@ -139,22 +134,20 @@ where
                 ListNotificationsReasons::CollaborationAccept
             }
             ListNotificationsReasons::NewEntry => ListNotificationsReasons::NewEntry,
-            ListNotificationsReasons::EntryUpdate => {
-                ListNotificationsReasons::EntryUpdate
-            }
+            ListNotificationsReasons::EntryUpdate => ListNotificationsReasons::EntryUpdate,
             ListNotificationsReasons::Mention => ListNotificationsReasons::Mention,
             ListNotificationsReasons::Tag => ListNotificationsReasons::Tag,
             ListNotificationsReasons::Comment => ListNotificationsReasons::Comment,
-            ListNotificationsReasons::Other(v) => {
-                ListNotificationsReasons::Other(v.into_static())
-            }
+            ListNotificationsReasons::Other(v) => ListNotificationsReasons::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -168,9 +161,11 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub seen_at: Option<Datetime>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -215,7 +210,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -233,10 +228,7 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<
-    St: list_notifications_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ListNotificationsBuilder<St: list_notifications_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -249,10 +241,7 @@ pub struct ListNotificationsBuilder<
 
 impl ListNotifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListNotificationsBuilder<
-        list_notifications_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
         ListNotificationsBuilder::new()
     }
 }
@@ -314,18 +303,12 @@ impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St
 
 impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(
-        mut self,
-        value: impl Into<Option<Vec<ListNotificationsReasons<S>>>>,
-    ) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<ListNotificationsReasons<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(
-        mut self,
-        value: Option<Vec<ListNotificationsReasons<S>>>,
-    ) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<ListNotificationsReasons<S>>>) -> Self {
         self._fields.2 = value;
         self
     }

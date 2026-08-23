@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::network_cosmik::Provenance;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A record representing the relationship between a card and a collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,21 +39,21 @@ use crate::network_cosmik::Provenance;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CollectionLink<S: BosStr = DefaultStr> {
-    ///Timestamp when the card was added to the collection.
+    /// Timestamp when the card was added to the collection.
     pub added_at: Datetime,
-    ///DID of the user who added the card to the collection
+    /// DID of the user who added the card to the collection
     pub added_by: S,
-    ///Strong reference to the card record in the users library.
+    /// Strong reference to the card record in the users library.
     pub card: StrongRef<S>,
-    ///Strong reference to the collection record.
+    /// Strong reference to the collection record.
     pub collection: StrongRef<S>,
-    ///Timestamp when this link record was created (usually set by PDS).
+    /// Timestamp when this link record was created (usually set by PDS).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Strong reference to the original card record (may be in another library).
+    /// Strong reference to the original card record (may be in another library).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_card: Option<StrongRef<S>>,
-    ///Optional provenance information for this link.
+    /// Optional provenance information for this link.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub provenance: Option<Provenance<S>>,
     #[serde(
@@ -131,9 +131,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -145,7 +144,7 @@ where
 
 pub mod collection_link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,10 +217,7 @@ pub mod collection_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionLinkBuilder<
-    St: collection_link_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionLinkBuilder<St: collection_link_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -408,10 +404,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionLink<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionLink<S> {
         CollectionLink {
             added_at: self._fields.0.unwrap(),
             added_by: self._fields.1.unwrap(),
@@ -426,10 +419,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_collectionLink() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.collectionLink"),

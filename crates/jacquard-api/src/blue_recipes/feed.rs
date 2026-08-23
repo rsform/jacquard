@@ -10,7 +10,6 @@ pub mod get_recipe;
 pub mod get_recipes;
 pub mod recipe;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -27,14 +26,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::blue_recipes::actor::ProfileViewBasic;
 use crate::blue_recipes::feed::recipe::Recipe;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotFoundRecipe<S: BosStr = DefaultStr> {
     pub not_found: bool,
     pub uri: AtUri<S>,
@@ -50,7 +52,10 @@ pub struct NotFoundRecipe<S: BosStr = DefaultStr> {
 /// Response model for fetching multiple recipes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecipeView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -103,15 +108,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod not_found_recipe_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,10 +158,7 @@ pub mod not_found_recipe_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotFoundRecipeBuilder<
-    St: not_found_recipe_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct NotFoundRecipeBuilder<St: not_found_recipe_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -252,10 +253,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotFoundRecipe<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotFoundRecipe<S> {
         NotFoundRecipe {
             not_found: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -265,10 +263,10 @@ where
 }
 
 fn lexicon_doc_blue_recipes_feed_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.recipes.feed.defs"),
@@ -277,9 +275,10 @@ fn lexicon_doc_blue_recipes_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notFoundRecipe"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("notFound")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("notFound"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -304,18 +303,16 @@ fn lexicon_doc_blue_recipes_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recipeView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Response model for fetching multiple recipes.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Response model for fetching multiple recipes.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -374,15 +371,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod recipe_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -637,10 +633,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecipeView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecipeView<S> {
         RecipeView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),

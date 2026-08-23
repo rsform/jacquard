@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::io_sound::credit::Credit;
 use crate::io_sound::sequence;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -41,37 +41,37 @@ use crate::io_sound::sequence;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Sequence<S: BosStr = DefaultStr> {
-    ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
+    /// Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
-    ///Attribution for composers, arrangers, etc
+    /// Attribution for composers, arrangers, etc
     #[serde(skip_serializing_if = "Option::is_none")]
     pub credits: Option<Vec<Credit<S>>>,
-    ///Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
+    /// Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub events: Bytes,
-    ///Identifies this sequence for playback by a "sequence" event.
+    /// Identifies this sequence for playback by a "sequence" event.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
-    ///Name of the sequence
+    /// Name of the sequence
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Timestamp of the time of publication.
+    /// Timestamp of the time of publication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
-    ///A collection of sequences that may be played back by "sequence" events.
+    /// A collection of sequences that may be played back by "sequence" events.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sequences: Option<Vec<sequence::Sequence<S>>>,
-    ///Array of strings used to tag the sequence.
+    /// Array of strings used to tag the sequence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Timestamp of the time of last edit.
+    /// Timestamp of the time of last edit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
+    /// Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
-    ///Version number for the byte array encoding of the events field.
+    /// Version number for the byte array encoding of the events field.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
     #[serde(
@@ -194,8 +194,7 @@ impl<S: BosStr> LexiconSchema for Sequence<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 128usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -217,9 +216,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -231,7 +229,7 @@ where
 
 pub mod sequence_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -299,7 +297,9 @@ impl SequenceBuilder<sequence_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SequenceBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -310,7 +310,9 @@ impl<S: BosStr> SequenceBuilder<sequence_state::Empty, S> {
     pub fn builder() -> Self {
         SequenceBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -402,10 +404,7 @@ impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
 
 impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `sequences` field (optional)
-    pub fn sequences(
-        mut self,
-        value: impl Into<Option<Vec<sequence::Sequence<S>>>>,
-    ) -> Self {
+    pub fn sequences(mut self, value: impl Into<Option<Vec<sequence::Sequence<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -510,10 +509,10 @@ where
 }
 
 fn lexicon_doc_io_sound_sequence() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.sound.sequence"),

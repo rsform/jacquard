@@ -14,45 +14,47 @@ pub mod profile;
 pub mod signup;
 pub mod update_profile;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, AtUri, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_coves::actor;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::actor;
+use serde::{Deserialize, Serialize};
 /// Aggregated statistics for a user profile
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileStats<S: BosStr = DefaultStr> {
-    ///Total number of comments made
+    /// Total number of comments made
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment_count: Option<i64>,
-    ///Number of communities subscribed to
+    /// Number of communities subscribed to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub community_count: Option<i64>,
-    ///Number of communities with membership status
+    /// Number of communities with membership status
     #[serde(skip_serializing_if = "Option::is_none")]
     pub membership_count: Option<i64>,
-    ///Total number of posts created
+    /// Total number of posts created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_count: Option<i64>,
-    ///Global reputation score
+    /// Global reputation score
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reputation: Option<i64>,
     #[serde(
@@ -67,15 +69,18 @@ pub struct ProfileStats<S: BosStr = DefaultStr> {
 /// Basic profile view with essential information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
-    ///URL to avatar image
+    /// URL to avatar image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Current handle resolved from DID
+    /// Current handle resolved from DID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub handle: Option<Handle<S>>,
     #[serde(
@@ -90,31 +95,34 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// Detailed profile view with stats and viewer state
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
-    ///URL to avatar image
+    /// URL to avatar image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
-    ///URL to banner image
+    /// URL to banner image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Rich text annotations for the description
+    /// Rich text annotations for the description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Data<S>>>,
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Current handle resolved from DID
+    /// Current handle resolved from DID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub handle: Option<Handle<S>>,
-    ///Aggregated statistics
+    /// Aggregated statistics
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stats: Option<actor::ProfileStats<S>>,
-    ///Viewer's relationship to this profile
+    /// Viewer's relationship to this profile
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<actor::ViewerState<S>>,
     #[serde(
@@ -129,15 +137,18 @@ pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
 /// The viewing user's relationship to this profile
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewerState<S: BosStr = DefaultStr> {
-    ///Whether the viewer has blocked this user
+    /// Whether the viewer has blocked this user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<bool>,
-    ///Whether the viewer is blocked by this user
+    /// Whether the viewer is blocked by this user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by: Option<bool>,
-    ///AT-URI of the block record if the viewer has blocked this user
+    /// AT-URI of the block record if the viewer has blocked this user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocking: Option<AtUri<S>>,
     #[serde(
@@ -328,17 +339,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.actor.defs"),
@@ -347,9 +357,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Aggregated statistics for a user profile"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Aggregated statistics for a user profile",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -395,11 +405,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Basic profile view with essential information",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Basic profile view with essential information",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -407,9 +415,7 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to avatar image"),
-                                ),
+                                description: Some(CowStr::new_static("URL to avatar image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -432,9 +438,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Current handle resolved from DID"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Current handle resolved from DID",
+                                )),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -447,11 +453,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileViewDetailed"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Detailed profile view with stats and viewer state",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Detailed profile view with stats and viewer state",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -459,9 +463,7 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to avatar image"),
-                                ),
+                                description: Some(CowStr::new_static("URL to avatar image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -469,9 +471,7 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("banner"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to banner image"),
-                                ),
+                                description: Some(CowStr::new_static("URL to banner image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -494,11 +494,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("descriptionFacets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Rich text annotations for the description",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Rich text annotations for the description",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("social.coves.richtext.facet"),
                                     ..Default::default()
@@ -525,9 +523,9 @@ fn lexicon_doc_social_coves_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Current handle resolved from DID"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Current handle resolved from DID",
+                                )),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -604,15 +602,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -645,7 +642,12 @@ pub mod profile_view_state {
 /// Builder for constructing an instance of this type.
 pub struct ProfileViewBuilder<St: profile_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<UriValue<S>>, Option<Did<S>>, Option<S>, Option<Handle<S>>),
+    _fields: (
+        Option<UriValue<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Handle<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -759,10 +761,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileView<S> {
         ProfileView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -780,15 +779,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod profile_view_detailed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -841,20 +839,14 @@ pub struct ProfileViewDetailedBuilder<
 
 impl ProfileViewDetailed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ProfileViewDetailedBuilder<
-        profile_view_detailed_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ProfileViewDetailedBuilder<profile_view_detailed_state::Empty, DefaultStr> {
         ProfileViewDetailedBuilder::new()
     }
 }
 
 impl<S: BosStr> ProfileViewDetailed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ProfileViewDetailedBuilder<
-        profile_view_detailed_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ProfileViewDetailedBuilder<profile_view_detailed_state::Empty, S> {
         ProfileViewDetailedBuilder::builder()
     }
 }
@@ -881,10 +873,7 @@ impl<S: BosStr> ProfileViewDetailedBuilder<profile_view_detailed_state::Empty, S
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -897,10 +886,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -913,10 +899,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -929,10 +912,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -945,10 +925,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -980,10 +957,7 @@ where
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -996,10 +970,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1012,10 +983,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<actor::ProfileStats<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1028,10 +996,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_view_detailed_state::State,
-    S: BosStr,
-> ProfileViewDetailedBuilder<St, S> {
+impl<St: profile_view_detailed_state::State, S: BosStr> ProfileViewDetailedBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -1066,10 +1031,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileViewDetailed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileViewDetailed<S> {
         ProfileViewDetailed {
             avatar: self._fields.0,
             banner: self._fields.1,
@@ -1093,8 +1055,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -93,6 +93,9 @@ tracing = [
 ]
 dns = ["jacquard-identity/dns"]
 streaming = [
+    "reqwest-stream",
+    "jacquard-oauth/reqwest-stream",
+    "jacquard-identity/reqwest-stream",
     "jacquard-common/websocket",
     "jacquard-common/jss",
     "jacquard-oauth/streaming",
@@ -190,12 +193,12 @@ path = "../../examples/moderated_timeline.rs"
 required-features = ["api_bluesky", "loopback"]
 
 [dependencies]
-jacquard-api = { version = "0.12.1", path = "../jacquard-api", default-features = false }
-jacquard-common = { version = "0.12.1", path = "../jacquard-common", default-features = false }
-jacquard-oauth = { version = "0.12.1", path = "../jacquard-oauth", default-features = false }
+jacquard-api = { version = "0.13.0", path = "../jacquard-api", default-features = false }
+jacquard-common = { version = "0.13.0", path = "../jacquard-common", default-features = false }
+jacquard-oauth = { version = "0.13.0", path = "../jacquard-oauth", default-features = false }
 reqwest = { workspace = true, optional = true }
-jacquard-derive = { version = "0.12.1", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", default-features = false }
+jacquard-derive = { version = "0.13.0", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.13.0", path = "../jacquard-identity", default-features = false }
 
 
 
@@ -224,7 +227,7 @@ n0-future = { workspace = true, optional = true }
 serde_ipld_dagcbor.workspace = true
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", features = ["cache"] }
+jacquard-identity = { version = "0.13.0", path = "../jacquard-identity", features = ["cache"] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 regex = { workspace = true, default-features = false, features = ["std", "perf-literal", "unicode"] }
 

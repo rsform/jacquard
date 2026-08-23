@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,15 +25,18 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::site_standard::document;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Contributor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,42 +62,42 @@ pub struct Contributor<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Document<S: BosStr = DefaultStr> {
-    ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
+    /// Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
-    ///Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.
+    /// Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contributors: Option<Vec<document::Contributor<S>>>,
-    ///Image to used for thumbnail or cover image. Less than 1MB is size.
+    /// Image to used for thumbnail or cover image. Less than 1MB is size.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<BlobRef<S>>,
-    ///A brief description or excerpt from the document.
+    /// A brief description or excerpt from the document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Self-label values for this post. Effectively content warnings.
+    /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Array of values describing relationships between this document and external resources
+    /// Array of values describing relationships between this document and external resources
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Data<S>>,
-    ///Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.
+    /// Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
-    ///Timestamp of the documents publish time.
+    /// Timestamp of the documents publish time.
     pub published_at: Datetime,
-    ///Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.
+    /// Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.
     pub site: UriValue<S>,
-    ///Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.
+    /// Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Plaintext representation of the documents contents. Should not contain markdown or other formatting.
+    /// Plaintext representation of the documents contents. Should not contain markdown or other formatting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text_content: Option<S>,
-    ///Title of the document.
+    /// Title of the document.
     pub title: S,
-    ///Timestamp of the documents last edit.
+    /// Timestamp of the documents last edit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -236,19 +239,16 @@ impl<S: BosStr> LexiconSchema for Document<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_image"),
@@ -295,8 +295,7 @@ impl<S: BosStr> LexiconSchema for Document<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 128usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -342,15 +341,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod contributor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -483,10 +481,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Contributor<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contributor<S> {
         Contributor {
             did: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -497,10 +492,10 @@ where
 }
 
 fn lexicon_doc_site_standard_document() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("site.standard.document"),
@@ -736,9 +731,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -750,7 +744,7 @@ where
 
 pub mod document_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -848,20 +842,7 @@ impl DocumentBuilder<document_state::Empty, DefaultStr> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -874,20 +855,7 @@ impl<S: BosStr> DocumentBuilder<document_state::Empty, S> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -922,18 +890,12 @@ impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
 
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `contributors` field (optional)
-    pub fn contributors(
-        mut self,
-        value: impl Into<Option<Vec<document::Contributor<S>>>>,
-    ) -> Self {
+    pub fn contributors(mut self, value: impl Into<Option<Vec<document::Contributor<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `contributors` field to an Option value (optional)
-    pub fn maybe_contributors(
-        mut self,
-        value: Option<Vec<document::Contributor<S>>>,
-    ) -> Self {
+    pub fn maybe_contributors(mut self, value: Option<Vec<document::Contributor<S>>>) -> Self {
         self._fields.2 = value;
         self
     }

@@ -10,36 +10,39 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Nsid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_slices::slice::get_slice_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_slice_records;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IndexedRecord<S: BosStr = DefaultStr> {
-    ///Content identifier of the record
+    /// Content identifier of the record
     pub cid: Cid<S>,
-    ///NSID of the collection this record belongs to
+    /// NSID of the collection this record belongs to
     pub collection: Nsid<S>,
-    ///DID of the record creator
+    /// DID of the record creator
     pub did: Did<S>,
-    ///When this record was indexed
+    /// When this record was indexed
     pub indexed_at: Datetime,
-    ///AT-URI of the record
+    /// AT-URI of the record
     pub uri: AtUri<S>,
-    ///The record value/content
+    /// The record value/content
     pub value: Data<S>,
     #[serde(
         flatten,
@@ -50,34 +53,38 @@ pub struct IndexedRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSliceRecords<S: BosStr = DefaultStr> {
-    ///Pagination cursor from previous response
+    /// Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Maximum number of records to return  Defaults to `50`.
+    /// Maximum number of records to return  Defaults to `50`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_slice_records_limit")]
     pub limit: Option<i64>,
-    ///AT-URI of the slice to query
+    /// AT-URI of the slice to query
     pub slice: S,
-    ///Sorting configuration for result ordering
+    /// Sorting configuration for result ordering
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_by: Option<Data<S>>,
-    ///Flexible filtering conditions for querying records
+    /// Flexible filtering conditions for querying records
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#where: Option<Data<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSliceRecordsOutput<S: BosStr = DefaultStr> {
-    ///Pagination cursor for next page
+    /// Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub records: Vec<get_slice_records::IndexedRecord<S>>,
@@ -113,9 +120,8 @@ impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<S> {
     const NSID: &'static str = "network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetSliceRecordsResponse;
 }
 
@@ -125,9 +131,8 @@ Path: `/xrpc/network.slices.slice.getSliceRecords`. The request payload type is 
 pub struct GetSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = GetSliceRecords<S>;
     type Response = GetSliceRecordsResponse;
 }
@@ -139,15 +144,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod indexed_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -258,10 +262,7 @@ pub mod indexed_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IndexedRecordBuilder<
-    St: indexed_record_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct IndexedRecordBuilder<St: indexed_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -447,10 +448,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> IndexedRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IndexedRecord<S> {
         IndexedRecord {
             cid: self._fields.0.unwrap(),
             collection: self._fields.1.unwrap(),
@@ -464,10 +462,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getSliceRecords"),
@@ -476,24 +474,23 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("indexedRecord"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("collection"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Content identifier of the record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Content identifier of the record",
+                                )),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -501,11 +498,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("collection"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "NSID of the collection this record belongs to",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "NSID of the collection this record belongs to",
+                                )),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -513,9 +508,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the record creator"),
-                                ),
+                                description: Some(CowStr::new_static("DID of the record creator")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -523,9 +516,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When this record was indexed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When this record was indexed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -533,9 +526,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the record"),
-                                ),
+                                description: Some(CowStr::new_static("AT-URI of the record")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -556,57 +547,53 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("slice")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("cursor"),
-                                        LexObjectProperty::String(LexString {
-                                            description: Some(
-                                                CowStr::new_static(
-                                                    "Pagination cursor from previous response",
-                                                ),
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("limit"),
-                                        LexObjectProperty::Integer(LexInteger {
-                                            minimum: Some(1i64),
-                                            maximum: Some(100i64),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("slice"),
-                                        LexObjectProperty::String(LexString {
-                                            description: Some(
-                                                CowStr::new_static("AT-URI of the slice to query"),
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("sortBy"),
-                                        LexObjectProperty::Unknown(LexUnknown {
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("where"),
-                                        LexObjectProperty::Unknown(LexUnknown {
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("slice")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexObjectProperty::String(LexString {
+                                        description: Some(CowStr::new_static(
+                                            "Pagination cursor from previous response",
+                                        )),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexObjectProperty::Integer(LexInteger {
+                                        minimum: Some(1i64),
+                                        maximum: Some(100i64),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("slice"),
+                                    LexObjectProperty::String(LexString {
+                                        description: Some(CowStr::new_static(
+                                            "AT-URI of the slice to query",
+                                        )),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("sortBy"),
+                                    LexObjectProperty::Unknown(LexUnknown {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("where"),
+                                    LexObjectProperty::Unknown(LexUnknown {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fyi_frontpage::feed::get_feed_skeleton;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fyi_frontpage::feed::get_feed_skeleton;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -38,9 +41,11 @@ pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -49,25 +54,20 @@ pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetFeedSkeletonError {
     #[serde(rename = "UnknownFeed")]
-    UnknownFeed(Option<SmolStr>),
+    UnknownFeed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetFeedSkeletonError {
@@ -91,11 +91,13 @@ impl core::fmt::Display for GetFeedSkeletonError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SkeletonFeedPost<S: BosStr = DefaultStr> {
-    ///AT URI of the post.
+    /// AT URI of the post.
     pub post: AtUri<S>,
     #[serde(
         flatten,
@@ -155,7 +157,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_feed_skeleton_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,10 +188,7 @@ pub mod get_feed_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedSkeletonBuilder<
-    St: get_feed_skeleton_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetFeedSkeletonBuilder<St: get_feed_skeleton_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -298,15 +297,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod skeleton_feed_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,10 +335,7 @@ pub mod skeleton_feed_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SkeletonFeedPostBuilder<
-    St: skeleton_feed_post_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SkeletonFeedPostBuilder<St: skeleton_feed_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -348,10 +343,7 @@ pub struct SkeletonFeedPostBuilder<
 
 impl SkeletonFeedPost<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SkeletonFeedPostBuilder<
-        skeleton_feed_post_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> SkeletonFeedPostBuilder<skeleton_feed_post_state::Empty, DefaultStr> {
         SkeletonFeedPostBuilder::new()
     }
 }
@@ -417,10 +409,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SkeletonFeedPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SkeletonFeedPost<S> {
         SkeletonFeedPost {
             post: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -429,10 +418,10 @@ where
 }
 
 fn lexicon_doc_fyi_frontpage_feed_getFeedSkeleton() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fyi.frontpage.feed.getFeedSkeleton"),
@@ -441,40 +430,38 @@ fn lexicon_doc_fyi_frontpage_feed_getFeedSkeleton() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("feed")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(CowStr::new_static("Pagination cursor.")),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("feed"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("AT URI of the feed generator record."),
-                                        ),
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("feed")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Pagination cursor.")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("feed"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "AT URI of the feed generator record.",
+                                    )),
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -488,9 +475,7 @@ fn lexicon_doc_fyi_frontpage_feed_getFeedSkeleton() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("post"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT URI of the post."),
-                                ),
+                                description: Some(CowStr::new_static("AT URI of the post.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

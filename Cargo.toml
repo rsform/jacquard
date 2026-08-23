@@ -5,9 +5,8 @@ members = ["crates/*"]
 
 [workspace.package]
 edition = "2024"
-version = "0.12.1"
+version = "0.13.0"
 authors = ["Orual <orual@nonbinary.computer>"]
-#repository = "https://github.com/rsform/jacquard"
 repository = "https://tangled.org/nonbinary.computer/jacquard"
 keywords = ["atproto", "at", "bluesky", "api", "client"]
 categories = ["api-bindings", "web-programming::http-client"]

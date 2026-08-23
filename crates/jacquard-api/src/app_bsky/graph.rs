@@ -38,33 +38,32 @@ pub mod unmute_actor_list;
 pub mod unmute_thread;
 pub mod verification;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::feed::GeneratorView;
+use crate::app_bsky::graph;
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::label::Label;
-use crate::app_bsky::graph;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A list of actors used for curation purposes such as list feeds or interaction gating.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -75,9 +74,11 @@ impl core::fmt::Display for Curatelist {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItemView<S: BosStr = DefaultStr> {
     pub subject: ProfileView<S>,
     pub uri: AtUri<S>,
@@ -89,7 +90,6 @@ pub struct ListItemView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListPurpose<S: BosStr = DefaultStr> {
@@ -159,9 +159,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             ListPurpose::AppBskyGraphDefsModlist => ListPurpose::AppBskyGraphDefsModlist,
-            ListPurpose::AppBskyGraphDefsCuratelist => {
-                ListPurpose::AppBskyGraphDefsCuratelist
-            }
+            ListPurpose::AppBskyGraphDefsCuratelist => ListPurpose::AppBskyGraphDefsCuratelist,
             ListPurpose::AppBskyGraphDefsReferencelist => {
                 ListPurpose::AppBskyGraphDefsReferencelist
             }
@@ -170,9 +168,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -201,9 +201,11 @@ pub struct ListView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -228,9 +230,11 @@ pub struct ListViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked: Option<AtUri<S>>,
@@ -258,7 +262,10 @@ impl core::fmt::Display for Modlist {
 /// indicates that a handle or DID could not be resolved
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotFoundActor<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     pub not_found: bool,
@@ -284,25 +291,28 @@ impl core::fmt::Display for Referencelist {
 /// lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Relationship<S: BosStr = DefaultStr> {
-    ///if the actor is blocked by this DID, contains the AT-URI of the block record
+    /// if the actor is blocked by this DID, contains the AT-URI of the block record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by: Option<AtUri<S>>,
-    ///if the actor is blocked by this DID via a block list, contains the AT-URI of the listblock record
+    /// if the actor is blocked by this DID via a block list, contains the AT-URI of the listblock record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by_list: Option<AtUri<S>>,
-    ///if the actor blocks this DID, this is the AT-URI of the block record
+    /// if the actor blocks this DID, this is the AT-URI of the block record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocking: Option<AtUri<S>>,
-    ///if the actor blocks this DID via a block list, this is the AT-URI of the listblock record
+    /// if the actor blocks this DID via a block list, this is the AT-URI of the listblock record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocking_by_list: Option<AtUri<S>>,
     pub did: Did<S>,
-    ///if the actor is followed by this DID, contains the AT-URI of the follow record
+    /// if the actor is followed by this DID, contains the AT-URI of the follow record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub followed_by: Option<AtUri<S>>,
-    ///if the actor follows this DID, this is the AT-URI of the follow record
+    /// if the actor follows this DID, this is the AT-URI of the follow record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub following: Option<AtUri<S>>,
     #[serde(
@@ -314,9 +324,11 @@ pub struct Relationship<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StarterPackView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileViewBasic<S>,
@@ -344,9 +356,11 @@ pub struct StarterPackView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StarterPackViewBasic<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileViewBasic<S>,
@@ -646,15 +660,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_item_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -792,10 +805,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ListItemView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListItemView<S> {
         ListItemView {
             subject: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -805,10 +815,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.defs"),
@@ -816,23 +826,24 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("curatelist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("listItemView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("subject")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("subject"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("subject"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileView",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileView"),
                                 ..Default::default()
                             }),
                         );
@@ -850,19 +861,21 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("listPurpose"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("listView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("creator"), SmolStr::new_static("name"),
-                            SmolStr::new_static("purpose"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("creator"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("purpose"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -883,9 +896,7 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileView",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileView"),
                                 ..Default::default()
                             }),
                         );
@@ -968,12 +979,12 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("name"), SmolStr::new_static("purpose")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("purpose"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1075,21 +1086,20 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("modlist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("notFoundActor"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "indicates that a handle or DID could not be resolved",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("actor"), SmolStr::new_static("notFound")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "indicates that a handle or DID could not be resolved",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("actor"),
+                        SmolStr::new_static("notFound"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1113,7 +1123,9 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("referencelist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("relationship"),
@@ -1214,14 +1226,13 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("starterPackView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("creator"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("creator"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1235,9 +1246,7 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -1245,9 +1254,7 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("feeds"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "app.bsky.feed.defs#generatorView",
-                                    ),
+                                    r#ref: CowStr::new_static("app.bsky.feed.defs#generatorView"),
                                     ..Default::default()
                                 }),
                                 max_length: Some(3usize),
@@ -1324,14 +1331,13 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("starterPackViewBasic"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("creator"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("creator"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1345,9 +1351,7 @@ fn lexicon_doc_app_bsky_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -1420,15 +1424,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1578,18 +1581,7 @@ impl ListViewBuilder<list_view_state::Empty, DefaultStr> {
         ListViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1602,18 +1594,7 @@ impl<S: BosStr> ListViewBuilder<list_view_state::Empty, S> {
         ListViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1686,10 +1667,7 @@ impl<St: list_view_state::State, S: BosStr> ListViewBuilder<St, S> {
 
 impl<St: list_view_state::State, S: BosStr> ListViewBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -1751,10 +1729,7 @@ where
     St::Name: list_view_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListViewBuilder<list_view_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ListViewBuilder<list_view_state::SetName<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
@@ -1804,10 +1779,7 @@ where
 
 impl<St: list_view_state::State, S: BosStr> ListViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<graph::ListViewerState<S>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<graph::ListViewerState<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
@@ -1873,15 +1845,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1954,10 +1925,7 @@ pub mod list_view_basic_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListViewBasicBuilder<
-    St: list_view_basic_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ListViewBasicBuilder<St: list_view_basic_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -2139,10 +2107,7 @@ where
 
 impl<St: list_view_basic_state::State, S: BosStr> ListViewBasicBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<graph::ListViewerState<S>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<graph::ListViewerState<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -2177,10 +2142,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ListViewBasic<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListViewBasic<S> {
         ListViewBasic {
             avatar: self._fields.0,
             cid: self._fields.1.unwrap(),
@@ -2203,9 +2165,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2216,15 +2177,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod not_found_actor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2267,10 +2227,7 @@ pub mod not_found_actor_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotFoundActorBuilder<
-    St: not_found_actor_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct NotFoundActorBuilder<St: not_found_actor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -2365,10 +2322,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotFoundActor<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotFoundActor<S> {
         NotFoundActor {
             actor: self._fields.0.unwrap(),
             not_found: self._fields.1.unwrap(),
@@ -2384,15 +2338,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod relationship_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2589,10 +2542,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Relationship<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Relationship<S> {
         Relationship {
             blocked_by: self._fields.0,
             blocked_by_list: self._fields.1,
@@ -2613,15 +2563,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod starter_pack_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2712,10 +2661,7 @@ pub mod starter_pack_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StarterPackViewBuilder<
-    St: starter_pack_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct StarterPackViewBuilder<St: starter_pack_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -2752,7 +2698,9 @@ impl StarterPackViewBuilder<starter_pack_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         StarterPackViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2763,7 +2711,9 @@ impl<S: BosStr> StarterPackViewBuilder<starter_pack_view_state::Empty, S> {
     pub fn builder() -> Self {
         StarterPackViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2901,10 +2851,7 @@ impl<St: starter_pack_view_state::State, S: BosStr> StarterPackViewBuilder<St, S
         self
     }
     /// Set the `listItemsSample` field to an Option value (optional)
-    pub fn maybe_list_items_sample(
-        mut self,
-        value: Option<Vec<graph::ListItemView<S>>>,
-    ) -> Self {
+    pub fn maybe_list_items_sample(mut self, value: Option<Vec<graph::ListItemView<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -2975,10 +2922,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StarterPackView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StarterPackView<S> {
         StarterPackView {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -3003,15 +2947,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod starter_pack_view_basic_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3123,20 +3066,14 @@ pub struct StarterPackViewBasicBuilder<
 
 impl StarterPackViewBasic<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> StarterPackViewBasicBuilder<
-        starter_pack_view_basic_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> StarterPackViewBasicBuilder<starter_pack_view_basic_state::Empty, DefaultStr> {
         StarterPackViewBasicBuilder::new()
     }
 }
 
 impl<S: BosStr> StarterPackViewBasic<S> {
     /// Create a new builder for this type
-    pub fn builder() -> StarterPackViewBasicBuilder<
-        starter_pack_view_basic_state::Empty,
-        S,
-    > {
+    pub fn builder() -> StarterPackViewBasicBuilder<starter_pack_view_basic_state::Empty, S> {
         StarterPackViewBasicBuilder::builder()
     }
 }
@@ -3210,10 +3147,7 @@ where
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StarterPackViewBasicBuilder<
-        starter_pack_view_basic_state::SetIndexedAt<St>,
-        S,
-    > {
+    ) -> StarterPackViewBasicBuilder<starter_pack_view_basic_state::SetIndexedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         StarterPackViewBasicBuilder {
             _state: PhantomData,
@@ -3223,10 +3157,7 @@ where
     }
 }
 
-impl<
-    St: starter_pack_view_basic_state::State,
-    S: BosStr,
-> StarterPackViewBasicBuilder<St, S> {
+impl<St: starter_pack_view_basic_state::State, S: BosStr> StarterPackViewBasicBuilder<St, S> {
     /// Set the `joinedAllTimeCount` field (optional)
     pub fn joined_all_time_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -3239,10 +3170,7 @@ impl<
     }
 }
 
-impl<
-    St: starter_pack_view_basic_state::State,
-    S: BosStr,
-> StarterPackViewBasicBuilder<St, S> {
+impl<St: starter_pack_view_basic_state::State, S: BosStr> StarterPackViewBasicBuilder<St, S> {
     /// Set the `joinedWeekCount` field (optional)
     pub fn joined_week_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -3255,10 +3183,7 @@ impl<
     }
 }
 
-impl<
-    St: starter_pack_view_basic_state::State,
-    S: BosStr,
-> StarterPackViewBasicBuilder<St, S> {
+impl<St: starter_pack_view_basic_state::State, S: BosStr> StarterPackViewBasicBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -3271,10 +3196,7 @@ impl<
     }
 }
 
-impl<
-    St: starter_pack_view_basic_state::State,
-    S: BosStr,
-> StarterPackViewBasicBuilder<St, S> {
+impl<St: starter_pack_view_basic_state::State, S: BosStr> StarterPackViewBasicBuilder<St, S> {
     /// Set the `listItemCount` field (optional)
     pub fn list_item_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();

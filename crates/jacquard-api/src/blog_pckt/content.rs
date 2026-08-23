@@ -20,19 +20,22 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Hybrid content storage: inline for small content (≤20KB), blob for large content (>20KB)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Content<S: BosStr = DefaultStr> {
-    ///Reference to external JSON blob containing content (extended mode, used when content > 20KB)
+    /// Reference to external JSON blob containing content (extended mode, used when content > 20KB)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
-    ///Array of content blocks (inline mode, used when content ≤ 20KB)
+    /// Array of content blocks (inline mode, used when content ≤ 20KB)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items: Option<Vec<Data<S>>>,
-    ///Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
+    /// Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub references: Option<Vec<BlobRef<S>>>,
     #[serde(
@@ -66,17 +69,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_blog_pckt_content() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.content"),

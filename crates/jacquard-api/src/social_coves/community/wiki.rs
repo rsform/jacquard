@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_coves::community::wiki;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::community::wiki;
+use serde::{Deserialize, Serialize};
 /// Community wiki page
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,19 +38,19 @@ use crate::social_coves::community::wiki;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Wiki<S: BosStr = DefaultStr> {
-    ///Markdown-formatted wiki content
+    /// Markdown-formatted wiki content
     pub content: S,
     pub created_at: Datetime,
-    ///History of edits (stored separately for efficiency)
+    /// History of edits (stored separately for efficiency)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edit_history: Option<Vec<wiki::WikiEdit<S>>>,
-    ///DID of the last editor
+    /// DID of the last editor
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_edited_by: Option<Did<S>>,
-    ///URL-friendly page identifier
+    /// URL-friendly page identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<S>,
-    ///Wiki page title
+    /// Wiki page title
     pub title: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -74,12 +74,14 @@ pub struct WikiGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Wiki<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WikiEdit<S: BosStr = DefaultStr> {
     pub editor: Did<S>,
-    ///Edit summary
+    /// Edit summary
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<S>,
     pub timestamp: Datetime,
@@ -217,9 +219,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -231,7 +232,7 @@ where
 
 pub mod wiki_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -344,10 +345,7 @@ where
     St::Content: wiki_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> WikiBuilder<wiki_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> WikiBuilder<wiki_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WikiBuilder {
             _state: PhantomData,
@@ -378,10 +376,7 @@ where
 
 impl<St: wiki_state::State, S: BosStr> WikiBuilder<St, S> {
     /// Set the `editHistory` field (optional)
-    pub fn edit_history(
-        mut self,
-        value: impl Into<Option<Vec<wiki::WikiEdit<S>>>>,
-    ) -> Self {
+    pub fn edit_history(mut self, value: impl Into<Option<Vec<wiki::WikiEdit<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -424,10 +419,7 @@ where
     St::Title: wiki_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> WikiBuilder<wiki_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> WikiBuilder<wiki_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         WikiBuilder {
             _state: PhantomData,
@@ -486,10 +478,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.wiki"),
@@ -501,22 +493,20 @@ fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("Community wiki page")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("content"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("content"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Markdown-formatted wiki content"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Markdown-formatted wiki content",
+                                    )),
                                     max_length: Some(50000usize),
                                     ..Default::default()
                                 }),
@@ -531,11 +521,9 @@ fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("editHistory"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "History of edits (stored separately for efficiency)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "History of edits (stored separately for efficiency)",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#wikiEdit"),
                                         ..Default::default()
@@ -546,9 +534,7 @@ fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lastEditedBy"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("DID of the last editor"),
-                                    ),
+                                    description: Some(CowStr::new_static("DID of the last editor")),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -556,9 +542,9 @@ fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("URL-friendly page identifier"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "URL-friendly page identifier",
+                                    )),
                                     max_length: Some(128usize),
                                     ..Default::default()
                                 }),
@@ -589,12 +575,10 @@ fn lexicon_doc_social_coves_community_wiki() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("wikiEdit"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("editor"),
-                            SmolStr::new_static("timestamp")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("editor"),
+                        SmolStr::new_static("timestamp"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -638,15 +622,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod wiki_edit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

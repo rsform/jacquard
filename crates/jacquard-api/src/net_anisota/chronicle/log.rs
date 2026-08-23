@@ -11,13 +11,12 @@ pub mod monthly;
 pub mod weekly;
 pub mod yearly;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,10 +30,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::expedition::ChronicleSignature;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::expedition::ChronicleSignature;
+use serde::{Deserialize, Serialize};
 /// Granular chronicle event log. Each record is a single timestamped event. TID rkey for chronological ordering. Used to capture moments that don't have their own record type (moth sightings, random encounters, item discoveries, etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -45,20 +44,20 @@ use crate::net_anisota::chronicle::expedition::ChronicleSignature;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Log<S: BosStr = DefaultStr> {
-    ///When the record was created
+    /// When the record was created
     pub created_at: Datetime,
-    ///Extra context (rarity, reason, conditions, etc.)
+    /// Extra context (rarity, reason, conditions, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub detail: Option<S>,
-    ///Event type. Extensible — new values added as features grow.
+    /// Event type. Extensible — new values added as features grow.
     pub event: LogEvent<S>,
-    ///AT URI of the parent expedition (if during an expedition)
+    /// AT URI of the parent expedition (if during an expedition)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expedition_ref: Option<S>,
-    ///When the event actually happened
+    /// When the event actually happened
     pub occurred_at: Datetime,
     pub signature: ChronicleSignature<S>,
-    ///What was involved (specimen name, item id, etc.)
+    /// What was involved (specimen name, item id, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<S>,
     #[serde(
@@ -235,9 +234,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -249,7 +247,7 @@ where
 
 pub mod log_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -524,10 +522,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_log() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.log"),

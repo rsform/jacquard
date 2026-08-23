@@ -8,17 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::convo::MessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::convo::MessageView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message_id: S,
@@ -27,43 +30,40 @@ pub struct RemoveReaction<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveReactionOutput<S: BosStr = DefaultStr> {
     pub message: MessageView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RemoveReactionError {
     #[serde(rename = "InvalidConvo")]
-    InvalidConvo(Option<SmolStr>),
+    InvalidConvo(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Indicates that reactions are not allowed on this message, e.g. because it is a system message.
     #[serde(rename = "ReactionNotAllowed")]
-    ReactionNotAllowed(Option<SmolStr>),
+    ReactionNotAllowed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
-    ReactionMessageDeleted(Option<SmolStr>),
+    ReactionMessageDeleted(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
-    ReactionInvalidValue(Option<SmolStr>),
+    ReactionInvalidValue(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RemoveReactionError {
@@ -121,9 +121,8 @@ impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveReaction<S> {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveReactionResponse;
 }
 
@@ -133,9 +132,8 @@ Path: `/xrpc/chat.bsky.convo.removeReaction`. The request payload type is `Remov
 pub struct RemoveReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.removeReaction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RemoveReaction<S>;
     type Response = RemoveReactionResponse;
 }

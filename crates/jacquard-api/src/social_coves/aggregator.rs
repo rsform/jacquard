@@ -19,35 +19,37 @@ pub mod revoke_api_key;
 pub mod service;
 pub mod update_config;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, AtUri, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_coves::aggregator;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::aggregator;
+use serde::{Deserialize, Serialize};
 /// Statistics about an aggregator's usage
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AggregatorStats<S: BosStr = DefaultStr> {
-    ///Number of communities that have authorized this aggregator
+    /// Number of communities that have authorized this aggregator
     pub communities_using: i64,
-    ///Total number of posts created by this aggregator
+    /// Total number of posts created by this aggregator
     pub posts_created: i64,
     #[serde(
         flatten,
@@ -61,29 +63,32 @@ pub struct AggregatorStats<S: BosStr = DefaultStr> {
 /// Detailed view of an aggregator service
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AggregatorView<S: BosStr = DefaultStr> {
-    ///URL to avatar image
+    /// URL to avatar image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
-    ///JSON Schema describing config options for this aggregator
+    /// JSON Schema describing config options for this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config_schema: Option<Data<S>>,
     pub created_at: Datetime,
-    ///Description of what this aggregator does
+    /// Description of what this aggregator does
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///DID of the aggregator service
+    /// DID of the aggregator service
     pub did: Did<S>,
-    ///Human-readable name (e.g., 'RSS News Aggregator')
+    /// Human-readable name (e.g., 'RSS News Aggregator')
     pub display_name: S,
-    ///DID of person/organization maintaining this aggregator
+    /// DID of person/organization maintaining this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maintainer: Option<Did<S>>,
-    ///AT-URI of the service declaration record
+    /// AT-URI of the service declaration record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record_uri: Option<AtUri<S>>,
-    ///URL to aggregator's source code (for transparency)
+    /// URL to aggregator's source code (for transparency)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_url: Option<UriValue<S>>,
     #[serde(
@@ -98,7 +103,10 @@ pub struct AggregatorView<S: BosStr = DefaultStr> {
 /// Detailed view of an aggregator with stats
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AggregatorViewDetailed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -128,18 +136,21 @@ pub struct AggregatorViewDetailed<S: BosStr = DefaultStr> {
 /// View of an API key's metadata. The actual key value is never returned after initial creation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ApiKeyView<S: BosStr = DefaultStr> {
-    ///When the key was created
+    /// When the key was created
     pub created_at: Datetime,
-    ///Whether the key has been revoked
+    /// Whether the key has been revoked
     pub is_revoked: bool,
-    ///When the key was last used for authentication
+    /// When the key was last used for authentication
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_used_at: Option<Datetime>,
-    ///First 12 characters of the key (e.g., 'ckapi_ab12cd') for identification in logs and UI
+    /// First 12 characters of the key (e.g., 'ckapi_ab12cd') for identification in logs and UI
     pub prefix: S,
-    ///When the key was revoked
+    /// When the key was revoked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revoked_at: Option<Datetime>,
     #[serde(
@@ -154,34 +165,37 @@ pub struct ApiKeyView<S: BosStr = DefaultStr> {
 /// View of an aggregator authorization for a community
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AuthorizationView<S: BosStr = DefaultStr> {
-    ///DID of the authorized aggregator
+    /// DID of the authorized aggregator
     pub aggregator_did: Did<S>,
-    ///DID of the community
+    /// DID of the community
     pub community_did: Did<S>,
-    ///Handle of the community
+    /// Handle of the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub community_handle: Option<Handle<S>>,
-    ///Display name of the community
+    /// Display name of the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub community_name: Option<S>,
-    ///Aggregator-specific configuration
+    /// Aggregator-specific configuration
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Data<S>>,
     pub created_at: Datetime,
-    ///DID of moderator who authorized this aggregator
+    /// DID of moderator who authorized this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<Did<S>>,
-    ///When this authorization was disabled (if enabled=false)
+    /// When this authorization was disabled (if enabled=false)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled_at: Option<Datetime>,
-    ///DID of moderator who disabled this aggregator
+    /// DID of moderator who disabled this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled_by: Option<Did<S>>,
-    ///Whether this aggregator is currently active
+    /// Whether this aggregator is currently active
     pub enabled: bool,
-    ///AT-URI of the authorization record
+    /// AT-URI of the authorization record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record_uri: Option<AtUri<S>>,
     #[serde(
@@ -196,15 +210,18 @@ pub struct AuthorizationView<S: BosStr = DefaultStr> {
 /// Aggregator's view of authorization for a community (used by aggregators querying their authorizations)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityAuthView<S: BosStr = DefaultStr> {
-    ///The aggregator service details
+    /// The aggregator service details
     pub aggregator: aggregator::AggregatorView<S>,
-    ///Community-specific configuration for this aggregator
+    /// Community-specific configuration for this aggregator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Data<S>>,
     pub created_at: Datetime,
-    ///Whether this authorization is currently active
+    /// Whether this authorization is currently active
     pub enabled: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub record_uri: Option<AtUri<S>>,
@@ -447,15 +464,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aggregator_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -498,10 +514,7 @@ pub mod aggregator_stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AggregatorStatsBuilder<
-    St: aggregator_stats_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AggregatorStatsBuilder<St: aggregator_stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -596,10 +609,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AggregatorStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AggregatorStats<S> {
         AggregatorStats {
             communities_using: self._fields.0.unwrap(),
             posts_created: self._fields.1.unwrap(),
@@ -609,10 +619,10 @@ where
 }
 
 fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.aggregator.defs"),
@@ -621,15 +631,11 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aggregatorStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Statistics about an aggregator's usage"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("communitiesUsing"),
-                            SmolStr::new_static("postsCreated")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Statistics about an aggregator's usage")),
+                    required: Some(vec![
+                        SmolStr::new_static("communitiesUsing"),
+                        SmolStr::new_static("postsCreated"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -655,25 +661,19 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aggregatorView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Detailed view of an aggregator service"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("displayName"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Detailed view of an aggregator service")),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("displayName"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to avatar image"),
-                                ),
+                                description: Some(CowStr::new_static("URL to avatar image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -694,11 +694,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Description of what this aggregator does",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Description of what this aggregator does",
+                                )),
                                 max_length: Some(3000usize),
                                 max_graphemes: Some(300usize),
                                 ..Default::default()
@@ -707,9 +705,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the aggregator service"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the aggregator service",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -717,11 +715,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Human-readable name (e.g., 'RSS News Aggregator')",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Human-readable name (e.g., 'RSS News Aggregator')",
+                                )),
                                 max_length: Some(640usize),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
@@ -730,11 +726,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("maintainer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of person/organization maintaining this aggregator",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of person/organization maintaining this aggregator",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -742,11 +736,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("recordUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "AT-URI of the service declaration record",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the service declaration record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -754,11 +746,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sourceUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URL to aggregator's source code (for transparency)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to aggregator's source code (for transparency)",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -771,17 +761,15 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aggregatorViewDetailed"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Detailed view of an aggregator with stats"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("displayName"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("stats")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Detailed view of an aggregator with stats",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("displayName"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("stats"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -937,28 +925,24 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorizationView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "View of an aggregator authorization for a community",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("aggregatorDid"),
-                            SmolStr::new_static("communityDid"),
-                            SmolStr::new_static("enabled"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "View of an aggregator authorization for a community",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("aggregatorDid"),
+                        SmolStr::new_static("communityDid"),
+                        SmolStr::new_static("enabled"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("aggregatorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the authorized aggregator"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the authorized aggregator",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -966,9 +950,7 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("communityDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the community"),
-                                ),
+                                description: Some(CowStr::new_static("DID of the community")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -976,9 +958,7 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("communityHandle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Handle of the community"),
-                                ),
+                                description: Some(CowStr::new_static("Handle of the community")),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -986,9 +966,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("communityName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Display name of the community"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Display name of the community",
+                                )),
                                 max_length: Some(1280usize),
                                 ..Default::default()
                             }),
@@ -1009,11 +989,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of moderator who authorized this aggregator",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of moderator who authorized this aggregator",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1021,11 +999,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("disabledAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When this authorization was disabled (if enabled=false)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When this authorization was disabled (if enabled=false)",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1033,11 +1009,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("disabledBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of moderator who disabled this aggregator",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of moderator who disabled this aggregator",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1051,9 +1025,9 @@ fn lexicon_doc_social_coves_aggregator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("recordUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the authorization record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the authorization record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1132,15 +1106,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aggregator_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1197,10 +1170,7 @@ pub mod aggregator_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AggregatorViewBuilder<
-    St: aggregator_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AggregatorViewBuilder<St: aggregator_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -1410,10 +1380,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AggregatorView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AggregatorView<S> {
         AggregatorView {
             avatar: self._fields.0,
             config_schema: self._fields.1,
@@ -1436,15 +1403,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aggregator_view_detailed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1539,20 +1505,15 @@ pub struct AggregatorViewDetailedBuilder<
 
 impl AggregatorViewDetailed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> AggregatorViewDetailedBuilder<
-        aggregator_view_detailed_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> AggregatorViewDetailedBuilder<aggregator_view_detailed_state::Empty, DefaultStr>
+    {
         AggregatorViewDetailedBuilder::new()
     }
 }
 
 impl<S: BosStr> AggregatorViewDetailed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> AggregatorViewDetailedBuilder<
-        aggregator_view_detailed_state::Empty,
-        S,
-    > {
+    pub fn builder() -> AggregatorViewDetailedBuilder<aggregator_view_detailed_state::Empty, S> {
         AggregatorViewDetailedBuilder::builder()
     }
 }
@@ -1579,10 +1540,7 @@ impl<S: BosStr> AggregatorViewDetailedBuilder<aggregator_view_detailed_state::Em
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1595,10 +1553,7 @@ impl<
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `configSchema` field (optional)
     pub fn config_schema(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1620,10 +1575,7 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AggregatorViewDetailedBuilder<
-        aggregator_view_detailed_state::SetCreatedAt<St>,
-        S,
-    > {
+    ) -> AggregatorViewDetailedBuilder<aggregator_view_detailed_state::SetCreatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AggregatorViewDetailedBuilder {
             _state: PhantomData,
@@ -1633,10 +1585,7 @@ where
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1677,10 +1626,7 @@ where
     pub fn display_name(
         mut self,
         value: impl Into<S>,
-    ) -> AggregatorViewDetailedBuilder<
-        aggregator_view_detailed_state::SetDisplayName<St>,
-        S,
-    > {
+    ) -> AggregatorViewDetailedBuilder<aggregator_view_detailed_state::SetDisplayName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         AggregatorViewDetailedBuilder {
             _state: PhantomData,
@@ -1690,10 +1636,7 @@ where
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1706,10 +1649,7 @@ impl<
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `recordUri` field (optional)
     pub fn record_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1722,10 +1662,7 @@ impl<
     }
 }
 
-impl<
-    St: aggregator_view_detailed_state::State,
-    S: BosStr,
-> AggregatorViewDetailedBuilder<St, S> {
+impl<St: aggregator_view_detailed_state::State, S: BosStr> AggregatorViewDetailedBuilder<St, S> {
     /// Set the `sourceUrl` field (optional)
     pub fn source_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1809,15 +1746,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod api_key_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2024,10 +1960,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ApiKeyView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ApiKeyView<S> {
         ApiKeyView {
             created_at: self._fields.0.unwrap(),
             is_revoked: self._fields.1.unwrap(),
@@ -2046,15 +1979,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod authorization_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2127,10 +2059,7 @@ pub mod authorization_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorizationViewBuilder<
-    St: authorization_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AuthorizationViewBuilder<St: authorization_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -2150,10 +2079,7 @@ pub struct AuthorizationViewBuilder<
 
 impl AuthorizationView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> AuthorizationViewBuilder<
-        authorization_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> AuthorizationViewBuilder<authorization_view_state::Empty, DefaultStr> {
         AuthorizationViewBuilder::new()
     }
 }
@@ -2170,7 +2096,9 @@ impl AuthorizationViewBuilder<authorization_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         AuthorizationViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2181,7 +2109,9 @@ impl<S: BosStr> AuthorizationViewBuilder<authorization_view_state::Empty, S> {
     pub fn builder() -> Self {
         AuthorizationViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2380,10 +2310,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AuthorizationView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorizationView<S> {
         AuthorizationView {
             aggregator_did: self._fields.0.unwrap(),
             community_did: self._fields.1.unwrap(),
@@ -2408,15 +2335,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod community_auth_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2473,10 +2399,7 @@ pub mod community_auth_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityAuthViewBuilder<
-    St: community_auth_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CommunityAuthViewBuilder<St: community_auth_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<aggregator::AggregatorView<S>>,
@@ -2490,10 +2413,7 @@ pub struct CommunityAuthViewBuilder<
 
 impl CommunityAuthView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CommunityAuthViewBuilder<
-        community_auth_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CommunityAuthViewBuilder<community_auth_view_state::Empty, DefaultStr> {
         CommunityAuthViewBuilder::new()
     }
 }
@@ -2629,10 +2549,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityAuthView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityAuthView<S> {
         CommunityAuthView {
             aggregator: self._fields.0.unwrap(),
             config: self._fields.1,

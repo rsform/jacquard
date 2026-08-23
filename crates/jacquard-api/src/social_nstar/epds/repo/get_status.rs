@@ -10,29 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetStatus<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetStatusOutput<S: BosStr = DefaultStr> {
     pub active: bool,
     pub did: Did<S>,
-    ///Optional field, the current rev of the repo, if active=true
+    /// Optional field, the current rev of the repo, if active=true
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rev: Option<Tid>,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<GetStatusOutputStatus<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -127,13 +132,9 @@ where
             GetStatusOutputStatus::Suspended => GetStatusOutputStatus::Suspended,
             GetStatusOutputStatus::Deleted => GetStatusOutputStatus::Deleted,
             GetStatusOutputStatus::Deactivated => GetStatusOutputStatus::Deactivated,
-            GetStatusOutputStatus::Desynchronized => {
-                GetStatusOutputStatus::Desynchronized
-            }
+            GetStatusOutputStatus::Desynchronized => GetStatusOutputStatus::Desynchronized,
             GetStatusOutputStatus::Throttled => GetStatusOutputStatus::Throttled,
-            GetStatusOutputStatus::Other(v) => {
-                GetStatusOutputStatus::Other(v.into_static())
-            }
+            GetStatusOutputStatus::Other(v) => GetStatusOutputStatus::Other(v.into_static()),
         }
     }
 }
@@ -168,7 +169,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStatusRequest {
 
 pub mod get_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,46 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddMember<S: BosStr = DefaultStr> {
-    ///The DID of the member to add.
+    /// The DID of the member to add.
     pub did: Did<S>,
-    ///Reference to the space.
+    /// Reference to the space.
     pub space: AtSpaceUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum AddMemberError {
     #[serde(rename = "SpaceNotFound")]
-    SpaceNotFound(Option<SmolStr>),
+    SpaceNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "NotSpaceOwner")]
-    NotSpaceOwner(Option<SmolStr>),
+    NotSpaceOwner(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for AddMemberError {
@@ -105,9 +103,8 @@ impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddMember<S> {
     const NSID: &'static str = "com.atproto.simplespace.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddMemberResponse;
 }
 
@@ -117,16 +114,15 @@ Path: `/xrpc/com.atproto.simplespace.addMember`. The request payload type is `Ad
 pub struct AddMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
     const PATH: &'static str = "/xrpc/com.atproto.simplespace.addMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AddMember<S>;
     type Response = AddMemberResponse;
 }
 
 pub mod add_member_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -264,10 +260,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AddMember<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddMember<S> {
         AddMember {
             did: self._fields.0.unwrap(),
             space: self._fields.1.unwrap(),

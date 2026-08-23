@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::setting::DefsOption;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::setting::DefsOption;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListOptionsScope<S: BosStr = DefaultStr> {
@@ -95,9 +95,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListOptions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -115,9 +117,11 @@ pub struct ListOptions<S: BosStr = DefaultStr> {
     pub scope: Option<ListOptionsScope<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListOptionsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -158,15 +162,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_scope<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    ListOptionsScope<S>,
-> {
-    Some(<ListOptionsScope<S>>::from_value(S::from_static("instance")))
+fn _default_scope<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<ListOptionsScope<S>> {
+    Some(<ListOptionsScope<S>>::from_value(S::from_static(
+        "instance",
+    )))
 }
 
 pub mod list_options_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

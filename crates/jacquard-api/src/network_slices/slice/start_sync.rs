@@ -10,45 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartSync<S: BosStr = DefaultStr> {
-    ///List of collection NSIDs to sync (primary collections matching slice domain)
+    /// List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<Nsid<S>>>,
-    ///List of external collection NSIDs to sync (collections outside slice domain)
+    /// List of external collection NSIDs to sync (collections outside slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_collections: Option<Vec<Nsid<S>>>,
-    ///Maximum number of records to sync per repository
+    /// Maximum number of records to sync per repository
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit_per_repo: Option<i64>,
-    ///List of specific repository DIDs to sync from
+    /// List of specific repository DIDs to sync from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repos: Option<Vec<Did<S>>>,
-    ///Skip lexicon validation during sync  Defaults to `false`.
+    /// Skip lexicon validation during sync  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_start_sync_skip_validation")]
     pub skip_validation: Option<bool>,
-    ///AT-URI of the slice to sync data into
+    /// AT-URI of the slice to sync data into
     pub slice: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartSyncOutput<S: BosStr = DefaultStr> {
-    ///UUID of the enqueued sync job
+    /// UUID of the enqueued sync job
     pub job_id: S,
-    ///Success message confirming job enqueue
+    /// Success message confirming job enqueue
     pub message: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -67,9 +72,8 @@ impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartSync<S> {
     const NSID: &'static str = "network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartSyncResponse;
 }
 
@@ -79,9 +83,8 @@ Path: `/xrpc/network.slices.slice.startSync`. The request payload type is `Start
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = StartSync<S>;
     type Response = StartSyncResponse;
 }

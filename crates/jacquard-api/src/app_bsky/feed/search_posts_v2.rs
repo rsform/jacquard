@@ -8,16 +8,16 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::feed::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Language, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::feed::PostView;
+use serde::{Deserialize, Serialize};
 /// Language analyzer hint for the query text. If unset, the server auto-detects when possible.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -75,8 +75,7 @@ impl<S: BosStr> Serialize for SearchPostsV2QueryLanguage<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for SearchPostsV2QueryLanguage<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchPostsV2QueryLanguage<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -191,9 +190,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub all_time: Option<bool>,
@@ -257,27 +258,26 @@ pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     pub urls: Option<Vec<UriValue<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchPostsV2Output<S: BosStr = DefaultStr> {
-    ///Cursor for the next page of results.
+    /// Cursor for the next page of results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Query languages detected for CJK, Thai, or Arabic text. Empty or omitted for other scripts.
+    /// Query languages detected for CJK, Thai, or Arabic text. Empty or omitted for other scripts.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub detected_query_languages: Option<
-        Vec<SearchPostsV2OutputDetectedQueryLanguages<S>>,
-    >,
-    ///Estimated total number of matching hits. May be rounded or truncated.
+    pub detected_query_languages: Option<Vec<SearchPostsV2OutputDetectedQueryLanguages<S>>>,
+    /// Estimated total number of matching hits. May be rounded or truncated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hits_total: Option<i64>,
-    ///Hydrated views of matching posts.
+    /// Hydrated views of matching posts.
     pub posts: Vec<PostView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchPostsV2OutputDetectedQueryLanguages<S: BosStr = DefaultStr> {
@@ -335,7 +335,8 @@ impl<S: BosStr> Serialize for SearchPostsV2OutputDetectedQueryLanguages<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    for SearchPostsV2OutputDetectedQueryLanguages<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -351,8 +352,7 @@ impl<S: BosStr + Default> Default for SearchPostsV2OutputDetectedQueryLanguages<
     }
 }
 
-impl<S: BosStr> jacquard_common::IntoStatic
-for SearchPostsV2OutputDetectedQueryLanguages<S>
+impl<S: BosStr> jacquard_common::IntoStatic for SearchPostsV2OutputDetectedQueryLanguages<S>
 where
     S: BosStr + jacquard_common::IntoStatic,
     S::Output: BosStr,
@@ -382,25 +382,20 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SearchPostsV2Error {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(Option<SmolStr>),
+    BadQueryString(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SearchPostsV2Error {
@@ -458,7 +453,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_posts_v2_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -476,10 +471,7 @@ pub mod search_posts_v2_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchPostsV2Builder<
-    St: search_posts_v2_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SearchPostsV2Builder<St: search_posts_v2_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -535,34 +527,8 @@ impl SearchPostsV2Builder<search_posts_v2_state::Empty, DefaultStr> {
         SearchPostsV2Builder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -576,34 +542,8 @@ impl<S: BosStr> SearchPostsV2Builder<search_posts_v2_state::Empty, S> {
         SearchPostsV2Builder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -678,10 +618,7 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeAuthors` field (optional)
-    pub fn exclude_authors(
-        mut self,
-        value: impl Into<Option<Vec<AtIdentifier<S>>>>,
-    ) -> Self {
+    pub fn exclude_authors(mut self, value: impl Into<Option<Vec<AtIdentifier<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -707,18 +644,12 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeEmbeddedAtUris` field (optional)
-    pub fn exclude_embedded_at_uris(
-        mut self,
-        value: impl Into<Option<Vec<AtUri<S>>>>,
-    ) -> Self {
+    pub fn exclude_embedded_at_uris(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `excludeEmbeddedAtUris` field to an Option value (optional)
-    pub fn maybe_exclude_embedded_at_uris(
-        mut self,
-        value: Option<Vec<AtUri<S>>>,
-    ) -> Self {
+    pub fn maybe_exclude_embedded_at_uris(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -752,18 +683,12 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeMentions` field (optional)
-    pub fn exclude_mentions(
-        mut self,
-        value: impl Into<Option<Vec<AtIdentifier<S>>>>,
-    ) -> Self {
+    pub fn exclude_mentions(mut self, value: impl Into<Option<Vec<AtIdentifier<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `excludeMentions` field to an Option value (optional)
-    pub fn maybe_exclude_mentions(
-        mut self,
-        value: Option<Vec<AtIdentifier<S>>>,
-    ) -> Self {
+    pub fn maybe_exclude_mentions(mut self, value: Option<Vec<AtIdentifier<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -909,10 +834,7 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
         self
     }
     /// Set the `queryLanguage` field to an Option value (optional)
-    pub fn maybe_query_language(
-        mut self,
-        value: Option<SearchPostsV2QueryLanguage<S>>,
-    ) -> Self {
+    pub fn maybe_query_language(mut self, value: Option<SearchPostsV2QueryLanguage<S>>) -> Self {
         self._fields.21 = value;
         self
     }

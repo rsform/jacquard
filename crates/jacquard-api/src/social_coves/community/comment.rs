@@ -10,13 +10,12 @@ pub mod delete;
 pub mod get_comments;
 pub mod update;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,25 +29,28 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::social_coves::community::comment;
 use crate::social_coves::community::post::AuthorView;
 use crate::social_coves::embed::images::Images;
 use crate::social_coves::embed::post::Post;
-use crate::social_coves::community::comment;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Aggregate vote counts asserted by the bridge for content federated from an origin platform (e.g. Lemmy). These supplement, and are kept separate from, native atproto votes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BridgedStats<S: BosStr = DefaultStr> {
-    ///Timestamp the origin-platform counts were sampled; used to discard stale updates
+    /// Timestamp the origin-platform counts were sampled; used to discard stale updates
     pub as_of: Datetime,
-    ///Number of downvotes on the origin platform as of asOf
+    /// Number of downvotes on the origin platform as of asOf
     pub downvotes: i64,
-    ///Number of upvotes on the origin platform as of asOf
+    /// Number of upvotes on the origin platform as of asOf
     pub upvotes: i64,
     #[serde(
         flatten,
@@ -69,26 +71,26 @@ pub struct BridgedStats<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Comment<S: BosStr = DefaultStr> {
-    ///Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored comments.
+    /// Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored comments.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bridged_stats: Option<comment::BridgedStats<S>>,
-    ///Comment text content
+    /// Comment text content
     pub content: S,
-    ///Timestamp of comment creation
+    /// Timestamp of comment creation
     pub created_at: Datetime,
-    ///Embedded media or quoted posts
+    /// Embedded media or quoted posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<CommentEmbed<S>>,
-    ///Annotations for rich text (mentions, links, formatting, block structure)
+    /// Annotations for rich text (mentions, links, formatting, block structure)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
-    ///Self-applied content labels
+    /// Self-applied content labels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Languages used in the comment content (ISO 639-1)
+    /// Languages used in the comment content (ISO 639-1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
-    ///Reference to the post and parent being replied to
+    /// Reference to the post and parent being replied to
     pub reply: comment::ReplyRef<S>,
     #[serde(
         flatten,
@@ -98,7 +100,6 @@ pub struct Comment<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -124,11 +125,14 @@ pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
 /// References for maintaining thread structure. Root always points to the original post, parent points to the immediate parent (post or comment).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
-    ///Strong reference to the immediate parent (post or comment) being replied to
+    /// Strong reference to the immediate parent (post or comment) being replied to
     pub parent: StrongRef<S>,
-    ///Strong reference to the original post that started the thread
+    /// Strong reference to the original post that started the thread
     pub root: StrongRef<S>,
     #[serde(
         flatten,
@@ -142,14 +146,17 @@ pub struct ReplyRef<S: BosStr = DefaultStr> {
 /// Comment is blocked due to viewer blocking author or moderation action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockedComment<S: BosStr = DefaultStr> {
-    ///Always true for blocked comments
+    /// Always true for blocked comments
     pub blocked: bool,
-    ///What caused the block: viewer blocked author, or comment was removed by moderators
+    /// What caused the block: viewer blocked author, or comment was removed by moderators
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by: Option<BlockedCommentBlockedBy<S>>,
-    ///AT-URI of the blocked comment
+    /// AT-URI of the blocked comment
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -234,9 +241,7 @@ where
         match self {
             BlockedCommentBlockedBy::Author => BlockedCommentBlockedBy::Author,
             BlockedCommentBlockedBy::Moderator => BlockedCommentBlockedBy::Moderator,
-            BlockedCommentBlockedBy::Other(v) => {
-                BlockedCommentBlockedBy::Other(v.into_static())
-            }
+            BlockedCommentBlockedBy::Other(v) => BlockedCommentBlockedBy::Other(v.into_static()),
         }
     }
 }
@@ -244,11 +249,14 @@ where
 /// Reference to a comment record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommentRef<S: BosStr = DefaultStr> {
-    ///CID of the comment record
+    /// CID of the comment record
     pub cid: Cid<S>,
-    ///AT-URI of the comment
+    /// AT-URI of the comment
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -262,15 +270,18 @@ pub struct CommentRef<S: BosStr = DefaultStr> {
 /// Statistics for a comment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommentStats<S: BosStr = DefaultStr> {
-    ///Number of downvotes
+    /// Number of downvotes
     pub downvotes: i64,
-    ///Number of direct replies to this comment
+    /// Number of direct replies to this comment
     pub reply_count: i64,
-    ///Calculated score (upvotes - downvotes)
+    /// Calculated score (upvotes - downvotes)
     pub score: i64,
-    ///Number of upvotes
+    /// Number of upvotes
     pub upvotes: i64,
     #[serde(
         flatten,
@@ -284,31 +295,34 @@ pub struct CommentStats<S: BosStr = DefaultStr> {
 /// Base view for a single comment with voting, stats, and viewer state
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommentView<S: BosStr = DefaultStr> {
-    ///Comment author information
+    /// Comment author information
     pub author: AuthorView<S>,
-    ///CID of the comment record
+    /// CID of the comment record
     pub cid: Cid<S>,
-    ///When the comment was created
+    /// When the comment was created
     pub created_at: Datetime,
-    ///Embedded content from the comment record (images or quoted post). The AppView may transform blob references into fetchable URLs and enrich quoted posts with a resolved view.
+    /// Embedded content from the comment record (images or quoted post). The AppView may transform blob references into fetchable URLs and enrich quoted posts with a resolved view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<CommentViewEmbed<S>>,
-    ///When this comment was indexed by the AppView
+    /// When this comment was indexed by the AppView
     pub indexed_at: Datetime,
-    ///Reference to parent comment if this is a nested reply
+    /// Reference to parent comment if this is a nested reply
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<comment::CommentRef<S>>,
-    ///Reference to the parent post
+    /// Reference to the parent post
     pub post: comment::PostRef<S>,
-    ///The actual comment record verbatim
+    /// The actual comment record verbatim
     pub record: Data<S>,
-    ///Comment statistics (votes, replies)
+    /// Comment statistics (votes, replies)
     pub stats: comment::CommentStats<S>,
-    ///AT-URI of the comment record
+    /// AT-URI of the comment record
     pub uri: AtUri<S>,
-    ///Viewer-specific state (vote, saved, etc.)
+    /// Viewer-specific state (vote, saved, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<comment::CommentViewerState<S>>,
     #[serde(
@@ -319,7 +333,6 @@ pub struct CommentView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -334,12 +347,15 @@ pub enum CommentViewEmbed<S: BosStr = DefaultStr> {
 /// Viewer-specific state for a comment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommentViewerState<S: BosStr = DefaultStr> {
-    ///Viewer's vote on this comment
+    /// Viewer's vote on this comment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vote: Option<CommentViewerStateVote<S>>,
-    ///AT-URI of the viewer's vote record
+    /// AT-URI of the viewer's vote record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vote_uri: Option<AtUri<S>>,
     #[serde(
@@ -425,9 +441,7 @@ where
         match self {
             CommentViewerStateVote::Up => CommentViewerStateVote::Up,
             CommentViewerStateVote::Down => CommentViewerStateVote::Down,
-            CommentViewerStateVote::Other(v) => {
-                CommentViewerStateVote::Other(v.into_static())
-            }
+            CommentViewerStateVote::Other(v) => CommentViewerStateVote::Other(v.into_static()),
         }
     }
 }
@@ -435,11 +449,14 @@ where
 /// Comment was not found (deleted, never indexed, or invalid URI)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotFoundComment<S: BosStr = DefaultStr> {
-    ///Always true for not found comments
+    /// Always true for not found comments
     pub not_found: bool,
-    ///AT-URI of the missing comment
+    /// AT-URI of the missing comment
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -453,11 +470,14 @@ pub struct NotFoundComment<S: BosStr = DefaultStr> {
 /// Reference to a post record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostRef<S: BosStr = DefaultStr> {
-    ///CID of the post record
+    /// CID of the post record
     pub cid: Cid<S>,
-    ///AT-URI of the post
+    /// AT-URI of the post
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -471,14 +491,17 @@ pub struct PostRef<S: BosStr = DefaultStr> {
 /// Wrapper for threaded comment structure, similar to Bluesky's threadViewPost pattern
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThreadViewComment<S: BosStr = DefaultStr> {
-    ///The comment itself
+    /// The comment itself
     pub comment: comment::CommentView<S>,
-    ///True if more replies exist but are not included in this response
+    /// True if more replies exist but are not included in this response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_more: Option<bool>,
-    ///Nested replies to this comment
+    /// Nested replies to this comment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replies: Option<Vec<ThreadViewCommentRepliesItem<S>>>,
     #[serde(
@@ -489,7 +512,6 @@ pub struct ThreadViewComment<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -822,15 +844,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod bridged_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1003,10 +1024,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BridgedStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BridgedStats<S> {
         BridgedStats {
             as_of: self._fields.0.unwrap(),
             downvotes: self._fields.1.unwrap(),
@@ -1017,10 +1035,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_comment() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.comment"),
@@ -1236,9 +1254,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1250,7 +1267,7 @@ where
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1360,18 +1377,12 @@ impl<S: BosStr> CommentBuilder<comment_state::Empty, S> {
 
 impl<St: comment_state::State, S: BosStr> CommentBuilder<St, S> {
     /// Set the `bridgedStats` field (optional)
-    pub fn bridged_stats(
-        mut self,
-        value: impl Into<Option<comment::BridgedStats<S>>>,
-    ) -> Self {
+    pub fn bridged_stats(mut self, value: impl Into<Option<comment::BridgedStats<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `bridgedStats` field to an Option value (optional)
-    pub fn maybe_bridged_stats(
-        mut self,
-        value: Option<comment::BridgedStats<S>>,
-    ) -> Self {
+    pub fn maybe_bridged_stats(mut self, value: Option<comment::BridgedStats<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1530,15 +1541,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1692,15 +1702,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod blocked_comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1743,12 +1752,13 @@ pub mod blocked_comment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockedCommentBuilder<
-    St: blocked_comment_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BlockedCommentBuilder<St: blocked_comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<bool>, Option<BlockedCommentBlockedBy<S>>, Option<AtUri<S>>),
+    _fields: (
+        Option<bool>,
+        Option<BlockedCommentBlockedBy<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1809,18 +1819,12 @@ where
 
 impl<St: blocked_comment_state::State, S: BosStr> BlockedCommentBuilder<St, S> {
     /// Set the `blockedBy` field (optional)
-    pub fn blocked_by(
-        mut self,
-        value: impl Into<Option<BlockedCommentBlockedBy<S>>>,
-    ) -> Self {
+    pub fn blocked_by(mut self, value: impl Into<Option<BlockedCommentBlockedBy<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `blockedBy` field to an Option value (optional)
-    pub fn maybe_blocked_by(
-        mut self,
-        value: Option<BlockedCommentBlockedBy<S>>,
-    ) -> Self {
+    pub fn maybe_blocked_by(mut self, value: Option<BlockedCommentBlockedBy<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1861,10 +1865,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockedComment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedComment<S> {
         BlockedComment {
             blocked: self._fields.0.unwrap(),
             blocked_by: self._fields.1,
@@ -1875,10 +1876,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.comment.defs"),
@@ -1934,21 +1935,15 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("commentRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Reference to a comment record"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    description: Some(CowStr::new_static("Reference to a comment record")),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the comment record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the comment record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1956,9 +1951,7 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the comment"),
-                                ),
+                                description: Some(CowStr::new_static("AT-URI of the comment")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1972,14 +1965,12 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("commentStats"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Statistics for a comment")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("upvotes"),
-                            SmolStr::new_static("downvotes"),
-                            SmolStr::new_static("score"),
-                            SmolStr::new_static("replyCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("upvotes"),
+                        SmolStr::new_static("downvotes"),
+                        SmolStr::new_static("score"),
+                        SmolStr::new_static("replyCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2144,18 +2135,16 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("commentViewerState"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Viewer-specific state for a comment"),
-                    ),
+                    description: Some(CowStr::new_static("Viewer-specific state for a comment")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("vote"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Viewer's vote on this comment"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Viewer's vote on this comment",
+                                )),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -2163,9 +2152,9 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("voteUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the viewer's vote record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the viewer's vote record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -2178,14 +2167,13 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notFoundComment"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Comment was not found (deleted, never indexed, or invalid URI)",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("notFound")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Comment was not found (deleted, never indexed, or invalid URI)",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("notFound"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2198,9 +2186,9 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the missing comment"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the missing comment",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -2214,18 +2202,14 @@ fn lexicon_doc_social_coves_community_comment_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("postRef"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Reference to a post record")),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the post record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the post record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -2303,15 +2287,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod comment_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2449,10 +2432,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommentRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommentRef<S> {
         CommentRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -2468,15 +2448,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod comment_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2686,10 +2665,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommentStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommentStats<S> {
         CommentStats {
             downvotes: self._fields.0.unwrap(),
             reply_count: self._fields.1.unwrap(),
@@ -2707,15 +2683,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod comment_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2909,7 +2884,9 @@ impl CommentViewBuilder<comment_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         CommentViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2920,7 +2897,9 @@ impl<S: BosStr> CommentViewBuilder<comment_view_state::Empty, S> {
     pub fn builder() -> Self {
         CommentViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3106,18 +3085,12 @@ where
 
 impl<St: comment_view_state::State, S: BosStr> CommentViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<comment::CommentViewerState<S>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<comment::CommentViewerState<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<comment::CommentViewerState<S>>,
-    ) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<comment::CommentViewerState<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -3153,10 +3126,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommentView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommentView<S> {
         CommentView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -3181,9 +3151,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3194,15 +3163,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod not_found_comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3245,10 +3213,7 @@ pub mod not_found_comment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotFoundCommentBuilder<
-    St: not_found_comment_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct NotFoundCommentBuilder<St: not_found_comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -3343,10 +3308,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotFoundComment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotFoundComment<S> {
         NotFoundComment {
             not_found: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -3362,15 +3324,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3524,15 +3485,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod thread_view_comment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3563,10 +3523,7 @@ pub mod thread_view_comment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThreadViewCommentBuilder<
-    St: thread_view_comment_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ThreadViewCommentBuilder<St: thread_view_comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<comment::CommentView<S>>,
@@ -3578,10 +3535,7 @@ pub struct ThreadViewCommentBuilder<
 
 impl ThreadViewComment<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ThreadViewCommentBuilder<
-        thread_view_comment_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ThreadViewCommentBuilder<thread_view_comment_state::Empty, DefaultStr> {
         ThreadViewCommentBuilder::new()
     }
 }
@@ -3657,10 +3611,7 @@ impl<St: thread_view_comment_state::State, S: BosStr> ThreadViewCommentBuilder<S
         self
     }
     /// Set the `replies` field to an Option value (optional)
-    pub fn maybe_replies(
-        mut self,
-        value: Option<Vec<ThreadViewCommentRepliesItem<S>>>,
-    ) -> Self {
+    pub fn maybe_replies(mut self, value: Option<Vec<ThreadViewCommentRepliesItem<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3681,10 +3632,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ThreadViewComment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadViewComment<S> {
         ThreadViewComment {
             comment: self._fields.0.unwrap(),
             has_more: self._fields.1,

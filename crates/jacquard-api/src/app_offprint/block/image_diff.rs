@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,26 +20,29 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_offprint::block::image_grid::GridImage;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_offprint::block::image_grid::GridImage;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageDiff<S: BosStr = DefaultStr> {
-    ///Horizontal alignment
+    /// Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alignment: Option<ImageDiffAlignment<S>>,
-    ///Comparison caption
+    /// Comparison caption
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<S>,
-    ///Exactly 2 images for comparison [before, after]
+    /// Exactly 2 images for comparison [before, after]
     pub images: Vec<GridImage<S>>,
-    ///Labels for the images [before label, after label]
+    /// Labels for the images [before label, after label]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<Vec<S>>,
-    ///CSS width value
+    /// CSS width value
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<S>,
     #[serde(
@@ -198,15 +201,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_diff_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,10 +375,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageDiff<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageDiff<S> {
         ImageDiff {
             alignment: self._fields.0,
             caption: self._fields.1,
@@ -389,10 +388,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.imageDiff"),
@@ -408,9 +407,7 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Horizontal alignment"),
-                                ),
+                                description: Some(CowStr::new_static("Horizontal alignment")),
                                 ..Default::default()
                             }),
                         );
@@ -424,11 +421,9 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("images"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Exactly 2 images for comparison [before, after]",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Exactly 2 images for comparison [before, after]",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "app.offprint.block.imageGrid#gridImage",
@@ -443,11 +438,9 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("labels"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Labels for the images [before label, after label]",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Labels for the images [before label, after label]",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),

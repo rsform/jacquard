@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Normalized podping startup fields. Record TID timestamp should represent when the event was received, useful for global ordering.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,34 +37,34 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Startup<S: BosStr = DefaultStr> {
-    ///Optional, e.g. 1,078
+    /// Optional, e.g. 1,078
     #[serde(skip_serializing_if = "Option::is_none")]
     pub capacity: Option<S>,
-    ///Optional, e.g. https://rpc.mahdiyari.info
+    /// Optional, e.g. https://rpc.mahdiyari.info
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hive: Option<UriValue<S>>,
-    ///e.g. Podping startup complete
+    /// e.g. Podping startup complete
     pub message: S,
-    ///Optional, e.g. hivepinger
+    /// Optional, e.g. hivepinger
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pinging_app: Option<S>,
-    ///e.g. podping.aaa
+    /// e.g. podping.aaa
     pub server_account: S,
-    ///Optional, e.g. 9887936240807410000
+    /// Optional, e.g. 9887936240807410000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_id: Option<S>,
-    ///Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
+    /// Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<S>,
-    ///Sender timestamp in ISO format, e.g. 2025-12-29T22:25:09.123Z
+    /// Sender timestamp in ISO format, e.g. 2025-12-29T22:25:09.123Z
     pub timestamp: Datetime,
-    ///Optional
+    /// Optional
     #[serde(skip_serializing_if = "Option::is_none")]
     pub use_test_node: Option<bool>,
-    ///Optional, e.g. 38a44421-a535-42de-b634-d1f6edce18ce
+    /// Optional, e.g. 38a44421-a535-42de-b634-d1f6edce18ce
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uuid: Option<S>,
-    ///Optional, e.g. 2.1.0
+    /// Optional, e.g. 2.1.0
     #[serde(skip_serializing_if = "Option::is_none")]
     pub v: Option<S>,
     #[serde(
@@ -142,9 +142,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -156,7 +155,7 @@ where
 
 pub mod startup_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -250,7 +249,9 @@ impl StartupBuilder<startup_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         StartupBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -261,7 +262,9 @@ impl<S: BosStr> StartupBuilder<startup_state::Empty, S> {
     pub fn builder() -> Self {
         StartupBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -472,10 +475,10 @@ where
 }
 
 fn lexicon_doc_at_podping_records_startup() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.podping.records.startup"),

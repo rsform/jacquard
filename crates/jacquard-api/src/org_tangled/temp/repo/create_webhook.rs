@@ -10,62 +10,62 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateWebhook<S: BosStr = DefaultStr> {
-    ///Whether the webhook should be active immediately. Defaults to true.
+    /// Whether the webhook should be active immediately. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
-    ///Event types to subscribe to (e.g. 'push', 'repository:renamed').
+    /// Event types to subscribe to (e.g. 'push', 'repository:renamed').
     pub events: Vec<S>,
-    ///DID of the repository as minted by the knot.
+    /// DID of the repository as minted by the knot.
     pub repo_did: Did<S>,
-    ///Optional HMAC secret used to sign payloads. If omitted, payloads are not signed.
+    /// Optional HMAC secret used to sign payloads. If omitted, payloads are not signed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secret: Option<S>,
-    ///Endpoint URL that will receive webhook payloads.
+    /// Endpoint URL that will receive webhook payloads.
     pub url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateWebhookOutput<S: BosStr = DefaultStr> {
-    ///ID of the newly created webhook.
+    /// ID of the newly created webhook.
     pub id: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateWebhookError {
     /// At least one event type must be specified.
     #[serde(rename = "NoEventsSelected")]
-    NoEventsSelected(Option<SmolStr>),
+    NoEventsSelected(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateWebhookError {
@@ -102,9 +102,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateWebhook<S> {
     const NSID: &'static str = "org.tangled.temp.repo.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateWebhookResponse;
 }
 
@@ -114,16 +113,15 @@ Path: `/xrpc/org.tangled.temp.repo.createWebhook`. The request payload type is `
 pub struct CreateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.repo.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateWebhook<S>;
     type Response = CreateWebhookResponse;
 }
 
 pub mod create_webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,10 +178,7 @@ pub mod create_webhook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateWebhookBuilder<
-    St: create_webhook_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateWebhookBuilder<St: create_webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -333,10 +328,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateWebhook<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateWebhook<S> {
         CreateWebhook {
             active: self._fields.0,
             events: self._fields.1.unwrap(),

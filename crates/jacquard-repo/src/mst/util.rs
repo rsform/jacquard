@@ -71,10 +71,10 @@ pub fn validate_key(key: &str) -> Result<()> {
         return Err(MstError::EmptyKey.into());
     }
 
-    if key.len() > 256 {
+    if key.len() > 830 {
         return Err(MstError::KeyTooLong {
             len: key.len(),
-            max: 256,
+            max: 830,
         }
         .into());
     }
@@ -245,8 +245,17 @@ mod tests {
 
     #[test]
     fn test_validate_key_too_long() {
-        let long_key = "a".repeat(257);
+        let long_key = "a".repeat(831);
         assert!(validate_key(&long_key).is_err());
+    }
+
+    #[test]
+    fn test_validate_key_max_length() {
+        let collection = "a".repeat(317);
+        let rkey = "a".repeat(512);
+        let key = format!("{collection}/{rkey}");
+        assert_eq!(key.len(), 830);
+        assert!(validate_key(&key).is_ok());
     }
 
     #[test]

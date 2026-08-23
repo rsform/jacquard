@@ -1,4 +1,6 @@
-use super::{LabelerDefs, ModerationDecision, ModerationPrefs, moderate};
+#[cfg(feature = "api_bluesky")]
+use super::moderate;
+use super::{LabelerDefs, ModerationDecision, ModerationPrefs};
 use jacquard_common::bos::BosStr;
 use jacquard_common::types::string::Did;
 

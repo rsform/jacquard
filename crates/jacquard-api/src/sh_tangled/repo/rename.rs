@@ -10,21 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Rename<S: BosStr = DefaultStr> {
-    ///New display name of the repository
+    /// New display name of the repository
     pub name: S,
-    ///DID of the repository to rename
+    /// DID of the repository to rename
     pub repo: Did<S>,
-    ///Rkey of the sh.tangled.repo record written for the new name
+    /// Rkey of the sh.tangled.repo record written for the new name
     pub rkey: RecordKey<Rkey<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -55,9 +58,8 @@ impl jacquard_common::xrpc::XrpcResp for RenameResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Rename<S> {
     const NSID: &'static str = "sh.tangled.repo.rename";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RenameResponse;
 }
 
@@ -67,16 +69,15 @@ Path: `/xrpc/sh.tangled.repo.rename`. The request payload type is `Rename<S>`; s
 pub struct RenameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RenameRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.rename";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Rename<S>;
     type Response = RenameResponse;
 }
 
 pub mod rename_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -181,10 +182,7 @@ where
     St::Name: rename_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RenameBuilder<rename_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> RenameBuilder<rename_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RenameBuilder {
             _state: PhantomData,
@@ -200,10 +198,7 @@ where
     St::Repo: rename_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> RenameBuilder<rename_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> RenameBuilder<rename_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RenameBuilder {
             _state: PhantomData,

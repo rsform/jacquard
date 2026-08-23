@@ -103,7 +103,9 @@ impl RepoError {
     /// Create an invalid key error
     pub fn invalid_key(key: impl Into<String>) -> Self {
         Self::new(RepoErrorKind::InvalidKey, None)
-            .with_help("MST keys must match [a-zA-Z0-9._:~-]+, max 256 bytes")
+            .with_help(
+                "MST keys must contain a collection and record key, and be at most 830 bytes",
+            )
             .with_context(format!("key: {}", key.into()))
     }
 

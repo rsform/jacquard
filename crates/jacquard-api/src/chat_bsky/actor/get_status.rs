@@ -10,20 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetStatusOutput<S: BosStr = DefaultStr> {
-    ///Whether the viewer's account is allowed to create group chats. New accounts are restricted from creating groups.
+    /// Whether the viewer's account is allowed to create group chats. New accounts are restricted from creating groups.
     pub can_create_groups: bool,
-    ///True when the viewer's account is disabled and cannot actively participate in chat.
+    /// True when the viewer's account is disabled and cannot actively participate in chat.
     pub chat_disabled: bool,
-    ///The maximum number of members allowed in a group conversation.
+    /// The maximum number of members allowed in a group conversation.
     pub group_member_limit: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -50,10 +53,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetStatus {
     const NSID: &'static str = "chat.bsky.actor.getStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStatusResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }

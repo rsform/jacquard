@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /** Request marker for the `org.tangled.temp.focus.endSession` procedure.
 
 This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
@@ -46,14 +46,10 @@ impl jacquard_common::xrpc::XrpcResp for EndSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for EndSession {
     const NSID: &'static str = "org.tangled.temp.focus.endSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = EndSessionResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -64,9 +60,8 @@ Path: `/xrpc/org.tangled.temp.focus.endSession`. The request payload type is `En
 pub struct EndSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EndSessionRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.focus.endSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = EndSession;
     type Response = EndSessionResponse;
 }

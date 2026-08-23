@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A cryptographic grant allowing a streaming service to decrypt the artist's music catalog. This record contains the master content key encrypted with the service's public key.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,19 +37,19 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Grant<S: BosStr = DefaultStr> {
-    ///When the grant was created
+    /// When the grant was created
     pub created_at: Datetime,
-    ///Optional expiration date. After this, the grant should be considered revoked.
+    /// Optional expiration date. After this, the grant should be considered revoked.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    ///The DID of the streaming service being authorized
+    /// The DID of the streaming service being authorized
     pub service_did: Did<S>,
-    ///The Master Content Key (32 bytes) encrypted with the service's public key, base64-encoded. Only the service can decrypt this with their private key.
+    /// The Master Content Key (32 bytes) encrypted with the service's public key, base64-encoded. Only the service can decrypt this with their private key.
     pub wrapped_master_key: S,
-    ///Base64-encoded IV (12 bytes) used to encrypt the master key. Only present for AES-GCM wrapping; empty for RSA-OAEP.
+    /// Base64-encoded IV (12 bytes) used to encrypt the master key. Only present for AES-GCM wrapping; empty for RSA-OAEP.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapped_master_key_iv: Option<S>,
-    ///The algorithm used to wrap the master key. Currently RSA-OAEP (asymmetric, using the service's public key).  Defaults to `"RSA-OAEP"`.
+    /// The algorithm used to wrap the master key. Currently RSA-OAEP (asymmetric, using the service's public key).  Defaults to `"RSA-OAEP"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grant_wrapping_algorithm")]
     pub wrapping_algorithm: Option<S>,
@@ -170,9 +170,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -188,7 +187,7 @@ fn _default_grant_wrapping_algorithm<S: FromStaticStr>() -> ::core::option::Opti
 
 pub mod grant_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -405,10 +404,7 @@ where
             service_did: self._fields.2.unwrap(),
             wrapped_master_key: self._fields.3.unwrap(),
             wrapped_master_key_iv: self._fields.4,
-            wrapping_algorithm: self
-                ._fields
-                .5
-                .or_else(|| Some(S::from_static("RSA-OAEP"))),
+            wrapping_algorithm: self._fields.5.or_else(|| Some(S::from_static("RSA-OAEP"))),
             extra_data: Default::default(),
         }
     }
@@ -420,20 +416,17 @@ where
             service_did: self._fields.2.unwrap(),
             wrapped_master_key: self._fields.3.unwrap(),
             wrapped_master_key_iv: self._fields.4,
-            wrapping_algorithm: self
-                ._fields
-                .5
-                .or_else(|| Some(S::from_static("RSA-OAEP"))),
+            wrapping_algorithm: self._fields.5.or_else(|| Some(S::from_static("RSA-OAEP"))),
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_grant() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.grant"),

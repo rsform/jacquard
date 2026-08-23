@@ -75,6 +75,7 @@ impl IdentityResolver for IngressResolver {
             Ok(DidDocResponse {
                 buffer: Bytes::from(body),
                 status: http::StatusCode::OK,
+                headers: http::HeaderMap::new(),
                 requested: Some(Did::new_owned(&did).expect("validated DID")),
             })
         }

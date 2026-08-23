@@ -7,9 +7,9 @@ pre-commit-all:
 
 # Run tests with default features
 test *ARGS:
-    cargo nextest run {{ ARGS }}
+    cargo nextest run --workspace {{ ARGS }}
 
-publish: test-all check-wasm
+publish: test-all check-wasm e2e
     @echo "Publishing..."
     cargo publish -p jacquard-common
     cargo publish -p jacquard-lexicon
@@ -22,23 +22,72 @@ publish: test-all check-wasm
     cargo publish -p jacquard
     cargo publish -p jacquard-axum
 
-# Run tests across the full feature matrix
-test-all:
+# Run tests across the scoped feature matrix
+test-all: && test-docs test-doctests
     @echo "── default ──"
-    cargo nextest run
+    cargo nextest run --workspace
     @echo ""
     @echo "── scope-check ──"
-    cargo nextest run --features scope-check
+    cargo nextest run --workspace --features scope-check
     @echo ""
     @echo "── streaming ──"
-    cargo nextest run --features streaming
+    cargo nextest run --workspace --features streaming
     @echo ""
     @echo "── websocket ──"
-    cargo nextest run --features websocket
+    cargo nextest run --workspace --features websocket
+    @echo ""
+    @echo "── scope-check + streaming ──"
+    cargo nextest run --workspace --features scope-check,streaming
+    @echo ""
+    @echo "── scope-check + websocket ──"
+    cargo nextest run --workspace --features scope-check,websocket
+
+# Build documentation with the feature sets configured for docs.rs.
+test-docs:
+    @echo "── docs.rs: jacquard-common ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard-common --no-deps --features crypto-k256,crypto-ed25519,crypto-p256,websocket,zstd,service-auth,reqwest-client,reqwest-stream,crypto
+    @echo ""
+    @echo "── docs.rs: jacquard-oauth ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard-oauth --no-deps --features loopback,browser-open
+    @echo ""
+    @echo "── docs.rs: jacquard-repo ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard-repo --no-deps --all-features
+    @echo ""
+    @echo "── docs.rs: jacquard ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard --no-deps --features api_all,derive,dns,streaming
+    @echo ""
+    @echo "── docs.rs: tokio-tungstenite-wasm ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p tokio-tungstenite-wasm-jacquard --no-deps --all-features
+    @echo ""
+    @echo "── docs.rs: jacquard-api ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard-api --no-deps --features bluesky,other,streaming
+    @echo ""
+    @echo "── docs.rs: remaining workspace crates ──"
+    DOCS_RS=1 RUSTDOCFLAGS="--cfg docsrs" cargo doc -p jacquard-identity -p jacquard-lexicon -p jacquard-lexgen -p jacquard-derive -p jacquard-axum -p lazy-collections -p mini-moka-wasm --no-deps
+
+# Run doctests across the scoped feature matrix.
+test-doctests:
+    @echo "── doctests: default ──"
+    cargo test --doc --workspace
+    @echo ""
+    @echo "── doctests: scope-check ──"
+    cargo test --doc --workspace --features scope-check
+    @echo ""
+    @echo "── doctests: streaming ──"
+    cargo test --doc --workspace --features streaming,reqwest-stream
+    @echo ""
+    @echo "── doctests: websocket ──"
+    cargo test --doc --workspace --features websocket
+    @echo ""
+    @echo "── doctests: scope-check + streaming ──"
+    cargo test --doc --workspace --features scope-check,streaming
+    @echo ""
+    @echo "── doctests: scope-check + websocket ──"
+    cargo test --doc --workspace --features scope-check,websocket
 
 # Run tests with a specific feature set
 test-feature FEATURE *ARGS:
-    cargo nextest run --features {{ FEATURE }} {{ ARGS }}
+    cargo nextest run --workspace --features {{ FEATURE }} {{ ARGS }}
 
 # Check that jacquard-common compiles for wasm32
 check-wasm:

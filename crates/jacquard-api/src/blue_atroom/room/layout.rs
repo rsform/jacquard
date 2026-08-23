@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,15 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue_atroom::room::layout;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::blue_atroom::room::layout;
+use serde::{Deserialize, Serialize};
 /// RGB color with 8-bit channels.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
@@ -46,9 +49,11 @@ pub struct Color<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Floor<S: BosStr = DefaultStr> {
     pub surface: layout::Surface<S>,
     #[serde(
@@ -63,13 +68,16 @@ pub struct Floor<S: BosStr = DefaultStr> {
 /// A placed object in the room.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Furnishing<S: BosStr = DefaultStr> {
-    ///Strong reference to a blue.atroom.room.object record.
+    /// Strong reference to a blue.atroom.room.object record.
     pub object: StrongRef<S>,
-    ///Position [x, y, z] in millimeters.
+    /// Position [x, y, z] in millimeters.
     pub position: Vec<i64>,
-    ///Euler rotation [x, y, z] in degrees.
+    /// Euler rotation [x, y, z] in degrees.
     pub rotation: Vec<i64>,
     #[serde(
         flatten,
@@ -93,7 +101,7 @@ pub struct Layout<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub floor: layout::Floor<S>,
     pub furnishings: Vec<layout::Furnishing<S>>,
-    ///Room size in millimeters (square room).
+    /// Room size in millimeters (square room).
     pub size: i64,
     pub wall: layout::Wall<S>,
     #[serde(
@@ -116,15 +124,17 @@ pub struct LayoutGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Layout<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Surface<S: BosStr = DefaultStr> {
     pub color: layout::Color<S>,
-    ///Texture identifier.
+    /// Texture identifier.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub texture: Option<S>,
-    ///Texture tiling [u, v].
+    /// Texture tiling [u, v].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub texture_tiling: Option<Vec<i64>>,
     #[serde(
@@ -139,12 +149,15 @@ pub struct Surface<S: BosStr = DefaultStr> {
 /// Wall configuration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Wall<S: BosStr = DefaultStr> {
-    ///Wall height in millimeters.
+    /// Wall height in millimeters.
     pub height: i64,
     pub surface: layout::Surface<S>,
-    ///Wall thickness in millimeters.
+    /// Wall thickness in millimeters.
     pub thickness: i64,
     #[serde(
         flatten,
@@ -440,15 +453,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod color_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -553,10 +565,7 @@ where
     St::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
-    pub fn blue(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetBlue<St>, S> {
+    pub fn blue(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetBlue<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -572,10 +581,7 @@ where
     St::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
-    pub fn green(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetGreen<St>, S> {
+    pub fn green(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetGreen<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -591,10 +597,7 @@ where
     St::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
-    pub fn red(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetRed<St>, S> {
+    pub fn red(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetRed<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -632,10 +635,10 @@ where
 }
 
 fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.atroom.room.layout"),
@@ -644,15 +647,12 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("color"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("RGB color with 8-bit channels."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("red"), SmolStr::new_static("green"),
-                            SmolStr::new_static("blue")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("RGB color with 8-bit channels.")),
+                    required: Some(vec![
+                        SmolStr::new_static("red"),
+                        SmolStr::new_static("green"),
+                        SmolStr::new_static("blue"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -707,16 +707,12 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("furnishing"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A placed object in the room."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("object"),
-                            SmolStr::new_static("position"),
-                            SmolStr::new_static("rotation")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("A placed object in the room.")),
+                    required: Some(vec![
+                        SmolStr::new_static("object"),
+                        SmolStr::new_static("position"),
+                        SmolStr::new_static("rotation"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -730,9 +726,9 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("position"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Position [x, y, z] in millimeters."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Position [x, y, z] in millimeters.",
+                                )),
                                 items: LexArrayItem::Integer(LexInteger {
                                     ..Default::default()
                                 }),
@@ -744,9 +740,9 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("rotation"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Euler rotation [x, y, z] in degrees."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Euler rotation [x, y, z] in degrees.",
+                                )),
                                 items: LexArrayItem::Integer(LexInteger {
                                     ..Default::default()
                                 }),
@@ -763,19 +759,16 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A room layout with placed objects."),
-                    ),
+                    description: Some(CowStr::new_static("A room layout with placed objects.")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("size"), SmolStr::new_static("floor"),
-                                SmolStr::new_static("wall"),
-                                SmolStr::new_static("furnishings"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("size"),
+                            SmolStr::new_static("floor"),
+                            SmolStr::new_static("wall"),
+                            SmolStr::new_static("furnishings"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -843,18 +836,14 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("texture"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Texture identifier."),
-                                ),
+                                description: Some(CowStr::new_static("Texture identifier.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("textureTiling"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Texture tiling [u, v]."),
-                                ),
+                                description: Some(CowStr::new_static("Texture tiling [u, v].")),
                                 items: LexArrayItem::Integer(LexInteger {
                                     ..Default::default()
                                 }),
@@ -872,13 +861,11 @@ fn lexicon_doc_blue_atroom_room_layout() -> LexiconDoc<'static> {
                 SmolStr::new_static("wall"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Wall configuration.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("height"),
-                            SmolStr::new_static("thickness"),
-                            SmolStr::new_static("surface")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("height"),
+                        SmolStr::new_static("thickness"),
+                        SmolStr::new_static("surface"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -919,15 +906,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod floor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1047,15 +1033,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod furnishing_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1228,10 +1213,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Furnishing<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Furnishing<S> {
         Furnishing {
             object: self._fields.0.unwrap(),
             position: self._fields.1.unwrap(),
@@ -1248,9 +1230,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1262,7 +1243,7 @@ where
 
 pub mod layout_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1464,10 +1445,7 @@ where
     St::Size: layout_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(
-        mut self,
-        value: impl Into<i64>,
-    ) -> LayoutBuilder<layout_state::SetSize<St>, S> {
+    pub fn size(mut self, value: impl Into<i64>) -> LayoutBuilder<layout_state::SetSize<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
@@ -1536,15 +1514,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod surface_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1694,15 +1671,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod wall_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1807,10 +1783,7 @@ where
     St::Height: wall_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(
-        mut self,
-        value: impl Into<i64>,
-    ) -> WallBuilder<wall_state::SetHeight<St>, S> {
+    pub fn height(mut self, value: impl Into<i64>) -> WallBuilder<wall_state::SetHeight<St>, S> {
         self._fields.0 = Option::Some(value.into());
         WallBuilder {
             _state: PhantomData,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,23 +24,26 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct File<S: BosStr = DefaultStr> {
-    ///The blessed CID of the file's bytes (CIDv1, raw multicodec, sha-256 multihash) — the canonical identity. This is what dev.atfs.repo.uploadFile (and its com.atproto.repo.uploadBlob alias) returns, what equality/dedup use, what atfs's own HTTP surfaces serve at any size, and the only DASL-compatible form. Never a DAG root.
+    /// The blessed CID of the file's bytes (CIDv1, raw multicodec, sha-256 multihash) — the canonical identity. This is what dev.atfs.repo.uploadFile (and its com.atproto.repo.uploadBlob alias) returns, what equality/dedup use, what atfs's own HTTP surfaces serve at any size, and the only DASL-compatible form. Never a DAG root.
     pub cid: CidLink<S>,
-    ///The CID to fetch this file over the IPFS network: the UnixFS root for chunked (large) files, or exactly equal to `cid` when the file fits a single block. Always present, even when equal to `cid`, so consumers never need conditional logic — fetch `ipfsRoot`, then verify the bytes against `cid`. Chunker-dependent: this is *a* valid way to fetch the bytes, not a second identity — re-adding the same bytes elsewhere with different chunk settings would yield a different, equally valid root.
+    /// The CID to fetch this file over the IPFS network: the UnixFS root for chunked (large) files, or exactly equal to `cid` when the file fits a single block. Always present, even when equal to `cid`, so consumers never need conditional logic — fetch `ipfsRoot`, then verify the bytes against `cid`. Chunker-dependent: this is *a* valid way to fetch the bytes, not a second identity — re-adding the same bytes elsewhere with different chunk settings would yield a different, equally valid root.
     pub ipfs_root: CidLink<S>,
-    ///The IANA media type of the file's bytes, exactly as recorded at upload time (see dev.atfs.repo.uploadFile). Defaults to application/octet-stream when the uploader supplied no Content-Type.
+    /// The IANA media type of the file's bytes, exactly as recorded at upload time (see dev.atfs.repo.uploadFile). Defaults to application/octet-stream when the uploader supplied no Content-Type.
     pub mime_type: S,
-    ///Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing. HTTPS is meant literally — an atfs instance asked to pin this file skips any origin naming another scheme, and any origin resolving to an address that isn't routable on the public internet, since a providers list is a stranger's instruction about where to make connections.
+    /// Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing. HTTPS is meant literally — an atfs instance asked to pin this file skips any origin naming another scheme, and any origin resolving to an address that isn't routable on the public internet, since a providers list is a stranger's instruction about where to make connections.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub providers: Option<Vec<UriValue<S>>>,
-    ///Size of the file, in bytes.
+    /// Size of the file, in bytes.
     pub size: i64,
-    ///Free-form labels attached to this content, deduplicated and sorted. Advisory and instance-local, in the same register as `providers`: never part of the file's identity (two identical uploads to two different instances, or under two different accounts, can carry entirely different tags for the same cid), never required for correctness, and not something a `dev.atfs.file` reference's recipient should trust as a global fact about the content — only as a note from whoever produced this reference. In dev.atfs.repo.listFiles output this is a union: every tag borne by ANY of that file's claims here — account-class and mirrored-server claims alike — with no indication of which claimant applied which; listFiles never discloses who pinned or tagged anything (pass listFiles' `did` parameter to scope this to one claimant's own tags instead). dev.atfs.repo.pinFile reads this field on input and adopts it verbatim under the calling instance's own claim (see dev.atfs.repo.pinFile).
+    /// Free-form labels attached to this content, deduplicated and sorted. Advisory and instance-local, in the same register as `providers`: never part of the file's identity (two identical uploads to two different instances, or under two different accounts, can carry entirely different tags for the same cid), never required for correctness, and not something a `dev.atfs.file` reference's recipient should trust as a global fact about the content — only as a note from whoever produced this reference. In dev.atfs.repo.listFiles output this is a union: every tag borne by ANY of that file's claims here — account-class and mirrored-server claims alike — with no indication of which claimant applied which; listFiles never discloses who pinned or tagged anything (pass listFiles' `did` parameter to scope this to one claimant's own tags instead). dev.atfs.repo.pinFile reads this field on input and adopts it verbatim under the calling instance's own claim (see dev.atfs.repo.pinFile).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
     #[serde(
@@ -130,8 +133,7 @@ impl<S: BosStr> LexiconSchema for File<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 128usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -153,15 +155,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod file_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -289,10 +290,7 @@ where
     St::Cid: file_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(
-        mut self,
-        value: impl Into<CidLink<S>>,
-    ) -> FileBuilder<file_state::SetCid<St>, S> {
+    pub fn cid(mut self, value: impl Into<CidLink<S>>) -> FileBuilder<file_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -327,10 +325,7 @@ where
     St::MimeType: file_state::IsUnset,
 {
     /// Set the `mimeType` field (required)
-    pub fn mime_type(
-        mut self,
-        value: impl Into<S>,
-    ) -> FileBuilder<file_state::SetMimeType<St>, S> {
+    pub fn mime_type(mut self, value: impl Into<S>) -> FileBuilder<file_state::SetMimeType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -359,10 +354,7 @@ where
     St::Size: file_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(
-        mut self,
-        value: impl Into<i64>,
-    ) -> FileBuilder<file_state::SetSize<St>, S> {
+    pub fn size(mut self, value: impl Into<i64>) -> FileBuilder<file_state::SetSize<St>, S> {
         self._fields.4 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -420,10 +412,10 @@ where
 }
 
 fn lexicon_doc_dev_atfs_file() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.atfs.file"),

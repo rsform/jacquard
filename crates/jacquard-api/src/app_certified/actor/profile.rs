@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::org_hypercerts::LargeImage;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::Uri;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A declaration of a Certified account profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,24 +40,24 @@ use crate::org_hypercerts::Uri;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Small image to be displayed next to posts from account. AKA, 'profile picture'
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<ProfileAvatar<S>>,
-    ///Larger horizontal image to display behind profile view.
+    /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<ProfileBanner<S>>,
-    ///Client-declared timestamp when this record was originally created
+    /// Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Display name for the account
+    /// Display name for the account
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Free-form pronouns text.
+    /// Free-form pronouns text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pronouns: Option<S>,
-    ///Account website URL
+    /// Account website URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<UriValue<S>>,
     #[serde(
@@ -69,7 +69,6 @@ pub struct Profile<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -79,7 +78,6 @@ pub enum ProfileAvatar<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -223,9 +221,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -237,7 +234,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -449,10 +446,10 @@ where
 }
 
 fn lexicon_doc_app_certified_actor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.actor.profile"),

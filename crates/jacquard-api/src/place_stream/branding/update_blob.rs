@@ -10,67 +10,67 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateBlob<S: BosStr = DefaultStr> {
-    ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
+    /// DID of the broadcaster. If not provided, uses the server's default broadcaster.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
-    ///Base64-encoded blob data
+    /// Base64-encoded blob data
     pub data: S,
-    ///Image height in pixels (optional, for images only)
+    /// Image height in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
+    /// Branding asset key (mainLogo, favicon, siteTitle, etc.)
     pub key: S,
-    ///MIME type of the blob (e.g., image/png, text/plain)
+    /// MIME type of the blob (e.g., image/png, text/plain)
     pub mime_type: S,
-    ///Image width in pixels (optional, for images only)
+    /// Image width in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateBlobOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateBlobError {
     /// The authenticated DID is not authorized to modify branding
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<SmolStr>),
+    Unauthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The blob exceeds the maximum size limit
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(Option<SmolStr>),
+    BlobTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateBlobError {
@@ -114,9 +114,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateBlobResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateBlob<S> {
     const NSID: &'static str = "place.stream.branding.updateBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateBlobResponse;
 }
 
@@ -126,9 +125,8 @@ Path: `/xrpc/place.stream.branding.updateBlob`. The request payload type is `Upd
 pub struct UpdateBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.updateBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateBlob<S>;
     type Response = UpdateBlobResponse;
 }

@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::moderation::ModEventView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::moderation::ModEventView;
+use serde::{Deserialize, Serialize};
 /// If specified, only events where the age assurance state matches the given value are returned
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -74,8 +74,7 @@ impl<S: BosStr> Serialize for QueryEventsAgeAssuranceState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryEventsAgeAssuranceState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryEventsAgeAssuranceState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -99,19 +98,11 @@ where
     type Output = QueryEventsAgeAssuranceState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            QueryEventsAgeAssuranceState::Pending => {
-                QueryEventsAgeAssuranceState::Pending
-            }
-            QueryEventsAgeAssuranceState::Assured => {
-                QueryEventsAgeAssuranceState::Assured
-            }
-            QueryEventsAgeAssuranceState::Unknown => {
-                QueryEventsAgeAssuranceState::Unknown
-            }
+            QueryEventsAgeAssuranceState::Pending => QueryEventsAgeAssuranceState::Pending,
+            QueryEventsAgeAssuranceState::Assured => QueryEventsAgeAssuranceState::Assured,
+            QueryEventsAgeAssuranceState::Unknown => QueryEventsAgeAssuranceState::Unknown,
             QueryEventsAgeAssuranceState::Reset => QueryEventsAgeAssuranceState::Reset,
-            QueryEventsAgeAssuranceState::Blocked => {
-                QueryEventsAgeAssuranceState::Blocked
-            }
+            QueryEventsAgeAssuranceState::Blocked => QueryEventsAgeAssuranceState::Blocked,
             QueryEventsAgeAssuranceState::Other(v) => {
                 QueryEventsAgeAssuranceState::Other(v.into_static())
             }
@@ -167,8 +158,7 @@ impl<S: BosStr> Serialize for QueryEventsSortDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryEventsSortDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryEventsSortDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -194,9 +184,7 @@ where
         match self {
             QueryEventsSortDirection::Asc => QueryEventsSortDirection::Asc,
             QueryEventsSortDirection::Desc => QueryEventsSortDirection::Desc,
-            QueryEventsSortDirection::Other(v) => {
-                QueryEventsSortDirection::Other(v.into_static())
-            }
+            QueryEventsSortDirection::Other(v) => QueryEventsSortDirection::Other(v.into_static()),
         }
     }
 }
@@ -279,16 +267,16 @@ where
             QueryEventsSubjectType::Account => QueryEventsSubjectType::Account,
             QueryEventsSubjectType::Record => QueryEventsSubjectType::Record,
             QueryEventsSubjectType::Conversation => QueryEventsSubjectType::Conversation,
-            QueryEventsSubjectType::Other(v) => {
-                QueryEventsSubjectType::Other(v.into_static())
-            }
+            QueryEventsSubjectType::Other(v) => QueryEventsSubjectType::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryEvents<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_labels: Option<Vec<S>>,
@@ -344,9 +332,11 @@ pub struct QueryEvents<S: BosStr = DefaultStr> {
     pub with_strike: Option<bool>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryEventsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -391,15 +381,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    QueryEventsSortDirection<S>,
-> {
-    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static("desc")))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<QueryEventsSortDirection<S>> {
+    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }
 
 pub mod query_events_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -467,29 +458,8 @@ impl QueryEventsBuilder<query_events_state::Empty, DefaultStr> {
         QueryEventsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -502,29 +472,8 @@ impl<S: BosStr> QueryEventsBuilder<query_events_state::Empty, S> {
         QueryEventsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -773,18 +722,12 @@ impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
 
 impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(
-        mut self,
-        value: impl Into<Option<QueryEventsSortDirection<S>>>,
-    ) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<QueryEventsSortDirection<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<QueryEventsSortDirection<S>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<QueryEventsSortDirection<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -805,18 +748,12 @@ impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
 
 impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(
-        mut self,
-        value: impl Into<Option<QueryEventsSubjectType<S>>>,
-    ) -> Self {
+    pub fn subject_type(mut self, value: impl Into<Option<QueryEventsSubjectType<S>>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(
-        mut self,
-        value: Option<QueryEventsSubjectType<S>>,
-    ) -> Self {
+    pub fn maybe_subject_type(mut self, value: Option<QueryEventsSubjectType<S>>) -> Self {
         self._fields.20 = value;
         self
     }

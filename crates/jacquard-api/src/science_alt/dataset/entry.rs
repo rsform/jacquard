@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,25 +25,28 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry;
 use crate::science_alt::dataset::storage_blobs::StorageBlobs;
 use crate::science_alt::dataset::storage_http::StorageHttp;
 use crate::science_alt::dataset::storage_s3::StorageS3;
-use crate::science_alt::dataset::entry;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Information about dataset size
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DatasetSize<S: BosStr = DefaultStr> {
-    ///Total size in bytes
+    /// Total size in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bytes: Option<i64>,
-    ///Total number of samples in the dataset
+    /// Total number of samples in the dataset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub samples: Option<i64>,
-    ///Number of WebDataset shards
+    /// Number of WebDataset shards
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shards: Option<i64>,
     #[serde(
@@ -65,34 +68,34 @@ pub struct DatasetSize<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
-    ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
+    /// Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_metadata: Option<Data<S>>,
-    ///Timestamp when this dataset entry was created
+    /// Timestamp when this dataset entry was created
     pub created_at: Datetime,
-    ///Human-readable description of the dataset
+    /// Human-readable description of the dataset
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
+    /// License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub license: Option<S>,
-    ///Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
+    /// Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub metadata: Option<Bytes>,
-    ///Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
+    /// Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata_schema_ref: Option<AtUri<S>>,
-    ///Human-readable dataset name
+    /// Human-readable dataset name
     pub name: S,
-    ///AT-URI reference to the schema record for this dataset's samples
+    /// AT-URI reference to the schema record for this dataset's samples
     pub schema_ref: AtUri<S>,
-    ///Dataset size information (optional)
+    /// Dataset size information (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<entry::DatasetSize<S>>,
-    ///Storage location for dataset files (WebDataset tar archives)
+    /// Storage location for dataset files (WebDataset tar archives)
     pub storage: EntryStorage<S>,
-    ///Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
+    /// Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
     #[serde(
@@ -103,7 +106,6 @@ pub struct Entry<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -131,11 +133,14 @@ pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content hash for shard integrity verification. Algorithm is flexible to allow SHA-256, BLAKE3, or other hash functions.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ShardChecksum<S: BosStr = DefaultStr> {
-    ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
+    /// Hash algorithm identifier (e.g., 'sha256', 'blake3')
     pub algorithm: S,
-    ///Hex-encoded hash digest
+    /// Hex-encoded hash digest
     pub digest: S,
     #[serde(
         flatten,
@@ -354,17 +359,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_science_alt_dataset_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.entry"),
@@ -373,9 +377,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("datasetSize"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Information about dataset size"),
-                    ),
+                    description: Some(CowStr::new_static("Information about dataset size")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -614,9 +616,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -628,7 +629,7 @@ where
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -738,7 +739,9 @@ impl EntryBuilder<entry_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -749,7 +752,9 @@ impl<S: BosStr> EntryBuilder<entry_state::Empty, S> {
     pub fn builder() -> Self {
         EntryBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -845,10 +850,7 @@ where
     St::Name: entry_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> EntryBuilder<entry_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> EntryBuilder<entry_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -973,8 +975,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

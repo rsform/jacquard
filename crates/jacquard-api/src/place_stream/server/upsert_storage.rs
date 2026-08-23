@@ -8,63 +8,63 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::server::Storage;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::server::Storage;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpsertStorage<S: BosStr = DefaultStr> {
-    ///Whether backup storage is currently active.
+    /// Whether backup storage is currently active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_active: Option<bool>,
-    ///S3 storage URL in format: s3+https://ACCESS_KEY:SECRET_KEY@endpoint/bucket
+    /// S3 storage URL in format: s3+https://ACCESS_KEY:SECRET_KEY@endpoint/bucket
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpsertStorageOutput<S: BosStr = DefaultStr> {
     pub storage: Storage<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpsertStorageError {
     /// The provided S3 URL is invalid or malformed.
     #[serde(rename = "InvalidUrl")]
-    InvalidUrl(Option<SmolStr>),
+    InvalidUrl(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Could not connect to the S3 endpoint with the provided credentials.
     #[serde(rename = "ConnectionFailed")]
-    ConnectionFailed(Option<SmolStr>),
+    ConnectionFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Cannot modify URL while keeping masked credentials. Provide full credentials or omit URL to keep existing configuration.
     #[serde(rename = "MaskedCredentialsModified")]
-    MaskedCredentialsModified(Option<SmolStr>),
+    MaskedCredentialsModified(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpsertStorageError {
@@ -115,9 +115,8 @@ impl jacquard_common::xrpc::XrpcResp for UpsertStorageResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpsertStorage<S> {
     const NSID: &'static str = "place.stream.server.upsertStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpsertStorageResponse;
 }
 
@@ -127,9 +126,8 @@ Path: `/xrpc/place.stream.server.upsertStorage`. The request payload type is `Up
 pub struct UpsertStorageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertStorageRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.upsertStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpsertStorage<S>;
     type Response = UpsertStorageResponse;
 }

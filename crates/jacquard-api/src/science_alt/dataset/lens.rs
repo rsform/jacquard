@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,27 +24,30 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::science_alt::dataset::lens;
+use crate::science_alt::dataset::programming_language::ProgrammingLanguage;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::science_alt::dataset::programming_language::ProgrammingLanguage;
-use crate::science_alt::dataset::lens;
+use serde::{Deserialize, Serialize};
 /// Reference to code in an external repository (GitHub, tangled.org, etc.)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeReference<S: BosStr = DefaultStr> {
-    ///Optional branch name (for reference, commit hash is authoritative)
+    /// Optional branch name (for reference, commit hash is authoritative)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<S>,
-    ///Git commit hash (ensures immutability)
+    /// Git commit hash (ensures immutability)
     pub commit: S,
-    ///Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
+    /// Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<ProgrammingLanguage<S>>,
-    ///Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
+    /// Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
     pub path: S,
-    ///Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')
+    /// Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')
     pub repository: S,
     #[serde(
         flatten,
@@ -58,7 +61,10 @@ pub struct CodeReference<S: BosStr = DefaultStr> {
 /// Open metadata object for lens records. Applications may extend with additional fields (author, performance notes, etc.).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LensMetadata<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -79,31 +85,31 @@ pub struct LensMetadata<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Lens<S: BosStr = DefaultStr> {
-    ///Timestamp when this lens was created
+    /// Timestamp when this lens was created
     pub created_at: Datetime,
-    ///What this transformation does
+    /// What this transformation does
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Code reference for getter function (Source -> Target)
+    /// Code reference for getter function (Source -> Target)
     pub getter_code: lens::CodeReference<S>,
-    ///(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
+    /// (Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
-    ///Arbitrary metadata (author, performance notes, etc.)
+    /// Arbitrary metadata (author, performance notes, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<lens::LensMetadata<S>>,
-    ///Human-readable lens name
+    /// Human-readable lens name
     pub name: S,
-    ///Code reference for putter function (Target, Source -> Source)
+    /// Code reference for putter function (Target, Source -> Source)
     pub putter_code: lens::CodeReference<S>,
-    ///AT-URI reference to source schema
+    /// AT-URI reference to source schema
     pub source_schema: AtUri<S>,
-    ///Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
+    /// Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_schema_version: Option<S>,
-    ///AT-URI reference to target schema
+    /// AT-URI reference to target schema
     pub target_schema: AtUri<S>,
-    ///Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
+    /// Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_schema_version: Option<S>,
     #[serde(
@@ -337,17 +343,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_science_alt_dataset_lens() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.lens"),
@@ -598,9 +603,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -611,9 +615,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -625,7 +628,7 @@ where
 
 pub mod lens_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -773,7 +776,9 @@ impl LensBuilder<lens_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         LensBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -784,7 +789,9 @@ impl<S: BosStr> LensBuilder<lens_state::Empty, S> {
     pub fn builder() -> Self {
         LensBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -873,10 +880,7 @@ where
     St::Name: lens_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> LensBuilder<lens_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> LensBuilder<lens_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,

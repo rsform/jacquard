@@ -8,36 +8,41 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::ooo_bsky::authfetch::strategy::Strategy;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Nsid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::ooo_bsky::authfetch::strategy::Strategy;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutRecord<S: BosStr = DefaultStr> {
-    ///The NSID of the record collection.
+    /// The NSID of the record collection.
     pub collection: Nsid<S>,
-    ///The private record value to store.
+    /// The private record value to store.
     pub record: Data<S>,
-    ///The Record Key.
+    /// The Record Key.
     pub rkey: RecordKey<Rkey<S>>,
-    ///The strategy used to authenticate fetch requests for this record.
+    /// The strategy used to authenticate fetch requests for this record.
     pub strategy: Strategy<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutRecordOutput<S: BosStr = DefaultStr> {
-    ///The AT URI of the stored record.
+    /// The AT URI of the stored record.
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -56,9 +61,8 @@ impl jacquard_common::xrpc::XrpcResp for PutRecordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutRecord<S> {
     const NSID: &'static str = "ooo.bsky.authfetch.putRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutRecordResponse;
 }
 
@@ -68,16 +72,15 @@ Path: `/xrpc/ooo.bsky.authfetch.putRecord`. The request payload type is `PutReco
 pub struct PutRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutRecordRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.putRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PutRecord<S>;
     type Response = PutRecordResponse;
 }
 
 pub mod put_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -292,10 +295,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PutRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PutRecord<S> {
         PutRecord {
             collection: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),

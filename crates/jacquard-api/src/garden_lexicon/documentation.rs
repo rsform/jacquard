@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime, Language};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Language, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,21 +24,24 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::garden_lexicon::documentation;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::garden_lexicon::documentation;
+use serde::{Deserialize, Serialize};
 /// Documentation for a definition within a lexicon.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DefinitionDoc<S: BosStr = DefaultStr> {
-    ///Localized descriptions for this definition.
+    /// Localized descriptions for this definition.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Vec<documentation::LocalizedString<S>>>,
-    ///The name of the definition being documented (e.g., 'main', 'replyRef').
+    /// The name of the definition being documented (e.g., 'main', 'replyRef').
     pub name: S,
-    ///Documentation for properties within this definition.
+    /// Documentation for properties within this definition.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub properties: Option<Vec<documentation::PropertyDoc<S>>>,
     #[serde(
@@ -53,11 +56,14 @@ pub struct DefinitionDoc<S: BosStr = DefaultStr> {
 /// A string with an associated language code.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LocalizedString<S: BosStr = DefaultStr> {
-    ///ISO 639 language code (e.g., 'en', 'es', 'ja').
+    /// ISO 639 language code (e.g., 'en', 'es', 'ja').
     pub lang: Language,
-    ///The localized string value.
+    /// The localized string value.
     pub value: S,
     #[serde(
         flatten,
@@ -78,15 +84,15 @@ pub struct LocalizedString<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Documentation<S: BosStr = DefaultStr> {
-    ///Timestamp when this documentation was created.
+    /// Timestamp when this documentation was created.
     pub created_at: Datetime,
-    ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
+    /// Documentation for specific definitions within the lexicon (e.g., main, replyRef).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub definitions: Option<Vec<documentation::DefinitionDoc<S>>>,
-    ///Localized descriptions for the lexicon.
+    /// Localized descriptions for the lexicon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Vec<documentation::LocalizedString<S>>>,
-    ///The NSID of the lexicon being documented.
+    /// The NSID of the lexicon being documented.
     pub lexicon: Nsid<S>,
     #[serde(
         flatten,
@@ -111,12 +117,15 @@ pub struct DocumentationGetRecordOutput<S: BosStr = DefaultStr> {
 /// Documentation for a specific property within a definition.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PropertyDoc<S: BosStr = DefaultStr> {
-    ///Localized descriptions for this property.
+    /// Localized descriptions for this property.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Vec<documentation::LocalizedString<S>>>,
-    ///The property name being documented.
+    /// The property name being documented.
     pub name: S,
     #[serde(
         flatten,
@@ -260,17 +269,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.documentation"),
@@ -338,23 +346,22 @@ fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("localizedString"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A string with an associated language code."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("lang"), SmolStr::new_static("value")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A string with an associated language code.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("lang"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("lang"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "ISO 639 language code (e.g., 'en', 'es', 'ja').",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "ISO 639 language code (e.g., 'en', 'es', 'ja').",
+                                )),
                                 format: Some(LexStringFormat::Language),
                                 ..Default::default()
                             }),
@@ -362,9 +369,9 @@ fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The localized string value."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The localized string value.",
+                                )),
                                 max_length: Some(10000usize),
                                 ..Default::default()
                             }),
@@ -457,11 +464,9 @@ fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("propertyDoc"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Documentation for a specific property within a definition.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Documentation for a specific property within a definition.",
+                    )),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -469,11 +474,9 @@ fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Localized descriptions for this property.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Localized descriptions for this property.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#localizedString"),
                                     ..Default::default()
@@ -484,9 +487,9 @@ fn lexicon_doc_garden_lexicon_documentation() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The property name being documented."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The property name being documented.",
+                                )),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),
@@ -509,15 +512,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod localized_string_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -560,10 +562,7 @@ pub mod localized_string_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LocalizedStringBuilder<
-    St: localized_string_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct LocalizedStringBuilder<St: localized_string_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Language>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -658,10 +657,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LocalizedString<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LocalizedString<S> {
         LocalizedString {
             lang: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
@@ -677,9 +673,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -691,7 +686,7 @@ where
 
 pub mod documentation_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -874,10 +869,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Documentation<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Documentation<S> {
         Documentation {
             created_at: self._fields.0.unwrap(),
             definitions: self._fields.1,
@@ -895,8 +887,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

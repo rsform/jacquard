@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,21 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::fm_teal::alpha::actor::profile;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FeaturedItem<S: BosStr = DefaultStr> {
-    ///The MusicBrainz ID URI of the item, formatted as mbid:<uuid>
+    /// The MusicBrainz ID URI of the item, formatted as mbid:<uuid>
     pub mbid: UriValue<S>,
-    ///The type of the item. Must be a valid Musicbrainz type, e.g. album, track, recording, etc.
+    /// The type of the item. Must be a valid Musicbrainz type, e.g. album, track, recording, etc.
     pub r#type: S,
     #[serde(
         flatten,
@@ -57,23 +60,23 @@ pub struct FeaturedItem<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Small image to be displayed next to posts from account. AKA, 'profile picture'
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
-    ///Larger horizontal image to display behind profile view.
+    /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Annotations of text in the profile description (mentions, URLs, hashtags, etc).
+    /// Annotations of text in the profile description (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///The user's most recent item featured on their profile.
+    /// The user's most recent item featured on their profile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub featured_item: Option<profile::FeaturedItem<S>>,
     #[serde(
@@ -171,25 +174,20 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -211,25 +209,20 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -290,15 +283,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod featured_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -436,10 +428,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FeaturedItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeaturedItem<S> {
         FeaturedItem {
             mbid: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -449,10 +438,10 @@ where
 }
 
 fn lexicon_doc_fm_teal_alpha_actor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.actor.profile"),
@@ -584,9 +573,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -598,7 +586,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -720,10 +708,7 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -749,18 +734,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `featuredItem` field (optional)
-    pub fn featured_item(
-        mut self,
-        value: impl Into<Option<profile::FeaturedItem<S>>>,
-    ) -> Self {
+    pub fn featured_item(mut self, value: impl Into<Option<profile::FeaturedItem<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `featuredItem` field to an Option value (optional)
-    pub fn maybe_featured_item(
-        mut self,
-        value: Option<profile::FeaturedItem<S>>,
-    ) -> Self {
+    pub fn maybe_featured_item(mut self, value: Option<profile::FeaturedItem<S>>) -> Self {
         self._fields.6 = value;
         self
     }

@@ -21,23 +21,28 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::ooo_bsky::authfetch::fetch_records;
+use crate::ooo_bsky::authfetch::strategy::Strategy;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::ooo_bsky::authfetch::strategy::Strategy;
-use crate::ooo_bsky::authfetch::fetch_records;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FetchRecords<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FetchRecordsOutput<S: BosStr = DefaultStr> {
-    ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
+    /// The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
     pub results: Vec<fetch_records::FetchRecordsResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -46,13 +51,16 @@ pub struct FetchRecordsOutput<S: BosStr = DefaultStr> {
 /// Successful result, with the record value.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FetchRecordsResult<S: BosStr = DefaultStr> {
-    ///The stored private record value.
+    /// The stored private record value.
     pub record: Data<S>,
-    ///The strategy used to authenticate fetch requests for this record.
+    /// The strategy used to authenticate fetch requests for this record.
     pub strategy: Strategy<S>,
-    ///The AT URI of the record.
+    /// The AT URI of the record.
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -108,7 +116,7 @@ impl<S: BosStr> LexiconSchema for FetchRecordsResult<S> {
 
 pub mod fetch_records_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,15 +228,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod fetch_records_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -285,10 +292,8 @@ pub mod fetch_records_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FetchRecordsResultBuilder<
-    St: fetch_records_result_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct FetchRecordsResultBuilder<St: fetch_records_result_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Strategy<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -296,10 +301,7 @@ pub struct FetchRecordsResultBuilder<
 
 impl FetchRecordsResult<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FetchRecordsResultBuilder<
-        fetch_records_result_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> FetchRecordsResultBuilder<fetch_records_result_state::Empty, DefaultStr> {
         FetchRecordsResultBuilder::new()
     }
 }
@@ -407,10 +409,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FetchRecordsResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FetchRecordsResult<S> {
         FetchRecordsResult {
             record: self._fields.0.unwrap(),
             strategy: self._fields.1.unwrap(),
@@ -421,10 +420,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.authfetch.fetchRecords"),
@@ -433,44 +432,41 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("uris")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("uris"),
-                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                        items: LexPrimitiveArrayItem::String(LexString {
-                                            format: Some(LexStringFormat::AtUri),
-                                            ..Default::default()
-                                        }),
-                                        min_length: Some(1usize),
-                                        max_length: Some(50usize),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("uris")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("uris"),
+                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                    items: LexPrimitiveArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
                                         ..Default::default()
                                     }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                                    min_length: Some(1usize),
+                                    max_length: Some(50usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("result"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Successful result, with the record value."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("strategy"),
-                            SmolStr::new_static("record")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Successful result, with the record value.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("strategy"),
+                        SmolStr::new_static("record"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -490,9 +486,7 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The AT URI of the record."),
-                                ),
+                                description: Some(CowStr::new_static("The AT URI of the record.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

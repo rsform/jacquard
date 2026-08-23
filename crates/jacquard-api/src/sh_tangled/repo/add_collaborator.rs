@@ -10,19 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddCollaborator<S: BosStr = DefaultStr> {
-    ///DID of the repository to add the collaborator to
+    /// DID of the repository to add the collaborator to
     pub repo: Did<S>,
-    ///DID of the collaborator to add
+    /// DID of the collaborator to add
     pub subject: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -53,9 +56,8 @@ impl jacquard_common::xrpc::XrpcResp for AddCollaboratorResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddCollaborator<S> {
     const NSID: &'static str = "sh.tangled.repo.addCollaborator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddCollaboratorResponse;
 }
 
@@ -65,16 +67,15 @@ Path: `/xrpc/sh.tangled.repo.addCollaborator`. The request payload type is `AddC
 pub struct AddCollaboratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddCollaboratorRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.addCollaborator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AddCollaborator<S>;
     type Response = AddCollaboratorResponse;
 }
 
 pub mod add_collaborator_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,10 +118,7 @@ pub mod add_collaborator_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AddCollaboratorBuilder<
-    St: add_collaborator_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AddCollaboratorBuilder<St: add_collaborator_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -215,10 +213,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AddCollaborator<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddCollaborator<S> {
         AddCollaborator {
             repo: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

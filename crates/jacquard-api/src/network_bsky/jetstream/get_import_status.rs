@@ -10,36 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetImportStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub job: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetImportStatusOutput<S: BosStr = DefaultStr> {
-    ///Whether Phase A+B completed (the offset files are durable).
+    /// Whether Phase A+B completed (the offset files are durable).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bucketed: Option<bool>,
-    ///Failure detail; present only when state is failed.
+    /// Failure detail; present only when state is failed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
-    ///Present only for a terminal job.
+    /// Present only for a terminal job.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Datetime>,
-    ///Job id.
+    /// Job id.
     pub job: S,
-    ///Current phase: parse_bucket (Phase A+B) or apply (Phase C).
+    /// Current phase: parse_bucket (Phase A+B) or apply (Phase C).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phase: Option<GetImportStatusOutputPhase<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,19 +61,19 @@ pub struct GetImportStatusOutput<S: BosStr = DefaultStr> {
     pub rows_total: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rows_valid: Option<i64>,
-    ///Segments processed so far in Phase C.
+    /// Segments processed so far in Phase C.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments_applied: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments_examined: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments_patched: Option<i64>,
-    ///Segments Phase C will process (after resume-skips).
+    /// Segments Phase C will process (after resume-skips).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments_to_apply: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specific_cids_unmatched: Option<i64>,
-    ///Lifecycle state.
+    /// Lifecycle state.
     pub state: GetImportStatusOutputState<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submitted_at: Option<Datetime>,
@@ -124,8 +129,7 @@ impl<S: BosStr> Serialize for GetImportStatusOutputPhase<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for GetImportStatusOutputPhase<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetImportStatusOutputPhase<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -149,9 +153,7 @@ where
     type Output = GetImportStatusOutputPhase<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetImportStatusOutputPhase::ParseBucket => {
-                GetImportStatusOutputPhase::ParseBucket
-            }
+            GetImportStatusOutputPhase::ParseBucket => GetImportStatusOutputPhase::ParseBucket,
             GetImportStatusOutputPhase::Apply => GetImportStatusOutputPhase::Apply,
             GetImportStatusOutputPhase::Other(v) => {
                 GetImportStatusOutputPhase::Other(v.into_static())
@@ -211,8 +213,7 @@ impl<S: BosStr> Serialize for GetImportStatusOutputState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for GetImportStatusOutputState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetImportStatusOutputState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -246,26 +247,21 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetImportStatusError {
     /// No import job matches the supplied id, or no job has ever run when the id is omitted.
     #[serde(rename = "JobNotFound")]
-    JobNotFound(Option<SmolStr>),
+    JobNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetImportStatusError {
@@ -319,7 +315,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetImportStatusRequest {
 
 pub mod get_import_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,10 +333,7 @@ pub mod get_import_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetImportStatusBuilder<
-    St: get_import_status_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetImportStatusBuilder<St: get_import_status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,17 +37,17 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Lfg<S: BosStr = DefaultStr> {
-    ///Whether the LFG is currently active and visible to others.
+    /// Whether the LFG is currently active and visible to others.
     pub active: bool,
-    ///Record creation timestamp.
+    /// Record creation timestamp.
     pub created_at: Datetime,
-    ///When the LFG expires and is no longer visible.
+    /// When the LFG expires and is no longer visible.
     pub ends_at: Datetime,
-    ///The geographic location for activity partner matching.
+    /// The geographic location for activity partner matching.
     pub location: LfgLocation<S>,
-    ///When the LFG becomes active.
+    /// When the LFG becomes active.
     pub starts_at: Datetime,
-    ///Interest tags for matching with events and other users.
+    /// Interest tags for matching with events and other users.
     pub tags: Vec<S>,
     #[serde(
         flatten,
@@ -57,7 +57,6 @@ pub struct Lfg<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -173,9 +172,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -187,7 +185,7 @@ where
 
 pub mod lfg_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -353,10 +351,7 @@ where
     St::Active: lfg_state::IsUnset,
 {
     /// Set the `active` field (required)
-    pub fn active(
-        mut self,
-        value: impl Into<bool>,
-    ) -> LfgBuilder<lfg_state::SetActive<St>, S> {
+    pub fn active(mut self, value: impl Into<bool>) -> LfgBuilder<lfg_state::SetActive<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LfgBuilder {
             _state: PhantomData,
@@ -448,10 +443,7 @@ where
     St::Tags: lfg_state::IsUnset,
 {
     /// Set the `tags` field (required)
-    pub fn tags(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> LfgBuilder<lfg_state::SetTags<St>, S> {
+    pub fn tags(mut self, value: impl Into<Vec<S>>) -> LfgBuilder<lfg_state::SetTags<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LfgBuilder {
             _state: PhantomData,
@@ -498,10 +490,10 @@ where
 }
 
 fn lexicon_doc_events_smokesignal_lfg() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("events.smokesignal.lfg"),

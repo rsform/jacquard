@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// Senate simulation activity log entry.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,22 +38,22 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Activity<S: BosStr = DefaultStr> {
-    ///Type of senate activity
+    /// Type of senate activity
     pub activity_type: ActivityActivityType<S>,
-    ///References to the sim records participating in this committee
+    /// References to the sim records participating in this committee
     pub committee_sims: Vec<StrongRef<S>>,
-    ///Timestamp when the activity was logged
+    /// Timestamp when the activity was logged
     pub created_at: Datetime,
-    ///Link to org.hypercerts.claim.evaluation record
+    /// Link to org.hypercerts.claim.evaluation record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation: Option<StrongRef<S>>,
-    ///The proposal text being evaluated
+    /// The proposal text being evaluated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub proposal_text: Option<S>,
-    ///Summary of the simulation result
+    /// Summary of the simulation result
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result_summary: Option<S>,
-    ///Current status of the activity
+    /// Current status of the activity
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<ActivityStatus<S>>,
     #[serde(
@@ -140,18 +140,10 @@ where
     type Output = ActivityActivityType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ActivityActivityType::CommitteeEvaluation => {
-                ActivityActivityType::CommitteeEvaluation
-            }
-            ActivityActivityType::SimulationStarted => {
-                ActivityActivityType::SimulationStarted
-            }
-            ActivityActivityType::SimulationCompleted => {
-                ActivityActivityType::SimulationCompleted
-            }
-            ActivityActivityType::Other(v) => {
-                ActivityActivityType::Other(v.into_static())
-            }
+            ActivityActivityType::CommitteeEvaluation => ActivityActivityType::CommitteeEvaluation,
+            ActivityActivityType::SimulationStarted => ActivityActivityType::SimulationStarted,
+            ActivityActivityType::SimulationCompleted => ActivityActivityType::SimulationCompleted,
+            ActivityActivityType::Other(v) => ActivityActivityType::Other(v.into_static()),
         }
     }
 }
@@ -336,9 +328,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -350,7 +341,7 @@ where
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -602,10 +593,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_senate_activity() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.senate.activity"),

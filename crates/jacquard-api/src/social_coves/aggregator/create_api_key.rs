@@ -10,65 +10,65 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateApiKey<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateApiKeyOutput<S: BosStr = DefaultStr> {
-    ///ISO8601 timestamp when the key was created
+    /// ISO8601 timestamp when the key was created
     pub created_at: Datetime,
-    ///DID of the aggregator that owns this key
+    /// DID of the aggregator that owns this key
     pub did: Did<S>,
-    ///The plain-text API key. This is shown ONCE and cannot be retrieved again. Format: ckapi_<64-hex-chars> (32 bytes hex-encoded)
+    /// The plain-text API key. This is shown ONCE and cannot be retrieved again. Format: ckapi_<64-hex-chars> (32 bytes hex-encoded)
     pub key: S,
-    ///First 12 characters of the key (e.g., 'ckapi_ab12cd') for identification in logs and UI
+    /// First 12 characters of the key (e.g., 'ckapi_ab12cd') for identification in logs and UI
     pub key_prefix: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateApiKeyError {
     /// OAuth authentication is required to create an API key
     #[serde(rename = "AuthenticationRequired")]
-    AuthenticationRequired(Option<SmolStr>),
+    AuthenticationRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// OAuth session is required (not service JWT) to create an API key
     #[serde(rename = "OAuthSessionRequired")]
-    OAuthSessionRequired(Option<SmolStr>),
+    OAuthSessionRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Only registered aggregators can create API keys
     #[serde(rename = "AggregatorRequired")]
-    AggregatorRequired(Option<SmolStr>),
+    AggregatorRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Failed to generate the API key
     #[serde(rename = "KeyGenerationFailed")]
-    KeyGenerationFailed(Option<SmolStr>),
+    KeyGenerationFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateApiKeyError {
@@ -126,9 +126,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateApiKeyResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateApiKey<S> {
     const NSID: &'static str = "social.coves.aggregator.createApiKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateApiKeyResponse;
 }
 
@@ -138,9 +137,8 @@ Path: `/xrpc/social.coves.aggregator.createApiKey`. The request payload type is 
 pub struct CreateApiKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateApiKeyRequest {
     const PATH: &'static str = "/xrpc/social.coves.aggregator.createApiKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateApiKey<S>;
     type Response = CreateApiKeyResponse;
 }

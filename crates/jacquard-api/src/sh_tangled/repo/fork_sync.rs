@@ -10,27 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::string::{AtUri, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ForkSync<S: BosStr = DefaultStr> {
-    ///Branch to sync
+    /// Branch to sync
     pub branch: S,
-    ///DID of the fork owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    /// DID of the fork owner. A knot without the repo-did-input capability reads this and name in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
-    ///Name of the forked repository. A knot without the repo-did-input capability reads this and DID in place of repo.
+    /// Name of the forked repository. A knot without the repo-did-input capability reads this and DID in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///DID of the fork to sync
+    /// DID of the fork to sync
     pub repo: Did<S>,
-    ///AT-URI of the source repository. A knot without the repo-did-input capability requires this field without reading it.
+    /// AT-URI of the source repository. A knot without the repo-did-input capability requires this field without reading it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -62,9 +65,8 @@ impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ForkSync<S> {
     const NSID: &'static str = "sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ForkSyncResponse;
 }
 
@@ -74,16 +76,15 @@ Path: `/xrpc/sh.tangled.repo.forkSync`. The request payload type is `ForkSync<S>
 pub struct ForkSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ForkSync<S>;
     type Response = ForkSyncResponse;
 }
 
 pub mod fork_sync_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -128,7 +129,13 @@ pub mod fork_sync_state {
 /// Builder for constructing an instance of this type.
 pub struct ForkSyncBuilder<St: fork_sync_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<Did<S>>, Option<AtUri<S>>),
+    _fields: (
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 

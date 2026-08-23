@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -41,7 +41,7 @@ pub struct Note<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
     pub last_updated: Datetime,
-    ///AT URIs of related facts
+    /// AT URIs of related facts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub related_facts: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -164,9 +164,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -178,7 +177,7 @@ where
 
 pub mod note_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -320,10 +319,7 @@ where
     St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<note_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -403,10 +399,7 @@ where
     St::Title: note_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> NoteBuilder<note_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
@@ -453,10 +446,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_note() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.note"),
@@ -467,14 +460,12 @@ fn lexicon_doc_diy_razorgirl_winter_note() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("content"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("lastUpdated")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("content"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("lastUpdated"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -509,9 +500,9 @@ fn lexicon_doc_diy_razorgirl_winter_note() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("relatedFacts"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("AT URIs of related facts"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "AT URIs of related facts",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::AtUri),
                                         ..Default::default()

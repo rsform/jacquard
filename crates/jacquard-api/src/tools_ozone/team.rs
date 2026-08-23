@@ -11,30 +11,32 @@ pub mod delete_member;
 pub mod list_members;
 pub mod update_member;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::actor::ProfileViewDetailed;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::actor::ProfileViewDetailed;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Member<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -56,7 +58,6 @@ pub struct Member<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MemberRole<S: BosStr = DefaultStr> {
@@ -205,15 +206,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod member_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -325,10 +325,7 @@ where
     St::Did: member_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> MemberBuilder<member_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> MemberBuilder<member_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -444,10 +441,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_team_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.team.defs"),
@@ -456,9 +453,10 @@ fn lexicon_doc_tools_ozone_team_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("member"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("role")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("role"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -484,7 +482,9 @@ fn lexicon_doc_tools_ozone_team_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("lastUpdatedBy"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("profile"),
@@ -497,7 +497,9 @@ fn lexicon_doc_tools_ozone_team_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("role"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),
@@ -513,19 +515,27 @@ fn lexicon_doc_tools_ozone_team_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("roleAdmin"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("roleModerator"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("roleTriage"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("roleVerifier"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map
         },

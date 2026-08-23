@@ -10,36 +10,39 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::repo::list_issues;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::repo::list_issues;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IssueListItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
-    ///Count of sh.tangled.repo.issue.comment records targeting this issue.
+    /// Count of sh.tangled.repo.issue.comment records targeting this issue.
     pub comment_count: i64,
-    ///Latest derived state.
+    /// Latest derived state.
     pub state: IssueListItemState<S>,
-    ///TID-derived timestamp of the latest state record.
+    /// TID-derived timestamp of the latest state record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state_updated_at: Option<Datetime>,
     pub uri: AtUri<S>,
-    ///Embedded sh.tangled.repo.issue record
+    /// Embedded sh.tangled.repo.issue record
     pub value: Data<S>,
     #[serde(
         flatten,
@@ -287,9 +290,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListIssues<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<Did<S>>,
@@ -308,9 +313,11 @@ pub struct ListIssues<S: BosStr = DefaultStr> {
     pub subject: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListIssuesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -379,15 +386,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod issue_list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -460,10 +466,7 @@ pub mod issue_list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IssueListItemBuilder<
-    St: issue_list_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct IssueListItemBuilder<St: issue_list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -635,10 +638,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> IssueListItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IssueListItem<S> {
         IssueListItem {
             cid: self._fields.0,
             comment_count: self._fields.1.unwrap(),
@@ -652,10 +652,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_listIssues() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.listIssues"),
@@ -664,13 +664,12 @@ fn lexicon_doc_sh_tangled_repo_listIssues() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("issueListItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("value"),
-                            SmolStr::new_static("state"),
-                            SmolStr::new_static("commentCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("state"),
+                        SmolStr::new_static("commentCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -691,20 +690,16 @@ fn lexicon_doc_sh_tangled_repo_listIssues() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("state"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Latest derived state."),
-                                ),
+                                description: Some(CowStr::new_static("Latest derived state.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("stateUpdatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "TID-derived timestamp of the latest state record.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "TID-derived timestamp of the latest state record.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -730,72 +725,66 @@ fn lexicon_doc_sh_tangled_repo_listIssues() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("subject")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("author"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Restrict to issues authored by this user DID.",
-                                            ),
-                                        ),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(CowStr::new_static("Pagination cursor")),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("order"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Sort direction by createdAt."),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("state"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Restrict to issues whose latest derived state matches.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("subject"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Repo DID to list issues for"),
-                                        ),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("subject")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("author"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Restrict to issues authored by this user DID.",
+                                    )),
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Pagination cursor")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("order"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Sort direction by createdAt.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("state"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Restrict to issues whose latest derived state matches.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("subject"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Repo DID to list issues for",
+                                    )),
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -809,15 +798,14 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    ListIssuesOrder<S>,
-> {
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<ListIssuesOrder<S>> {
     Some(<ListIssuesOrder<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_issues_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

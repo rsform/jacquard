@@ -10,61 +10,61 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Subscribe<S: BosStr = DefaultStr> {
-    ///DID or handle of the community to subscribe to
+    /// DID or handle of the community to subscribe to
     pub community: AtIdentifier<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubscribeOutput<S: BosStr = DefaultStr> {
-    ///CID of the created subscription record
+    /// CID of the created subscription record
     pub cid: Cid<S>,
-    ///True if item was already subscribed
+    /// True if item was already subscribed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub existing: Option<bool>,
-    ///AT-URI of the created subscription record
+    /// AT-URI of the created subscription record
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeError {
     /// Community not found
     #[serde(rename = "CommunityNotFound")]
-    CommunityNotFound(Option<SmolStr>),
+    CommunityNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Cannot subscribe - you are blocked from this community
     #[serde(rename = "Blocked")]
-    Blocked(Option<SmolStr>),
+    Blocked(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SubscribeError {
@@ -108,9 +108,8 @@ impl jacquard_common::xrpc::XrpcResp for SubscribeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Subscribe<S> {
     const NSID: &'static str = "social.coves.community.subscribe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SubscribeResponse;
 }
 
@@ -120,16 +119,15 @@ Path: `/xrpc/social.coves.community.subscribe`. The request payload type is `Sub
 pub struct SubscribeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SubscribeRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.subscribe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Subscribe<S>;
     type Response = SubscribeResponse;
 }
 
 pub mod subscribe_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -234,10 +232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Subscribe<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subscribe<S> {
         Subscribe {
             community: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

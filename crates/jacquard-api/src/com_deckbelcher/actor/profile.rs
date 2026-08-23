@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_deckbelcher::richtext::Document;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_deckbelcher::richtext::Document;
+use serde::{Deserialize, Serialize};
 /// A DeckBelcher user profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,12 +38,12 @@ use crate::com_deckbelcher::richtext::Document;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Profile bio/description as a rich text document.
+    /// Profile bio/description as a rich text document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<Document<S>>,
-    ///Timestamp when the profile was created.
+    /// Timestamp when the profile was created.
     pub created_at: Datetime,
-    ///Free-form pronouns text, can include brief explanation.
+    /// Free-form pronouns text, can include brief explanation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pronouns: Option<S>,
     #[serde(
@@ -143,9 +143,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -157,7 +156,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -301,10 +300,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_actor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.actor.profile"),
@@ -323,20 +322,16 @@ fn lexicon_doc_com_deckbelcher_actor_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "com.deckbelcher.richtext#document",
-                                    ),
+                                    r#ref: CowStr::new_static("com.deckbelcher.richtext#document"),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when the profile was created.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the profile was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -344,11 +339,9 @@ fn lexicon_doc_com_deckbelcher_actor_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("pronouns"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Free-form pronouns text, can include brief explanation.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Free-form pronouns text, can include brief explanation.",
+                                    )),
                                     max_length: Some(256usize),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()

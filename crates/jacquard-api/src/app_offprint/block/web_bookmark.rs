@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,23 +24,26 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WebBookmark<S: BosStr = DefaultStr> {
-    ///Page description/excerpt
+    /// Page description/excerpt
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The URL of the bookmarked page
+    /// The URL of the bookmarked page
     pub href: UriValue<S>,
-    ///Open Graph image for the page
+    /// Open Graph image for the page
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preview: Option<BlobRef<S>>,
-    ///Name of the website
+    /// Name of the website
     #[serde(skip_serializing_if = "Option::is_none")]
     pub site_name: Option<S>,
-    ///Page title
+    /// Page title
     pub title: S,
     #[serde(
         flatten,
@@ -90,19 +93,16 @@ impl<S: BosStr> LexiconSchema for WebBookmark<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("preview"),
@@ -148,15 +148,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod web_bookmark_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -201,7 +200,13 @@ pub mod web_bookmark_state {
 /// Builder for constructing an instance of this type.
 pub struct WebBookmarkBuilder<St: web_bookmark_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<UriValue<S>>, Option<BlobRef<S>>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -336,10 +341,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> WebBookmark<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WebBookmark<S> {
         WebBookmark {
             description: self._fields.0,
             href: self._fields.1.unwrap(),
@@ -352,10 +354,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_webBookmark() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.webBookmark"),
@@ -364,18 +366,17 @@ fn lexicon_doc_app_offprint_block_webBookmark() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("href"), SmolStr::new_static("title")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("href"),
+                        SmolStr::new_static("title"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Page description/excerpt"),
-                                ),
+                                description: Some(CowStr::new_static("Page description/excerpt")),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -383,23 +384,23 @@ fn lexicon_doc_app_offprint_block_webBookmark() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("href"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the bookmarked page"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL of the bookmarked page",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("preview"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("siteName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Name of the website"),
-                                ),
+                                description: Some(CowStr::new_static("Name of the website")),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
                             }),

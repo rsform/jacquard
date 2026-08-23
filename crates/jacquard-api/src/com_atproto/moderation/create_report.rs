@@ -10,40 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::admin::RepoRef;
 use crate::com_atproto::moderation::ReasonType;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_atproto::moderation::create_report;
+use crate::com_atproto::repo::strong_ref::StrongRef;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateReport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mod_tool: Option<create_report::ModTool<S>>,
-    ///Additional context about the content and violation.
+    /// Additional context about the content and violation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
-    ///Indicates the broad category of violation the report is for.
+    /// Indicates the broad category of violation the report is for.
     pub reason_type: ReasonType<S>,
     pub subject: CreateReportSubject<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -55,9 +57,11 @@ pub enum CreateReportSubject<S: BosStr = DefaultStr> {
     StrongRef(Box<StrongRef<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateReportOutput<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub id: i64,
@@ -69,7 +73,6 @@ pub struct CreateReportOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -84,12 +87,15 @@ pub enum CreateReportOutputSubject<S: BosStr = DefaultStr> {
 /// Moderation tool information for tracing the source of the action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModTool<S: BosStr = DefaultStr> {
-    ///Additional arbitrary metadata about the source
+    /// Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Data<S>>,
-    ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
+    /// Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     pub name: S,
     #[serde(
         flatten,
@@ -113,9 +119,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateReport<S> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateReportResponse;
 }
 
@@ -125,9 +130,8 @@ Path: `/xrpc/com.atproto.moderation.createReport`. The request payload type is `
 pub struct CreateReportRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     const PATH: &'static str = "/xrpc/com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateReport<S>;
     type Response = CreateReportResponse;
 }
@@ -149,7 +153,7 @@ impl<S: BosStr> LexiconSchema for ModTool<S> {
 
 pub mod create_report_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -241,10 +245,7 @@ impl<S: BosStr> CreateReportBuilder<create_report_state::Empty, S> {
 
 impl<St: create_report_state::State, S: BosStr> CreateReportBuilder<St, S> {
     /// Set the `modTool` field (optional)
-    pub fn mod_tool(
-        mut self,
-        value: impl Into<Option<create_report::ModTool<S>>>,
-    ) -> Self {
+    pub fn mod_tool(mut self, value: impl Into<Option<create_report::ModTool<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -323,10 +324,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateReport<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateReport<S> {
         CreateReport {
             mod_tool: self._fields.0,
             reason: self._fields.1,
@@ -344,17 +342,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_com_atproto_moderation_createReport() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.moderation.createReport"),
@@ -365,61 +362,55 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(
-                                    vec![
-                                        SmolStr::new_static("reasonType"),
-                                        SmolStr::new_static("subject")
-                                    ],
-                                ),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("modTool"),
-                                        LexObjectProperty::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#modTool"),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("reason"),
-                                        LexObjectProperty::String(LexString {
-                                            description: Some(
-                                                CowStr::new_static(
-                                                    "Additional context about the content and violation.",
-                                                ),
-                                            ),
-                                            max_length: Some(20000usize),
-                                            max_graphemes: Some(2000usize),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("reasonType"),
-                                        LexObjectProperty::Ref(LexRef {
-                                            r#ref: CowStr::new_static(
-                                                "com.atproto.moderation.defs#reasonType",
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("subject"),
-                                        LexObjectProperty::Union(LexRefUnion {
-                                            refs: vec![
-                                                CowStr::new_static("com.atproto.admin.defs#repoRef"),
-                                                CowStr::new_static("com.atproto.repo.strongRef")
-                                            ],
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![
+                                SmolStr::new_static("reasonType"),
+                                SmolStr::new_static("subject"),
+                            ]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("modTool"),
+                                    LexObjectProperty::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#modTool"),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("reason"),
+                                    LexObjectProperty::String(LexString {
+                                        description: Some(CowStr::new_static(
+                                            "Additional context about the content and violation.",
+                                        )),
+                                        max_length: Some(20000usize),
+                                        max_graphemes: Some(2000usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("reasonType"),
+                                    LexObjectProperty::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
+                                            "com.atproto.moderation.defs#reasonType",
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("subject"),
+                                    LexObjectProperty::Union(LexRefUnion {
+                                        refs: vec![
+                                            CowStr::new_static("com.atproto.admin.defs#repoRef"),
+                                            CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ],
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()

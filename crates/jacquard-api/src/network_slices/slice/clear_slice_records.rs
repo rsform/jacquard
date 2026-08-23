@@ -10,26 +10,31 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ClearSliceRecords<S: BosStr = DefaultStr> {
-    ///AT-URI of the slice to clear
+    /// AT-URI of the slice to clear
     pub slice: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ClearSliceRecordsOutput<S: BosStr = DefaultStr> {
-    ///Success message
+    /// Success message
     pub message: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -48,9 +53,8 @@ impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<S> {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ClearSliceRecordsResponse;
 }
 
@@ -60,9 +64,8 @@ Path: `/xrpc/network.slices.slice.clearSliceRecords`. The request payload type i
 pub struct ClearSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ClearSliceRecords<S>;
     type Response = ClearSliceRecordsResponse;
 }

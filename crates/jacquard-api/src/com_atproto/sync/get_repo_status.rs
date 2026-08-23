@@ -10,29 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetRepoStatus<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetRepoStatusOutput<S: BosStr = DefaultStr> {
     pub active: bool,
     pub did: Did<S>,
-    ///Optional field, the current rev of the repo, if active=true
+    /// Optional field, the current rev of the repo, if active=true
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rev: Option<Tid>,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<GetRepoStatusOutputStatus<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -99,8 +104,7 @@ impl<S: BosStr> Serialize for GetRepoStatusOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for GetRepoStatusOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetRepoStatusOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -127,12 +131,8 @@ where
             GetRepoStatusOutputStatus::Takendown => GetRepoStatusOutputStatus::Takendown,
             GetRepoStatusOutputStatus::Suspended => GetRepoStatusOutputStatus::Suspended,
             GetRepoStatusOutputStatus::Deleted => GetRepoStatusOutputStatus::Deleted,
-            GetRepoStatusOutputStatus::Deactivated => {
-                GetRepoStatusOutputStatus::Deactivated
-            }
-            GetRepoStatusOutputStatus::Desynchronized => {
-                GetRepoStatusOutputStatus::Desynchronized
-            }
+            GetRepoStatusOutputStatus::Deactivated => GetRepoStatusOutputStatus::Deactivated,
+            GetRepoStatusOutputStatus::Desynchronized => GetRepoStatusOutputStatus::Desynchronized,
             GetRepoStatusOutputStatus::Throttled => GetRepoStatusOutputStatus::Throttled,
             GetRepoStatusOutputStatus::Other(v) => {
                 GetRepoStatusOutputStatus::Other(v.into_static())
@@ -141,25 +141,20 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetRepoStatusError {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<SmolStr>),
+    RepoNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetRepoStatusError {
@@ -213,7 +208,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
 
 pub mod get_repo_status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -244,10 +239,7 @@ pub mod get_repo_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRepoStatusBuilder<
-    St: get_repo_status_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetRepoStatusBuilder<St: get_repo_status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,

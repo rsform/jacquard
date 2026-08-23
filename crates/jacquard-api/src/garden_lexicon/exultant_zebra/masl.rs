@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,19 +21,22 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::garden_lexicon::exultant_zebra::masl;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::garden_lexicon::exultant_zebra::masl;
+use serde::{Deserialize, Serialize};
 /// A bundle of resources.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Masl<S: BosStr = DefaultStr> {
-    ///Optional name for the bundle.
+    /// Optional name for the bundle.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///The resources in this bundle.
+    /// The resources in this bundle.
     pub resources: Vec<masl::Resource<S>>,
     #[serde(
         flatten,
@@ -47,14 +50,17 @@ pub struct Masl<S: BosStr = DefaultStr> {
 /// A single resource identified by a CID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Resource<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<S>,
-    ///Optional path for this resource (e.g. '/index.html').
+    /// Optional path for this resource (e.g. '/index.html').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
-    ///The content identifier for this resource.
+    /// The content identifier for this resource.
     pub src: BlobRef<S>,
     #[serde(
         flatten,
@@ -102,15 +108,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod masl_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -239,10 +244,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.masl"),
@@ -259,18 +264,18 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional name for the bundle."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional name for the bundle.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("resources"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("The resources in this bundle."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The resources in this bundle.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "garden.lexicon.exultant-zebra.masl#resource",
@@ -288,31 +293,31 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("resource"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A single resource identified by a CID."),
-                    ),
+                    description: Some(CowStr::new_static("A single resource identified by a CID.")),
                     required: Some(vec![SmolStr::new_static("src")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("contentType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("path"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional path for this resource (e.g. '/index.html').",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional path for this resource (e.g. '/index.html').",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("src"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -332,15 +337,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod resource_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

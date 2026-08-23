@@ -84,6 +84,7 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
         Ok(jacquard::identity::resolver::DidDocResponse {
             buffer: Bytes::from(serde_json::to_vec(&doc).unwrap()),
             status: StatusCode::OK,
+            headers: http::HeaderMap::new(),
             requested: None,
         })
     }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,21 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_deckbelcher::CardRef;
 use crate::com_deckbelcher::social::like;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Subject for liking a card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CardSubject<S: BosStr = DefaultStr> {
-    ///Reference to the card.
+    /// Reference to the card.
     pub r#ref: CardRef<S>,
     #[serde(
         flatten,
@@ -56,9 +59,9 @@ pub struct CardSubject<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Like<S: BosStr = DefaultStr> {
-    ///Timestamp when the like was created.
+    /// Timestamp when the like was created.
     pub created_at: Datetime,
-    ///Reference to the content being liked.
+    /// Reference to the content being liked.
     pub subject: LikeSubject<S>,
     #[serde(
         flatten,
@@ -68,7 +71,6 @@ pub struct Like<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -94,9 +96,12 @@ pub struct LikeGetRecordOutput<S: BosStr = DefaultStr> {
 /// Subject for liking an ATProto record (deck, reply, etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordSubject<S: BosStr = DefaultStr> {
-    ///Reference to the record.
+    /// Reference to the record.
     pub r#ref: StrongRef<S>,
     #[serde(
         flatten,
@@ -192,15 +197,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod card_subject_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,10 +309,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CardSubject<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardSubject<S> {
         CardSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -317,10 +318,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.social.like"),
@@ -349,28 +350,24 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Record declaring a 'like' of a piece of content (card, deck, reply, etc).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record declaring a 'like' of a piece of content (card, deck, reply, etc).",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("subject"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when the like was created."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the like was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -378,12 +375,12 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(
-                                        CowStr::new_static("Reference to the content being liked."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Reference to the content being liked.",
+                                    )),
                                     refs: vec![
                                         CowStr::new_static("#cardSubject"),
-                                        CowStr::new_static("#recordSubject")
+                                        CowStr::new_static("#recordSubject"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -398,11 +395,9 @@ fn lexicon_doc_com_deckbelcher_social_like() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordSubject"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Subject for liking an ATProto record (deck, reply, etc).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Subject for liking an ATProto record (deck, reply, etc).",
+                    )),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -432,9 +427,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -446,7 +440,7 @@ where
 
 pub mod like_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -600,15 +594,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod record_subject_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -639,10 +632,7 @@ pub mod record_subject_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordSubjectBuilder<
-    St: record_subject_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RecordSubjectBuilder<St: record_subject_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -716,10 +706,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordSubject<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordSubject<S> {
         RecordSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

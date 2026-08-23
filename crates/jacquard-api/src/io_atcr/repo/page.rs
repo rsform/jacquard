@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Repository page metadata including description and avatar. Users can edit this directly in their PDS to customize their repository page.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,19 +38,19 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Page<S: BosStr = DefaultStr> {
-    ///Repository avatar/icon image.
+    /// Repository avatar/icon image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
-    ///Record creation timestamp
+    /// Record creation timestamp
     pub created_at: Datetime,
-    ///Markdown README/description content for the repository page.
+    /// Markdown README/description content for the repository page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The name of the repository (e.g., 'myapp'). Must match the rkey.
+    /// The name of the repository (e.g., 'myapp'). Must match the rkey.
     pub repository: S,
-    ///Record last updated timestamp
+    /// Record last updated timestamp
     pub updated_at: Datetime,
-    ///Whether the description was manually edited by the user. When true, auto-population from manifest annotations is skipped on push.
+    /// Whether the description was manually edited by the user. When true, auto-population from manifest annotations is skipped on push.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_edited: Option<bool>,
     #[serde(
@@ -133,25 +133,23 @@ impl<S: BosStr> LexiconSchema for Page<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -190,9 +188,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -204,7 +201,7 @@ where
 
 pub mod page_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -440,10 +437,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_repo_page() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.repo.page"),

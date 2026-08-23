@@ -11,7 +11,6 @@ pub mod message;
 pub mod pinned_record;
 pub mod profile;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -28,26 +27,29 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::place_stream::badge::BadgeView;
+use crate::place_stream::chat;
 use crate::place_stream::chat::pinned_record::PinnedRecord;
 use crate::place_stream::chat::profile::Profile;
-use crate::place_stream::chat;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MessageView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
-    ///Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.
+    /// Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub badges: Option<Vec<BadgeView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_profile: Option<Profile<S>>,
     pub cid: Cid<S>,
-    ///If true, this message has been deleted or labeled and should be cleared from the cache
+    /// If true, this message has been deleted or labeled and should be cleared from the cache
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deleted: Option<bool>,
     pub indexed_at: Datetime,
@@ -64,7 +66,6 @@ pub struct MessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[jacquard_derive::open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -76,7 +77,10 @@ pub enum MessageViewReplyTo<S: BosStr = DefaultStr> {
 /// View of a pinned chat record with hydrated message data.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PinnedRecordView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub indexed_at: Datetime,
@@ -142,15 +146,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod message_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -465,10 +468,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MessageView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
             badges: self._fields.1,
@@ -485,10 +485,10 @@ where
 }
 
 fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.chat.defs"),
@@ -589,18 +589,15 @@ fn lexicon_doc_place_stream_chat_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pinnedRecordView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "View of a pinned chat record with hydrated message data.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "View of a pinned chat record with hydrated message data.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -664,15 +661,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod pinned_record_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -745,10 +741,7 @@ pub mod pinned_record_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PinnedRecordViewBuilder<
-    St: pinned_record_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PinnedRecordViewBuilder<St: pinned_record_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
@@ -763,10 +756,7 @@ pub struct PinnedRecordViewBuilder<
 
 impl PinnedRecordView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> PinnedRecordViewBuilder<
-        pinned_record_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> PinnedRecordViewBuilder<pinned_record_view_state::Empty, DefaultStr> {
         PinnedRecordViewBuilder::new()
     }
 }
@@ -923,10 +913,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PinnedRecordView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PinnedRecordView<S> {
         PinnedRecordView {
             cid: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),

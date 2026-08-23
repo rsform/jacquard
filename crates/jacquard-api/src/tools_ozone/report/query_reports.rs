@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::report::ReportView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::report::ReportView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryReportsSortDirection<S: BosStr = DefaultStr> {
@@ -64,8 +64,7 @@ impl<S: BosStr> Serialize for QueryReportsSortDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for QueryReportsSortDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryReportsSortDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -97,7 +96,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryReportsSortField<S: BosStr = DefaultStr> {
@@ -171,9 +169,7 @@ where
         match self {
             QueryReportsSortField::CreatedAt => QueryReportsSortField::CreatedAt,
             QueryReportsSortField::UpdatedAt => QueryReportsSortField::UpdatedAt,
-            QueryReportsSortField::Other(v) => {
-                QueryReportsSortField::Other(v.into_static())
-            }
+            QueryReportsSortField::Other(v) => QueryReportsSortField::Other(v.into_static()),
         }
     }
 }
@@ -350,19 +346,17 @@ where
             QueryReportsSubjectType::Account => QueryReportsSubjectType::Account,
             QueryReportsSubjectType::Record => QueryReportsSubjectType::Record,
             QueryReportsSubjectType::Message => QueryReportsSubjectType::Message,
-            QueryReportsSubjectType::Conversation => {
-                QueryReportsSubjectType::Conversation
-            }
-            QueryReportsSubjectType::Other(v) => {
-                QueryReportsSubjectType::Other(v.into_static())
-            }
+            QueryReportsSubjectType::Conversation => QueryReportsSubjectType::Conversation,
+            QueryReportsSubjectType::Other(v) => QueryReportsSubjectType::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryReports<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assigned_to: Option<Did<S>>,
@@ -403,9 +397,11 @@ pub struct QueryReports<S: BosStr = DefaultStr> {
     pub subject_type: Option<QueryReportsSubjectType<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryReportsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -450,21 +446,23 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    QueryReportsSortDirection<S>,
-> {
-    Some(<QueryReportsSortDirection<S>>::from_value(S::from_static("desc")))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<QueryReportsSortDirection<S>> {
+    Some(<QueryReportsSortDirection<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }
 
-fn _default_sort_field<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    QueryReportsSortField<S>,
-> {
-    Some(<QueryReportsSortField<S>>::from_value(S::from_static("createdAt")))
+fn _default_sort_field<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<QueryReportsSortField<S>> {
+    Some(<QueryReportsSortField<S>>::from_value(S::from_static(
+        "createdAt",
+    )))
 }
 
 pub mod query_reports_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -537,20 +535,7 @@ impl QueryReportsBuilder<query_reports_state::Empty, DefaultStr> {
         QueryReportsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -564,20 +549,7 @@ impl<S: BosStr> QueryReportsBuilder<query_reports_state::Empty, S> {
         QueryReportsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -725,10 +697,7 @@ impl<St: query_reports_state::State, S: BosStr> QueryReportsBuilder<St, S> {
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<QueryReportsSortDirection<S>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<QueryReportsSortDirection<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -736,10 +705,7 @@ impl<St: query_reports_state::State, S: BosStr> QueryReportsBuilder<St, S> {
 
 impl<St: query_reports_state::State, S: BosStr> QueryReportsBuilder<St, S> {
     /// Set the `sortField` field (optional)
-    pub fn sort_field(
-        mut self,
-        value: impl Into<Option<QueryReportsSortField<S>>>,
-    ) -> Self {
+    pub fn sort_field(mut self, value: impl Into<Option<QueryReportsSortField<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
@@ -784,18 +750,12 @@ impl<St: query_reports_state::State, S: BosStr> QueryReportsBuilder<St, S> {
 
 impl<St: query_reports_state::State, S: BosStr> QueryReportsBuilder<St, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(
-        mut self,
-        value: impl Into<Option<QueryReportsSubjectType<S>>>,
-    ) -> Self {
+    pub fn subject_type(mut self, value: impl Into<Option<QueryReportsSubjectType<S>>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(
-        mut self,
-        value: Option<QueryReportsSubjectType<S>>,
-    ) -> Self {
+    pub fn maybe_subject_type(mut self, value: Option<QueryReportsSubjectType<S>>) -> Self {
         self._fields.14 = value;
         self
     }

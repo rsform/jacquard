@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,20 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::download_darkworld::content::markdown;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::download_darkworld::content::markdown;
+use serde::{Deserialize, Serialize};
 /// blob keyed by ref in the body
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageRef<S: BosStr = DefaultStr> {
     pub blob: BlobRef<S>,
-    ///key used to reference the blob
+    /// key used to reference the blob
     pub image_ref: S,
     #[serde(
         flatten,
@@ -45,14 +48,17 @@ pub struct ImageRef<S: BosStr = DefaultStr> {
 /// markdown for rendering in darkworld.download/blog
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Markdown<S: BosStr = DefaultStr> {
-    ///markdown source ![alt](imageRef) to embed images
+    /// markdown source ![alt](imageRef) to embed images
     pub body: S,
-    ///Images referenced in the body with ![alt](imageRef)
+    /// Images referenced in the body with ![alt](imageRef)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<markdown::ImageRef<S>>>,
-    ///big red warning such as DELTARUNE CHAPTER 5 SPOILERS the user will have to click trough to view the content
+    /// big red warning such as DELTARUNE CHAPTER 5 SPOILERS the user will have to click trough to view the content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spoiler_warning: Option<S>,
     #[serde(
@@ -93,19 +99,16 @@ impl<S: BosStr> LexiconSchema for ImageRef<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -196,15 +199,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -352,10 +354,10 @@ where
 }
 
 fn lexicon_doc_download_darkworld_content_markdown() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("download.darkworld.content.markdown"),
@@ -364,27 +366,26 @@ fn lexicon_doc_download_darkworld_content_markdown() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("imageRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("blob keyed by ref in the body"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("imageRef"), SmolStr::new_static("blob")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("blob keyed by ref in the body")),
+                    required: Some(vec![
+                        SmolStr::new_static("imageRef"),
+                        SmolStr::new_static("blob"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("imageRef"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("key used to reference the blob"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "key used to reference the blob",
+                                )),
                                 max_length: Some(512usize),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
@@ -465,8 +466,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

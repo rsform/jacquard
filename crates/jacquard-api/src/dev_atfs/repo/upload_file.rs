@@ -10,22 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::cid::CidLink;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UploadFileParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<Vec<S>>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -33,42 +35,39 @@ pub struct UploadFile {
     pub body: Bytes,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UploadFileOutput<S: BosStr = DefaultStr> {
-    ///The PDS's own uploadBlob response shape: the uploaded bytes' blessed CID (see dev.atfs.file's cid field), the mimeType recorded (defaulting to application/octet-stream when the request carried no Content-Type), and size in bytes.
+    /// The PDS's own uploadBlob response shape: the uploaded bytes' blessed CID (see dev.atfs.file's cid field), the mimeType recorded (defaulting to application/octet-stream when the request carried no Content-Type), and size in bytes.
     pub blob: BlobRef<S>,
-    ///atfs's own addition to the PDS response shape, absent from a plain com.atproto.repo.uploadBlob response: the CID to fetch the just-uploaded file over the IPFS network, exactly as dev.atfs.file's ipfsRoot field documents — the UnixFS root for a large file, or equal to blob's own CID when it fits a single Bitswap block. Standard atproto clients ignore unknown top-level fields, so this stays response-compatible with the PDS. Omitted (not a misleading zero value) on the rare occasion indexing hasn't finished yet; the file is already safely stored either way, and a later dev.atfs.repo.getFile or /ipfs/<cid> request is unaffected.
+    /// atfs's own addition to the PDS response shape, absent from a plain com.atproto.repo.uploadBlob response: the CID to fetch the just-uploaded file over the IPFS network, exactly as dev.atfs.file's ipfsRoot field documents — the UnixFS root for a large file, or equal to blob's own CID when it fits a single Bitswap block. Standard atproto clients ignore unknown top-level fields, so this stays response-compatible with the PDS. Omitted (not a misleading zero value) on the rare occasion indexing hasn't finished yet; the file is already safely stored either way, and a later dev.atfs.repo.getFile or /ipfs/<cid> request is unaffected.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ipfs_root: Option<CidLink<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UploadFileError {
     /// The request body exceeds this instance's maximum blob size.
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(Option<SmolStr>),
+    BlobTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// This instance has no room to store more content: its data volume has reached the free space it keeps in reserve, or what is left of that is already promised to uploads and pins in flight. Nothing was stored, and the instance keeps serving and deleting normally — releasing content with dev.atfs.repo.deleteFile is what makes room again. Retrying is reasonable, but only after something has been deleted or an upload in flight has finished.
     #[serde(rename = "InsufficientStorage")]
-    InsufficientStorage(Option<SmolStr>),
+    InsufficientStorage(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UploadFileError {
@@ -112,22 +111,16 @@ impl jacquard_common::xrpc::XrpcResp for UploadFileResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for UploadFile {
     const NSID: &'static str = "dev.atfs.repo.uploadFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "*/*",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
     type Response = UploadFileResponse;
-    fn encode_body(
-        &self,
-        buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.extend_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(
-        body: &'de [u8],
-    ) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -143,16 +136,15 @@ Path: `/xrpc/dev.atfs.repo.uploadFile`. The request payload type is `UploadFile`
 pub struct UploadFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadFileRequest {
     const PATH: &'static str = "/xrpc/dev.atfs.repo.uploadFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "*/*",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
     type Request<S: BosStr> = UploadFile;
     type Response = UploadFileResponse;
 }
 
 pub mod upload_file_params_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,10 +162,7 @@ pub mod upload_file_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UploadFileParamsBuilder<
-    St: upload_file_params_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct UploadFileParamsBuilder<St: upload_file_params_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -181,10 +170,7 @@ pub struct UploadFileParamsBuilder<
 
 impl UploadFileParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UploadFileParamsBuilder<
-        upload_file_params_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> UploadFileParamsBuilder<upload_file_params_state::Empty, DefaultStr> {
         UploadFileParamsBuilder::new()
     }
 }

@@ -14,13 +14,12 @@ pub mod request;
 pub mod request_response;
 pub mod room_gate;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,20 +30,23 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::tech_tokimeki::kaku;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Width and height representing the aspect ratio of an image
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
-    ///Height component of aspect ratio
+    /// Height component of aspect ratio
     pub height: i64,
-    ///Width component of aspect ratio
+    /// Width component of aspect ratio
     pub width: i64,
     #[serde(
         flatten,
@@ -58,30 +60,33 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// A view of a collection with author profile and item count
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionView<S: BosStr = DefaultStr> {
-    ///Collection owner profile
+    /// Collection owner profile
     pub author: ProfileViewBasic<S>,
-    ///CID of the collection record
+    /// CID of the collection record
     pub cid: Cid<S>,
-    ///Timestamp when the collection was created
+    /// Timestamp when the collection was created
     pub created_at: Datetime,
-    ///Collection description
+    /// Collection description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Timestamp when the collection was indexed
+    /// Timestamp when the collection was indexed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed_at: Option<Datetime>,
-    ///Whether the collection is publicly visible  Defaults to `true`.
+    /// Whether the collection is publicly visible  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_collection_view_is_public")]
     pub is_public: Option<bool>,
-    ///Number of items in the collection
+    /// Number of items in the collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_count: Option<i64>,
-    ///Collection name
+    /// Collection name
     pub name: S,
-    ///AT-URI of the collection record
+    /// AT-URI of the collection record
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -95,36 +100,39 @@ pub struct CollectionView<S: BosStr = DefaultStr> {
 /// A view of a drawing post with author profile and metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostView<S: BosStr = DefaultStr> {
-    ///Aspect ratio of the image
+    /// Aspect ratio of the image
     pub aspect_ratio: kaku::AspectRatio<S>,
-    ///Author profile
+    /// Author profile
     pub author: ProfileViewBasic<S>,
-    ///CID of the post record
+    /// CID of the post record
     pub cid: Cid<S>,
-    ///Timestamp when the post was created
+    /// Timestamp when the post was created
     pub created_at: Datetime,
-    ///URL of the drawing image
+    /// URL of the drawing image
     pub image: UriValue<S>,
-    ///Timestamp when the post was indexed
+    /// Timestamp when the post was indexed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed_at: Option<Datetime>,
-    ///Reference to linked Bluesky post
+    /// Reference to linked Bluesky post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub linked_post: Option<StrongRef<S>>,
-    ///Counts of each reaction type
+    /// Counts of each reaction type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reaction_counts: Option<kaku::ReactionCounts<S>>,
-    ///Tags for categorization
+    /// Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Optional description or title
+    /// Optional description or title
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    ///AT-URI of the post record
+    /// AT-URI of the post record
     pub uri: AtUri<S>,
-    ///Current user's reaction to this post
+    /// Current user's reaction to this post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer_reaction: Option<kaku::ReactionType<S>>,
     #[serde(
@@ -139,25 +147,28 @@ pub struct PostView<S: BosStr = DefaultStr> {
 /// Counts of each reaction type on a post
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReactionCounts<S: BosStr = DefaultStr> {
-    ///Count of kami (godly) reactions  Defaults to `0`.
+    /// Count of kami (godly) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_kami")]
     pub kami: Option<i64>,
-    ///Count of kawaii (cute) reactions  Defaults to `0`.
+    /// Count of kawaii (cute) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_kawaii")]
     pub kawaii: Option<i64>,
-    ///Count of sugoi (amazing) reactions  Defaults to `0`.
+    /// Count of sugoi (amazing) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_sugoi")]
     pub sugoi: Option<i64>,
-    ///Count of suki (like) reactions  Defaults to `0`.
+    /// Count of suki (like) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_suki")]
     pub suki: Option<i64>,
-    ///Count of tasukaru (helpful) reactions  Defaults to `0`.
+    /// Count of tasukaru (helpful) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_tasukaru")]
     pub tasukaru: Option<i64>,
@@ -258,17 +269,20 @@ where
 /// A view of a Bluesky reply to a linked post
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyView<S: BosStr = DefaultStr> {
-    ///Reply author profile
+    /// Reply author profile
     pub author: ProfileViewBasic<S>,
-    ///CID of the Bluesky reply
+    /// CID of the Bluesky reply
     pub cid: Cid<S>,
-    ///Timestamp when the reply was created
+    /// Timestamp when the reply was created
     pub created_at: Datetime,
-    ///Reply text content
+    /// Reply text content
     pub text: S,
-    ///AT-URI of the Bluesky reply
+    /// AT-URI of the Bluesky reply
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -282,20 +296,23 @@ pub struct ReplyView<S: BosStr = DefaultStr> {
 /// A view of a response to a drawing request
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RequestResponseView<S: BosStr = DefaultStr> {
-    ///Response author profile
+    /// Response author profile
     pub author: ProfileViewBasic<S>,
-    ///CID of the response record
+    /// CID of the response record
     pub cid: Cid<S>,
-    ///Timestamp when the response was created
+    /// Timestamp when the response was created
     pub created_at: Datetime,
-    ///Optional message to the requester
+    /// Optional message to the requester
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
-    ///The drawing post submitted as response
+    /// The drawing post submitted as response
     pub post: kaku::PostView<S>,
-    ///AT-URI of the response record
+    /// AT-URI of the response record
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -309,34 +326,37 @@ pub struct RequestResponseView<S: BosStr = DefaultStr> {
 /// A view of a drawing request with author profile and response count
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RequestView<S: BosStr = DefaultStr> {
-    ///Request author profile
+    /// Request author profile
     pub author: ProfileViewBasic<S>,
-    ///CID of the request record
+    /// CID of the request record
     pub cid: Cid<S>,
-    ///Timestamp when the request was created
+    /// Timestamp when the request was created
     pub created_at: Datetime,
-    ///Timestamp when the request was indexed
+    /// Timestamp when the request was indexed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed_at: Option<Datetime>,
-    ///Whether the request is still accepting responses
+    /// Whether the request is still accepting responses
     pub is_open: bool,
-    ///URLs of reference images for the request
+    /// URLs of reference images for the request
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reference_images: Option<Vec<UriValue<S>>>,
-    ///Number of responses to this request
+    /// Number of responses to this request
     #[serde(skip_serializing_if = "Option::is_none")]
     pub response_count: Option<i64>,
-    ///Tags for categorization
+    /// Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Specific artist the request is directed to
+    /// Specific artist the request is directed to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_actor: Option<ProfileViewBasic<S>>,
-    ///Description of what to draw
+    /// Description of what to draw
     pub text: S,
-    ///AT-URI of the request record
+    /// AT-URI of the request record
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -479,8 +499,7 @@ impl<S: BosStr> LexiconSchema for PostView<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 32usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -654,8 +673,7 @@ impl<S: BosStr> LexiconSchema for RequestView<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 32usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -701,15 +719,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -847,10 +864,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -860,10 +874,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.defs"),
@@ -872,14 +886,13 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Width and height representing the aspect ratio of an image",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Width and height representing the aspect ratio of an image",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -905,36 +918,32 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A view of a collection with author profile and item count",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A view of a collection with author profile and item count",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the collection record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "CID of the collection record",
+                                )),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -942,11 +951,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp when the collection was created",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the collection was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -954,9 +961,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Collection description"),
-                                ),
+                                description: Some(CowStr::new_static("Collection description")),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(200usize),
                                 ..Default::default()
@@ -965,11 +970,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp when the collection was indexed",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the collection was indexed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -998,9 +1001,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the collection record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the collection record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1013,19 +1016,17 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("postView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A view of a drawing post with author profile and metadata",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("image"),
-                            SmolStr::new_static("aspectRatio"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A view of a drawing post with author profile and metadata",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("image"),
+                        SmolStr::new_static("aspectRatio"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1039,18 +1040,14 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the post record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the post record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1058,9 +1055,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the post was created"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the post was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1068,9 +1065,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("image"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL of the drawing image"),
-                                ),
+                                description: Some(CowStr::new_static("URL of the drawing image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1078,9 +1073,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the post was indexed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the post was indexed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1102,9 +1097,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Tags for categorization"),
-                                ),
+                                description: Some(CowStr::new_static("Tags for categorization")),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(64usize),
                                     max_graphemes: Some(32usize),
@@ -1117,9 +1110,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional description or title"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional description or title",
+                                )),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(300usize),
                                 ..Default::default()
@@ -1128,9 +1121,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the post record"),
-                                ),
+                                description: Some(CowStr::new_static("AT-URI of the post record")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1150,9 +1141,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reactionCounts"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Counts of each reaction type on a post"),
-                    ),
+                    description: Some(CowStr::new_static("Counts of each reaction type on a post")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1201,34 +1190,30 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("replyView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A view of a Bluesky reply to a linked post"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A view of a Bluesky reply to a linked post",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("text"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the Bluesky reply"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the Bluesky reply")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1236,9 +1221,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the reply was created"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the reply was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1255,9 +1240,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the Bluesky reply"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the Bluesky reply",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1270,34 +1255,30 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("requestResponseView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A view of a response to a drawing request"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("post"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A view of a response to a drawing request",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("post"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the response record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the response record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1305,11 +1286,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp when the response was created",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the response was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1317,9 +1296,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional message to the requester"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional message to the requester",
+                                )),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(150usize),
                                 ..Default::default()
@@ -1335,9 +1314,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the response record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the response record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1350,37 +1329,31 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("requestView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A view of a drawing request with author profile and response count",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("text"),
-                            SmolStr::new_static("isOpen"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A view of a drawing request with author profile and response count",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("text"),
+                        SmolStr::new_static("isOpen"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the request record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the request record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1388,9 +1361,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the request was created"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the request was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1398,9 +1371,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the request was indexed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the request was indexed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1414,11 +1387,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("referenceImages"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URLs of reference images for the request",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URLs of reference images for the request",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
@@ -1436,9 +1407,7 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Tags for categorization"),
-                                ),
+                                description: Some(CowStr::new_static("Tags for categorization")),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(64usize),
                                     max_graphemes: Some(32usize),
@@ -1451,18 +1420,16 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("targetActor"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Description of what to draw"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Description of what to draw",
+                                )),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(300usize),
                                 ..Default::default()
@@ -1471,9 +1438,9 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT-URI of the request record"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the request record",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1496,9 +1463,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1508,7 +1474,7 @@ fn _default_collection_view_is_public() -> Option<bool> {
 
 pub mod collection_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1599,10 +1565,7 @@ pub mod collection_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionViewBuilder<
-    St: collection_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionViewBuilder<St: collection_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -1826,10 +1789,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionView<S> {
         CollectionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -1852,15 +1812,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2010,18 +1969,7 @@ impl PostViewBuilder<post_view_state::Empty, DefaultStr> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2034,18 +1982,7 @@ impl<S: BosStr> PostViewBuilder<post_view_state::Empty, S> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2175,18 +2112,12 @@ impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `reactionCounts` field (optional)
-    pub fn reaction_counts(
-        mut self,
-        value: impl Into<Option<kaku::ReactionCounts<S>>>,
-    ) -> Self {
+    pub fn reaction_counts(mut self, value: impl Into<Option<kaku::ReactionCounts<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `reactionCounts` field to an Option value (optional)
-    pub fn maybe_reaction_counts(
-        mut self,
-        value: Option<kaku::ReactionCounts<S>>,
-    ) -> Self {
+    pub fn maybe_reaction_counts(mut self, value: Option<kaku::ReactionCounts<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -2239,18 +2170,12 @@ where
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `viewerReaction` field (optional)
-    pub fn viewer_reaction(
-        mut self,
-        value: impl Into<Option<kaku::ReactionType<S>>>,
-    ) -> Self {
+    pub fn viewer_reaction(mut self, value: impl Into<Option<kaku::ReactionType<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `viewerReaction` field to an Option value (optional)
-    pub fn maybe_viewer_reaction(
-        mut self,
-        value: Option<kaku::ReactionType<S>>,
-    ) -> Self {
+    pub fn maybe_viewer_reaction(mut self, value: Option<kaku::ReactionType<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -2311,9 +2236,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2357,15 +2281,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reply_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2620,10 +2543,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReplyView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReplyView<S> {
         ReplyView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -2642,15 +2562,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod request_response_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2759,20 +2678,14 @@ pub struct RequestResponseViewBuilder<
 
 impl RequestResponseView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RequestResponseViewBuilder<
-        request_response_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RequestResponseViewBuilder<request_response_view_state::Empty, DefaultStr> {
         RequestResponseViewBuilder::new()
     }
 }
 
 impl<S: BosStr> RequestResponseView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> RequestResponseViewBuilder<
-        request_response_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> RequestResponseViewBuilder<request_response_view_state::Empty, S> {
         RequestResponseViewBuilder::builder()
     }
 }
@@ -2856,10 +2769,7 @@ where
     }
 }
 
-impl<
-    St: request_response_view_state::State,
-    S: BosStr,
-> RequestResponseViewBuilder<St, S> {
+impl<St: request_response_view_state::State, S: BosStr> RequestResponseViewBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -2932,10 +2842,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RequestResponseView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RequestResponseView<S> {
         RequestResponseView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -2955,15 +2862,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod request_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3111,7 +3017,9 @@ impl RequestViewBuilder<request_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         RequestViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3122,7 +3030,9 @@ impl<S: BosStr> RequestViewBuilder<request_view_state::Empty, S> {
     pub fn builder() -> Self {
         RequestViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3219,10 +3129,7 @@ where
 
 impl<St: request_view_state::State, S: BosStr> RequestViewBuilder<St, S> {
     /// Set the `referenceImages` field (optional)
-    pub fn reference_images(
-        mut self,
-        value: impl Into<Option<Vec<UriValue<S>>>>,
-    ) -> Self {
+    pub fn reference_images(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -3261,10 +3168,7 @@ impl<St: request_view_state::State, S: BosStr> RequestViewBuilder<St, S> {
 
 impl<St: request_view_state::State, S: BosStr> RequestViewBuilder<St, S> {
     /// Set the `targetActor` field (optional)
-    pub fn target_actor(
-        mut self,
-        value: impl Into<Option<ProfileViewBasic<S>>>,
-    ) -> Self {
+    pub fn target_actor(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -3341,10 +3245,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RequestView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RequestView<S> {
         RequestView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),

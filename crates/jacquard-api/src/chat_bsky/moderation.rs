@@ -12,18 +12,16 @@ pub mod get_convo_members;
 pub mod get_convos;
 pub mod get_message_context;
 
-
 #[cfg(feature = "streaming")]
 pub mod subscribe_mod_events;
 pub mod update_actor_access;
-
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,19 +32,22 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::ConvoLockStatus;
 use crate::chat_bsky::group::JoinLinkView;
 use crate::chat_bsky::moderation;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A view of a conversation for moderation purposes. Unlike chat.bsky.convo.defs#convoView, it does not include viewer-specific data (such as muted, unreadCount, status, lastMessage, lastReaction), since the requester is a moderator and not a member of the conversation. The member list is not included; use chat.bsky.moderation.getConvoMembers to list members.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub id: S,
-    ///Union field that has data specific to different kinds of convos.
+    /// Union field that has data specific to different kinds of convos.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub kind: Option<ConvoViewKind<S>>,
     pub rev: S,
@@ -58,7 +59,6 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -73,7 +73,10 @@ pub enum ConvoViewKind<S: BosStr = DefaultStr> {
 /// Data specific to a direct conversation, for moderation purposes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DirectConvo<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -87,20 +90,23 @@ pub struct DirectConvo<S: BosStr = DefaultStr> {
 /// Data specific to a group conversation, for moderation purposes. Unlike chat.bsky.convo.defs#groupConvo, it does not include viewer-specific data (such as unreadJoinRequestCount), since the requester is a moderator and not a member of the conversation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GroupConvo<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub join_link: Option<JoinLinkView<S>>,
-    ///The total number of pending join requests for the group conversation. This information is only visible to the owner and to moderators. Capped at 21.
+    /// The total number of pending join requests for the group conversation. This information is only visible to the owner and to moderators. Capped at 21.
     pub join_request_count: i64,
-    ///The lock status of the conversation.
+    /// The lock status of the conversation.
     pub lock_status: ConvoLockStatus<S>,
-    ///The total number of members in the group conversation.
+    /// The total number of members in the group conversation.
     pub member_count: i64,
-    ///The maximum number of members allowed in the group conversation.
+    /// The maximum number of members allowed in the group conversation.
     pub member_limit: i64,
-    ///The display name of the group conversation.
+    /// The display name of the group conversation.
     pub name: S,
     #[serde(
         flatten,
@@ -187,17 +193,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.moderation.defs"),
@@ -248,11 +253,9 @@ fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("directConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Data specific to a direct conversation, for moderation purposes.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Data specific to a direct conversation, for moderation purposes.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -356,9 +359,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -369,15 +371,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod group_convo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -689,10 +690,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GroupConvo<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GroupConvo<S> {
         GroupConvo {
             created_at: self._fields.0.unwrap(),
             join_link: self._fields.1,

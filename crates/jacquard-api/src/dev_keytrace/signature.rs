@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,27 +23,30 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A cryptographic signature attesting to a claim
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Signature<S: BosStr = DefaultStr> {
-    ///The cryptographic signature (base64-encoded).
+    /// The cryptographic signature (base64-encoded).
     pub attestation: S,
-    ///Optional comment or description.
+    /// Optional comment or description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Key identifier (e.g., date in YYYY-MM-DD format).
+    /// Key identifier (e.g., date in YYYY-MM-DD format).
     pub kid: S,
-    ///Datetime when this signature was retracted. Present only if the signature has been retracted (ISO 8601).
+    /// Datetime when this signature was retracted. Present only if the signature has been retracted (ISO 8601).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retracted_at: Option<Datetime>,
-    ///Datetime when the signature was created (ISO 8601).
+    /// Datetime when the signature was created (ISO 8601).
     pub signed_at: Datetime,
-    ///Ordered list of field names included in the signed payload (e.g., ['did', 'subject', 'type', 'verifiedAt'])
+    /// Ordered list of field names included in the signed payload (e.g., ['did', 'subject', 'type', 'verifiedAt'])
     pub signed_fields: Vec<S>,
-    ///AT URI reference to the signing key record published by the verification service (e.g., at://did:plc:serviceaccount/dev.keytrace.serverPublicKey/2024-01-15).
+    /// AT URI reference to the signing key record published by the verification service (e.g., at://did:plc:serviceaccount/dev.keytrace.serverPublicKey/2024-01-15).
     pub src: AtUri<S>,
     #[serde(
         flatten,
@@ -88,15 +91,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -275,10 +277,7 @@ where
     St::Kid: signature_state::IsUnset,
 {
     /// Set the `kid` field (required)
-    pub fn kid(
-        mut self,
-        value: impl Into<S>,
-    ) -> SignatureBuilder<signature_state::SetKid<St>, S> {
+    pub fn kid(mut self, value: impl Into<S>) -> SignatureBuilder<signature_state::SetKid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -381,10 +380,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Signature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
         Signature {
             attestation: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -399,10 +395,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_signature() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.signature"),

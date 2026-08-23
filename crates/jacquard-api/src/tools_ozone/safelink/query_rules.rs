@@ -8,43 +8,46 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::safelink::UrlRule;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::safelink::UrlRule;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryRules<S: BosStr = DefaultStr> {
-    ///Filter by action types
+    /// Filter by action types
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actions: Option<Vec<S>>,
-    ///Filter by rule creator
+    /// Filter by rule creator
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<Did<S>>,
-    ///Cursor for pagination
+    /// Cursor for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Maximum number of results to return  Defaults to `50`.
+    /// Maximum number of results to return  Defaults to `50`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_rules_limit")]
     pub limit: Option<i64>,
-    ///Filter by pattern type
+    /// Filter by pattern type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern_type: Option<S>,
-    ///Filter by reason type
+    /// Filter by reason type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
-    ///Sort direction  Defaults to `"desc"`.
+    /// Sort direction  Defaults to `"desc"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_rules_sort_direction")]
     pub sort_direction: Option<QueryRulesSortDirection<S>>,
-    ///Filter by specific URLs or domains
+    /// Filter by specific URLs or domains
     #[serde(skip_serializing_if = "Option::is_none")]
     pub urls: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -125,18 +128,18 @@ where
         match self {
             QueryRulesSortDirection::Asc => QueryRulesSortDirection::Asc,
             QueryRulesSortDirection::Desc => QueryRulesSortDirection::Desc,
-            QueryRulesSortDirection::Other(v) => {
-                QueryRulesSortDirection::Other(v.into_static())
-            }
+            QueryRulesSortDirection::Other(v) => QueryRulesSortDirection::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryRulesOutput<S: BosStr = DefaultStr> {
-    ///Next cursor for pagination. Only present if there are more results.
+    /// Next cursor for pagination. Only present if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub rules: Vec<UrlRule<S>>,
@@ -157,9 +160,8 @@ impl jacquard_common::xrpc::XrpcResp for QueryRulesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryRules<S> {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = QueryRulesResponse;
 }
 
@@ -169,9 +171,8 @@ Path: `/xrpc/tools.ozone.safelink.queryRules`. The request payload type is `Quer
 pub struct QueryRulesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryRules";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = QueryRules<S>;
     type Response = QueryRulesResponse;
 }
@@ -180,8 +181,9 @@ fn _default_query_rules_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_query_rules_sort_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    QueryRulesSortDirection<S>,
-> {
-    Some(<QueryRulesSortDirection<S>>::from_value(S::from_static("desc")))
+fn _default_query_rules_sort_direction<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<QueryRulesSortDirection<S>> {
+    Some(<QueryRulesSortDirection<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }

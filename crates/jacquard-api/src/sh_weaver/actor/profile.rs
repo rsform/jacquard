@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::sh_weaver::actor::PinnedList;
 use crate::sh_weaver::actor::PronounsList;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A declaration of a Weaver account profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -41,40 +41,40 @@ use crate::sh_weaver::actor::PronounsList;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Small image to be displayed next to posts from account. AKA, 'profile picture'
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
-    ///Larger horizontal image to display behind profile view.
+    /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<BlobRef<S>>,
-    ///Include link to this account on Bluesky.
+    /// Include link to this account on Bluesky.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bluesky: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///Self-label values, specific to the application, on the overall account.
+    /// Self-label values, specific to the application, on the overall account.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Vec<UriValue<S>>>,
-    ///Free-form location text.
+    /// Free-form location text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<S>,
-    ///Notebooks or other records pinned for display.
+    /// Notebooks or other records pinned for display.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pinned: Option<PinnedList<S>>,
-    ///Pronouns to use in user-generated content.
+    /// Pronouns to use in user-generated content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pronouns: Option<PronounsList<S>>,
-    ///Include link to this account on stream.place.
+    /// Include link to this account on stream.place.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streamplace: Option<bool>,
-    ///Include link to this account on Tangled.
+    /// Include link to this account on Tangled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tangled: Option<bool>,
     #[serde(
@@ -157,25 +157,20 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -197,25 +192,20 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -332,8 +322,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
         if let Some(values) = &self.pronouns {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 50usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("pronouns"),
@@ -355,9 +344,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -369,7 +357,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -427,19 +415,7 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -452,19 +428,7 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -685,10 +649,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_actor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.actor.profile"),

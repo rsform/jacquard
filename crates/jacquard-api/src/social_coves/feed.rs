@@ -12,7 +12,6 @@ pub mod get_discover;
 pub mod get_timeline;
 pub mod vote;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -29,20 +28,23 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_coves::community::post::AuthorView;
 use crate::social_coves::community::post::CommunityRef;
 use crate::social_coves::community::post::PostView;
 use crate::social_coves::feed;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A post with optional context about why it appears in a feed
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FeedViewPost<S: BosStr = DefaultStr> {
     pub post: PostView<S>,
-    ///Additional context for why this post is in the feed
+    /// Additional context for why this post is in the feed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<FeedViewPostReason<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,7 +57,6 @@ pub struct FeedViewPost<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -70,7 +71,10 @@ pub enum FeedViewPostReason<S: BosStr = DefaultStr> {
 /// Minimal reference to a post
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -86,7 +90,10 @@ pub struct PostRef<S: BosStr = DefaultStr> {
 /// Indicates this post is pinned in a community
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReasonPin<S: BosStr = DefaultStr> {
     pub community: CommunityRef<S>,
     #[serde(
@@ -101,7 +108,10 @@ pub struct ReasonPin<S: BosStr = DefaultStr> {
 /// Indicates this post was reposted
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReasonRepost<S: BosStr = DefaultStr> {
     pub by: AuthorView<S>,
     pub indexed_at: Datetime,
@@ -117,7 +127,10 @@ pub struct ReasonRepost<S: BosStr = DefaultStr> {
 /// Reference to parent and root posts in a reply thread
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub parent: feed::PostRef<S>,
     pub root: feed::PostRef<S>,
@@ -212,15 +225,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod feed_view_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -357,10 +369,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FeedViewPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedViewPost<S> {
         FeedViewPost {
             post: self._fields.0.unwrap(),
             reason: self._fields.1,
@@ -371,10 +380,10 @@ where
 }
 
 fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.feed.defs"),
@@ -383,11 +392,9 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedViewPost"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A post with optional context about why it appears in a feed",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A post with optional context about why it appears in a feed",
+                    )),
                     required: Some(vec![SmolStr::new_static("post")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -404,14 +411,12 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("reason"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Additional context for why this post is in the feed",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Additional context for why this post is in the feed",
+                                )),
                                 refs: vec![
                                     CowStr::new_static("#reasonRepost"),
-                                    CowStr::new_static("#reasonPin")
+                                    CowStr::new_static("#reasonPin"),
                                 ],
                                 ..Default::default()
                             }),
@@ -432,9 +437,7 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("postRef"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Minimal reference to a post")),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -460,11 +463,9 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonPin"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Indicates this post is pinned in a community",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Indicates this post is pinned in a community",
+                    )),
                     required: Some(vec![SmolStr::new_static("community")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -486,12 +487,11 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonRepost"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Indicates this post was reposted"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
-                    ),
+                    description: Some(CowStr::new_static("Indicates this post was reposted")),
+                    required: Some(vec![
+                        SmolStr::new_static("by"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -519,14 +519,13 @@ fn lexicon_doc_social_coves_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("replyRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Reference to parent and root posts in a reply thread",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("root"), SmolStr::new_static("parent")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Reference to parent and root posts in a reply thread",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("root"),
+                        SmolStr::new_static("parent"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -562,15 +561,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod post_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -724,15 +722,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reason_pin_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -837,10 +834,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReasonPin<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonPin<S> {
         ReasonPin {
             community: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -855,15 +849,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reason_repost_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1001,10 +994,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReasonRepost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonRepost<S> {
         ReasonRepost {
             by: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -1020,15 +1010,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

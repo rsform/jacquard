@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notebook::PublishedVersionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notebook::PublishedVersionView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPublishedVersions<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
     ///  Defaults to `false`.
@@ -28,15 +31,17 @@ pub struct GetPublishedVersions<S: BosStr = DefaultStr> {
     pub include_content: Option<bool>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPublishedVersionsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical: Option<PublishedVersionView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_divergence: Option<bool>,
-    ///Full entry records if includeContent=true
+    /// Full entry records if includeContent=true
     #[serde(skip_serializing_if = "Option::is_none")]
     pub records: Option<Vec<Data<S>>>,
     pub versions: Vec<PublishedVersionView<S>>,
@@ -78,7 +83,7 @@ fn _default_include_content() -> Option<bool> {
 
 pub mod get_published_versions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,20 +125,14 @@ pub struct GetPublishedVersionsBuilder<
 
 impl GetPublishedVersions<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetPublishedVersionsBuilder<
-        get_published_versions_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetPublishedVersionsBuilder<get_published_versions_state::Empty, DefaultStr> {
         GetPublishedVersionsBuilder::new()
     }
 }
 
 impl<S: BosStr> GetPublishedVersions<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetPublishedVersionsBuilder<
-        get_published_versions_state::Empty,
-        S,
-    > {
+    pub fn builder() -> GetPublishedVersionsBuilder<get_published_versions_state::Empty, S> {
         GetPublishedVersionsBuilder::builder()
     }
 }
@@ -179,10 +178,7 @@ where
     }
 }
 
-impl<
-    St: get_published_versions_state::State,
-    S: BosStr,
-> GetPublishedVersionsBuilder<St, S> {
+impl<St: get_published_versions_state::State, S: BosStr> GetPublishedVersionsBuilder<St, S> {
     /// Set the `includeContent` field (optional)
     pub fn include_content(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// defines an item in a gallery group
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,9 +38,9 @@ use serde::{Serialize, Deserialize};
 )]
 pub struct GroupItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
-    ///uri of the group that the image belongs to
+    /// uri of the group that the image belongs to
     pub group: AtUri<S>,
-    ///uri of the image that this item represents
+    /// uri of the image that this item represents
     pub image: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
@@ -119,9 +119,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -133,7 +132,7 @@ where
 
 pub mod group_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -192,7 +191,12 @@ pub mod group_item_state {
 /// Builder for constructing an instance of this type.
 pub struct GroupItemBuilder<St: group_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -320,10 +324,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GroupItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GroupItem<S> {
         GroupItem {
             added_at: self._fields.0.unwrap(),
             group: self._fields.1.unwrap(),
@@ -335,10 +336,10 @@ where
 }
 
 fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("cat.vt3e.gallery.groupItem"),
@@ -347,17 +348,14 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("defines an item in a gallery group"),
-                    ),
+                    description: Some(CowStr::new_static("defines an item in a gallery group")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("group"), SmolStr::new_static("image"),
-                                SmolStr::new_static("addedAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("group"),
+                            SmolStr::new_static("image"),
+                            SmolStr::new_static("addedAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -371,11 +369,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("group"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "uri of the group that the image belongs to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "uri of the group that the image belongs to",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -383,11 +379,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("image"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "uri of the image that this item represents",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "uri of the image that this item represents",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

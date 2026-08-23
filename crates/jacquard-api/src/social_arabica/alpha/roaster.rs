@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A coffee roaster company
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,17 +37,17 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Roaster<S: BosStr = DefaultStr> {
-    ///Timestamp when the roaster record was created
+    /// Timestamp when the roaster record was created
     pub created_at: Datetime,
-    ///Location of the roaster (e.g., 'Raleigh, NC', 'Floyd, VA')
+    /// Location of the roaster (e.g., 'Raleigh, NC', 'Floyd, VA')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<S>,
-    ///Name of the roaster (e.g., 'Black & White', 'Red Rooster')
+    /// Name of the roaster (e.g., 'Black & White', 'Red Rooster')
     pub name: S,
-    ///AT-URI of the record this entity was sourced from
+    /// AT-URI of the record this entity was sourced from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_ref: Option<AtUri<S>>,
-    ///Roaster's website URL
+    /// Roaster's website URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<UriValue<S>>,
     #[serde(
@@ -156,9 +156,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -170,7 +169,7 @@ where
 
 pub mod roaster_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -299,10 +298,7 @@ where
     St::Name: roaster_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RoasterBuilder<roaster_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> RoasterBuilder<roaster_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RoasterBuilder {
             _state: PhantomData,
@@ -369,10 +365,10 @@ where
 }
 
 fn lexicon_doc_social_arabica_alpha_roaster() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.arabica.alpha.roaster"),

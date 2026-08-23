@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::tech_tokimeki::kaku::AspectRatio;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A drawing post created with the drawing tool
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,22 +40,22 @@ use crate::tech_tokimeki::kaku::AspectRatio;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
-    ///Aspect ratio of the image
+    /// Aspect ratio of the image
     pub aspect_ratio: AspectRatio<S>,
-    ///Timestamp when the post was created
+    /// Timestamp when the post was created
     pub created_at: Datetime,
-    ///The drawn image (max 1MB)
+    /// The drawn image (max 1MB)
     pub image: BlobRef<S>,
-    ///Bluesky post created for this drawing
+    /// Bluesky post created for this drawing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub linked_post: Option<StrongRef<S>>,
-    ///Reference to a related Bluesky post
+    /// Reference to a related Bluesky post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<StrongRef<S>>,
-    ///Tags for categorization
+    /// Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Optional description or title
+    /// Optional description or title
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
     #[serde(
@@ -140,25 +140,20 @@ impl<S: BosStr> LexiconSchema for Post<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -189,8 +184,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 32usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -234,9 +228,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -248,7 +241,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -500,10 +493,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.post"),
@@ -512,20 +505,16 @@ fn lexicon_doc_tech_tokimeki_kaku_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A drawing post created with the drawing tool",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A drawing post created with the drawing tool",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("image"),
-                                SmolStr::new_static("aspectRatio"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("image"),
+                            SmolStr::new_static("aspectRatio"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -541,16 +530,18 @@ fn lexicon_doc_tech_tokimeki_kaku_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when the post was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the post was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("linkedPost"),
@@ -569,9 +560,9 @@ fn lexicon_doc_tech_tokimeki_kaku_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Tags for categorization"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Tags for categorization",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         max_graphemes: Some(32usize),
@@ -584,9 +575,9 @@ fn lexicon_doc_tech_tokimeki_kaku_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Optional description or title"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Optional description or title",
+                                    )),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(300usize),
                                     ..Default::default()

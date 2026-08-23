@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A review connected to a verified transaction, can only be created by one of the transaction parties
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Review<S: BosStr = DefaultStr> {
-    ///When the review was created
+    /// When the review was created
     pub created_at: Datetime,
-    ///The detailed review text
+    /// The detailed review text
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Rating score from 1 to 5
+    /// Rating score from 1 to 5
     pub rating: i64,
-    ///Whether this review is from the service provider or consumer
+    /// Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reviewer_role: Option<ReviewReviewerRole<S>>,
-    ///The title of the review
+    /// The title of the review
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
+    /// AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     pub transaction: S,
     #[serde(
         flatten,
@@ -246,9 +246,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -260,7 +259,7 @@ where
 
 pub mod review_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -419,10 +418,7 @@ where
 
 impl<St: review_state::State, S: BosStr> ReviewBuilder<St, S> {
     /// Set the `reviewerRole` field (optional)
-    pub fn reviewer_role(
-        mut self,
-        value: impl Into<Option<ReviewReviewerRole<S>>>,
-    ) -> Self {
+    pub fn reviewer_role(mut self, value: impl Into<Option<ReviewReviewerRole<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -499,10 +495,10 @@ where
 }
 
 fn lexicon_doc_beauty_cybernetic_trustcow_review() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("beauty.cybernetic.trustcow.review"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,19 +22,22 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Heading<S: BosStr = DefaultStr> {
-    ///Facets for text formatting
+    /// Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
-    ///Heading level (1-3)
+    /// Heading level (1-3)
     pub level: i64,
-    ///The heading text content
+    /// The heading text content
     pub plaintext: S,
-    ///Text alignment
+    /// Text alignment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text_align: Option<HeadingTextAlign<S>>,
     #[serde(
@@ -171,15 +174,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod heading_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -224,7 +226,12 @@ pub mod heading_state {
 /// Builder for constructing an instance of this type.
 pub struct HeadingBuilder<St: heading_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<Data<S>>>, Option<i64>, Option<S>, Option<HeadingTextAlign<S>>),
+    _fields: (
+        Option<Vec<Data<S>>>,
+        Option<i64>,
+        Option<S>,
+        Option<HeadingTextAlign<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -357,10 +364,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.heading"),
@@ -369,21 +376,17 @@ fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("plaintext"),
-                            SmolStr::new_static("level")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("plaintext"),
+                        SmolStr::new_static("level"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Facets for text formatting"),
-                                ),
+                                description: Some(CowStr::new_static("Facets for text formatting")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.offprint.richtext.facet"),
                                     ..Default::default()
@@ -402,9 +405,7 @@ fn lexicon_doc_app_offprint_block_heading() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("plaintext"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The heading text content"),
-                                ),
+                                description: Some(CowStr::new_static("The heading text content")),
                                 ..Default::default()
                             }),
                         );

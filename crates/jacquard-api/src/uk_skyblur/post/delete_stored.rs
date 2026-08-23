@@ -10,24 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteStored<S: BosStr = DefaultStr> {
-    ///AT URI of the post to delete. The URI must include the logged-in user's DID in the format at://did...
+    /// AT URI of the post to delete. The URI must include the logged-in user's DID in the format at://did...
     pub uri: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteStoredOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub success: Option<bool>,
@@ -48,9 +53,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteStoredResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteStored<S> {
     const NSID: &'static str = "uk.skyblur.post.deleteStored";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteStoredResponse;
 }
 
@@ -60,9 +64,8 @@ Path: `/xrpc/uk.skyblur.post.deleteStored`. The request payload type is `DeleteS
 pub struct DeleteStoredRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteStoredRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.deleteStored";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeleteStored<S>;
     type Response = DeleteStoredResponse;
 }

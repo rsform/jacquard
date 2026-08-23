@@ -10,35 +10,38 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::knot::list_members;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::knot::list_members;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItem<S: BosStr = DefaultStr> {
-    ///DID that added this member
+    /// DID that added this member
     pub added_by: Did<S>,
-    ///Optional record CID for record-backed indexers
+    /// Optional record CID for record-backed indexers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
-    ///When the member was added
+    /// When the member was added
     pub created_at: Datetime,
-    ///DID of the member
+    /// DID of the member
     pub subject: Did<S>,
-    ///Optional record AT-URI for record-backed indexers
+    /// Optional record AT-URI for record-backed indexers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
     #[serde(
@@ -129,9 +132,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListMembers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -146,9 +151,11 @@ pub struct ListMembers<S: BosStr = DefaultStr> {
     pub subject: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListMembersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -207,15 +214,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -435,10 +441,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.knot.listMembers"),
@@ -447,22 +453,18 @@ fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("addedBy"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("addedBy"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID that added this member"),
-                                ),
+                                description: Some(CowStr::new_static("DID that added this member")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -470,11 +472,9 @@ fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional record CID for record-backed indexers",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional record CID for record-backed indexers",
+                                )),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -482,9 +482,7 @@ fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the member was added"),
-                                ),
+                                description: Some(CowStr::new_static("When the member was added")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -500,11 +498,9 @@ fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional record AT-URI for record-backed indexers",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional record AT-URI for record-backed indexers",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -517,50 +513,46 @@ fn lexicon_doc_sh_tangled_knot_listMembers() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("subject")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(CowStr::new_static("Pagination cursor")),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("order"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Sort direction by createdAt."),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("subject"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Knot identifier whose member records to list.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("subject")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Pagination cursor")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("order"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Sort direction by createdAt.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("subject"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Knot identifier whose member records to list.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -574,15 +566,14 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    ListMembersOrder<S>,
-> {
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<ListMembersOrder<S>> {
     Some(<ListMembersOrder<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_members_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -615,7 +606,12 @@ pub mod list_members_state {
 /// Builder for constructing an instance of this type.
 pub struct ListMembersBuilder<St: list_members_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<ListMembersOrder<S>>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<ListMembersOrder<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// An attestation that a MUXL blob is available for download from the publishing node, retrievable via XRPC (com.atproto.repo.getBlob and similar). Published by the Streamplace node that hosts the blob, not by the user who owns the underlying video. The rkey is conventionally the blob's BDASL CID — atproto lexicon doesn't yet have a literal-rkey syntax so we settle for `key: any` and rely on the convention.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Origin<S: BosStr = DefaultStr> {
-    ///BLAKE-3 content hash (BDASL CID) of the blob.
+    /// BLAKE-3 content hash (BDASL CID) of the blob.
     pub blob: S,
-    ///MIME type of the blob (e.g. video/mp4).
+    /// MIME type of the blob (e.g. video/mp4).
     pub mime_type: S,
-    ///Size of the blob in bytes.
+    /// Size of the blob in bytes.
     pub size: i64,
     #[serde(
         flatten,
@@ -118,9 +118,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -132,7 +131,7 @@ where
 
 pub mod origin_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -237,10 +236,7 @@ where
     St::Blob: origin_state::IsUnset,
 {
     /// Set the `blob` field (required)
-    pub fn blob(
-        mut self,
-        value: impl Into<S>,
-    ) -> OriginBuilder<origin_state::SetBlob<St>, S> {
+    pub fn blob(mut self, value: impl Into<S>) -> OriginBuilder<origin_state::SetBlob<St>, S> {
         self._fields.0 = Option::Some(value.into());
         OriginBuilder {
             _state: PhantomData,
@@ -275,10 +271,7 @@ where
     St::Size: origin_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(
-        mut self,
-        value: impl Into<i64>,
-    ) -> OriginBuilder<origin_state::SetSize<St>, S> {
+    pub fn size(mut self, value: impl Into<i64>) -> OriginBuilder<origin_state::SetSize<St>, S> {
         self._fields.2 = Option::Some(value.into());
         OriginBuilder {
             _state: PhantomData,
@@ -316,10 +309,10 @@ where
 }
 
 fn lexicon_doc_place_stream_media_origin() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.media.origin"),

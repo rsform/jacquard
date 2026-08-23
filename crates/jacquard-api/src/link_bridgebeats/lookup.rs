@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::link_bridgebeats::lookup;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::link_bridgebeats::lookup;
+use serde::{Deserialize, Serialize};
 /// Result of parsing and looking up media links across supported music streaming providers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,9 +38,9 @@ use crate::link_bridgebeats::lookup;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Lookup<S: BosStr = DefaultStr> {
-    ///ISO8601 timestamp of when this lookup was performed.
+    /// ISO8601 timestamp of when this lookup was performed.
     pub looked_up_at: Datetime,
-    ///Collection of lookup results from each provider that returned a match.
+    /// Collection of lookup results from each provider that returned a match.
     pub results: Vec<lookup::ProviderResult<S>>,
     #[serde(
         flatten,
@@ -65,27 +65,30 @@ pub struct LookupGetRecordOutput<S: BosStr = DefaultStr> {
 /// Music metadata from a specific provider's API query.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProviderResult<S: BosStr = DefaultStr> {
-    ///URL to the cover artwork image.
+    /// URL to the cover artwork image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub art_url: Option<UriValue<S>>,
-    ///Primary artist name for the track or album artist.
+    /// Primary artist name for the track or album artist.
     pub artist: S,
-    ///ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.
+    /// ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<S>,
-    ///True for albums/EPs, false for individual tracks.
+    /// True for albums/EPs, false for individual tracks.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_album: Option<bool>,
-    ///ISO3166-1 alpha-2 country code for the market/storefront.  Defaults to `"us"`.
+    /// ISO3166-1 alpha-2 country code for the market/storefront.  Defaults to `"us"`.
     #[serde(default = "_default_provider_result_market_region")]
     pub market_region: S,
-    ///The streaming platform provider.
+    /// The streaming platform provider.
     pub provider: ProviderResultProvider<S>,
-    ///Official title of the track or album as listed in the provider's catalog.
+    /// Official title of the track or album as listed in the provider's catalog.
     pub title: S,
-    ///Direct web link to the track or album on the provider's platform.
+    /// Direct web link to the track or album on the provider's platform.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -174,9 +177,7 @@ where
             ProviderResultProvider::AppleMusic => ProviderResultProvider::AppleMusic,
             ProviderResultProvider::Spotify => ProviderResultProvider::Spotify,
             ProviderResultProvider::Tidal => ProviderResultProvider::Tidal,
-            ProviderResultProvider::Other(v) => {
-                ProviderResultProvider::Other(v.into_static())
-            }
+            ProviderResultProvider::Other(v) => ProviderResultProvider::Other(v.into_static()),
         }
     }
 }
@@ -337,9 +338,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -351,7 +351,7 @@ where
 
 pub mod lookup_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -499,10 +499,10 @@ where
 }
 
 fn lexicon_doc_link_bridgebeats_lookup() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("link.bridgebeats.lookup"),
@@ -687,9 +687,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -699,7 +698,7 @@ fn _default_provider_result_market_region<S: FromStaticStr>() -> S {
 
 pub mod provider_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -790,10 +789,7 @@ pub mod provider_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProviderResultBuilder<
-    St: provider_result_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ProviderResultBuilder<St: provider_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
@@ -1002,10 +998,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProviderResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProviderResult<S> {
         ProviderResult {
             art_url: self._fields.0,
             artist: self._fields.1.unwrap(),

@@ -8,7 +8,6 @@
 //! Generated bindings for the `app.rocksky.stats` Lexicon namespace/module.
 pub mod get_stats;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
@@ -23,24 +22,27 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StatsView<S: BosStr = DefaultStr> {
-    ///The total number of unique albums scrobbled.
+    /// The total number of unique albums scrobbled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub albums: Option<i64>,
-    ///The total number of unique artists scrobbled.
+    /// The total number of unique artists scrobbled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artists: Option<i64>,
-    ///The total number of tracks marked as loved.
+    /// The total number of tracks marked as loved.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loved_tracks: Option<i64>,
-    ///The total number of scrobbles.
+    /// The total number of scrobbles.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobbles: Option<i64>,
-    ///The total number of unique tracks scrobbled.
+    /// The total number of unique tracks scrobbled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<i64>,
     #[serde(
@@ -74,17 +76,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_app_rocksky_stats_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.stats.defs"),

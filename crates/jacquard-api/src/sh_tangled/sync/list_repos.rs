@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,21 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::sync::list_repos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::sync::list_repos;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DefaultBranch<S: BosStr = DefaultStr> {
-    ///Commit SHA at the tip of the default branch, for reconciling against a last-known state. Width depends on the repo's git object-format.
+    /// Commit SHA at the tip of the default branch, for reconciling against a last-known state. Width depends on the repo's git object-format.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub head: Option<S>,
-    ///Default branch ref name, eg. refs/heads/main.
+    /// Default branch ref name, eg. refs/heads/main.
     pub r#ref: S,
     #[serde(
         flatten,
@@ -122,9 +125,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListRepos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -138,9 +143,11 @@ pub struct ListRepos<S: BosStr = DefaultStr> {
     pub order: Option<ListReposOrder<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListReposOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -149,26 +156,21 @@ pub struct ListReposOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ListReposError {
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<SmolStr>),
+    InvalidRequest(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ListReposError {
@@ -192,15 +194,17 @@ impl core::fmt::Display for ListReposError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Repo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_branch: Option<list_repos::DefaultBranch<S>>,
-    ///DID of the git repo as minted by the knot
+    /// DID of the git repo as minted by the knot
     pub repo: Did<S>,
-    ///Serving status of the repo according to the knot.
+    /// Serving status of the repo according to the knot.
     pub status: RepoStatus<S>,
     #[serde(
         flatten,
@@ -403,17 +407,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_sh_tangled_sync_listRepos() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.sync.listRepos"),
@@ -460,49 +463,46 @@ fn lexicon_doc_sh_tangled_sync_listRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(CowStr::new_static("Pagination cursor")),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("order"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Sort direction over the service's repo listing order.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Pagination cursor")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("order"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Sort direction over the service's repo listing order.",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("repo"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("repo"), SmolStr::new_static("status")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("repo"),
+                        SmolStr::new_static("status"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -516,11 +516,9 @@ fn lexicon_doc_sh_tangled_sync_listRepos() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("repo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the git repo as minted by the knot",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the git repo as minted by the knot",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -528,11 +526,9 @@ fn lexicon_doc_sh_tangled_sync_listRepos() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Serving status of the repo according to the knot.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Serving status of the repo according to the knot.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -551,15 +547,14 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    ListReposOrder<S>,
-> {
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<ListReposOrder<S>> {
     Some(<ListReposOrder<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_repos_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -679,15 +674,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -786,10 +780,7 @@ impl<St: repo_state::State, S: BosStr> RepoBuilder<St, S> {
         self
     }
     /// Set the `defaultBranch` field to an Option value (optional)
-    pub fn maybe_default_branch(
-        mut self,
-        value: Option<list_repos::DefaultBranch<S>>,
-    ) -> Self {
+    pub fn maybe_default_branch(mut self, value: Option<list_repos::DefaultBranch<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -801,10 +792,7 @@ where
     St::Repo: repo_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> RepoBuilder<repo_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> RepoBuilder<repo_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,

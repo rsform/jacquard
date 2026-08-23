@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,33 +37,33 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Proposal<S: BosStr = DefaultStr> {
-    ///The persistent, anonymous identifier for the user creating the proposal.
+    /// The persistent, anonymous identifier for the user creating the proposal.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aid: Option<S>,
-    ///Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
+    /// Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
-    ///Timestamp when this proposal was created.
+    /// Timestamp when this proposal was created.
     pub cts: Datetime,
-    ///For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
+    /// For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
-    ///An optional array of predefined reasons justifying the moderation action.
+    /// An optional array of predefined reasons justifying the moderation action.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reasons: Option<Vec<S>>,
-    ///Signature of dag-cbor encoded proposal.
+    /// Signature of dag-cbor encoded proposal.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub sig: Option<Bytes>,
-    ///DID of the actor who created this proposal.
+    /// DID of the actor who created this proposal.
     pub src: Did<S>,
-    ///The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
+    /// The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
     pub typ: S,
-    ///AT URI of the record, repository (account), or other resource that this proposal applies to.
+    /// AT URI of the record, repository (account), or other resource that this proposal applies to.
     pub uri: UriValue<S>,
-    ///For 'label' proposals, the short string name of the value of the proposed label.
+    /// For 'label' proposals, the short string name of the value of the proposed label.
     pub val: S,
-    ///The AT Protocol version of the proposal object.
+    /// The AT Protocol version of the proposal object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ver: Option<i64>,
     #[serde(
@@ -152,9 +152,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -166,7 +165,7 @@ where
 
 pub mod proposal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -294,7 +293,9 @@ impl ProposalBuilder<proposal_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProposalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -305,7 +306,9 @@ impl<S: BosStr> ProposalBuilder<proposal_state::Empty, S> {
     pub fn builder() -> Self {
         ProposalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -420,10 +423,7 @@ where
     St::Typ: proposal_state::IsUnset,
 {
     /// Set the `typ` field (required)
-    pub fn typ(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProposalBuilder<proposal_state::SetTyp<St>, S> {
+    pub fn typ(mut self, value: impl Into<S>) -> ProposalBuilder<proposal_state::SetTyp<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -458,10 +458,7 @@ where
     St::Val: proposal_state::IsUnset,
 {
     /// Set the `val` field (required)
-    pub fn val(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProposalBuilder<proposal_state::SetVal<St>, S> {
+    pub fn val(mut self, value: impl Into<S>) -> ProposalBuilder<proposal_state::SetVal<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -530,10 +527,10 @@ where
 }
 
 fn lexicon_doc_social_pmsky_proposal() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pmsky.proposal"),

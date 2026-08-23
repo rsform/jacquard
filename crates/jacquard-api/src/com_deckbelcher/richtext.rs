@@ -8,13 +8,12 @@
 //! Generated bindings for the `com.deckbelcher.richtext` Lexicon namespace/module.
 pub mod facet;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +23,20 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_deckbelcher::richtext;
+use crate::com_deckbelcher::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_deckbelcher::richtext::facet::Facet;
-use crate::com_deckbelcher::richtext;
+use serde::{Deserialize, Serialize};
 /// An unordered (bullet) list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BulletListBlock<S: BosStr = DefaultStr> {
-    ///The list items.
+    /// The list items.
     pub items: Vec<richtext::ListItem<S>>,
     #[serde(
         flatten,
@@ -48,12 +50,15 @@ pub struct BulletListBlock<S: BosStr = DefaultStr> {
 /// A code block with optional language hint.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CodeBlock<S: BosStr = DefaultStr> {
-    ///Optional language identifier for syntax highlighting.
+    /// Optional language identifier for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
-    ///The code content (plain text, no facets).
+    /// The code content (plain text, no facets).
     pub text: S,
     #[serde(
         flatten,
@@ -68,9 +73,12 @@ pub struct CodeBlock<S: BosStr = DefaultStr> {
 /// Used for primers and other long-form content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Document<S: BosStr = DefaultStr> {
-    ///Array of blocks (paragraphs, headings, etc).
+    /// Array of blocks (paragraphs, headings, etc).
     pub content: Vec<DocumentContentItem<S>>,
     #[serde(
         flatten,
@@ -80,7 +88,6 @@ pub struct Document<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -103,14 +110,17 @@ pub enum DocumentContentItem<S: BosStr = DefaultStr> {
 /// A heading block with level, text, and optional facets.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HeadingBlock<S: BosStr = DefaultStr> {
-    ///Annotations of text (formatting, mentions, links, etc).
+    /// Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///Heading level (1-6).
+    /// Heading level (1-6).
     pub level: i64,
-    ///The plain text content (no markdown symbols).
+    /// The plain text content (no markdown symbols).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
     #[serde(
@@ -125,7 +135,10 @@ pub struct HeadingBlock<S: BosStr = DefaultStr> {
 /// A horizontal rule (thematic break).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HorizontalRuleBlock<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -139,15 +152,18 @@ pub struct HorizontalRuleBlock<S: BosStr = DefaultStr> {
 /// A single list item with text, optional facets, and optional sublist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItem<S: BosStr = DefaultStr> {
-    ///Annotations of text (formatting, mentions, links, etc).
+    /// Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///Optional nested sublist (bullet or ordered).
+    /// Optional nested sublist (bullet or ordered).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sublist: Option<ListItemSublist<S>>,
-    ///The plain text content (no markdown symbols).
+    /// The plain text content (no markdown symbols).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
     #[serde(
@@ -158,7 +174,6 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -174,12 +189,15 @@ pub enum ListItemSublist<S: BosStr = DefaultStr> {
 /// Used for descriptions and other short formatted text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Richtext<S: BosStr = DefaultStr> {
-    ///Annotations of text (mentions, URLs, hashtags, formatting, etc).
+    /// Annotations of text (mentions, URLs, hashtags, formatting, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///The plain text content (no markdown symbols).
+    /// The plain text content (no markdown symbols).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
     #[serde(
@@ -194,11 +212,14 @@ pub struct Richtext<S: BosStr = DefaultStr> {
 /// An ordered (numbered) list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OrderedListBlock<S: BosStr = DefaultStr> {
-    ///The list items.
+    /// The list items.
     pub items: Vec<richtext::ListItem<S>>,
-    ///Starting number (default 1).
+    /// Starting number (default 1).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start: Option<i64>,
     #[serde(
@@ -213,12 +234,15 @@ pub struct OrderedListBlock<S: BosStr = DefaultStr> {
 /// A paragraph block with text and optional facets.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ParagraphBlock<S: BosStr = DefaultStr> {
-    ///Annotations of text (formatting, mentions, links, etc).
+    /// Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///The plain text content (no markdown symbols).
+    /// The plain text content (no markdown symbols).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
     #[serde(
@@ -501,15 +525,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod bullet_list_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -540,10 +563,7 @@ pub mod bullet_list_block_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BulletListBlockBuilder<
-    St: bullet_list_block_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BulletListBlockBuilder<St: bullet_list_block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<richtext::ListItem<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -617,10 +637,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BulletListBlock<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BulletListBlock<S> {
         BulletListBlock {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -629,10 +646,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.richtext"),
@@ -665,9 +682,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("codeBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A code block with optional language hint."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A code block with optional language hint.",
+                    )),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -675,11 +692,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("language"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional language identifier for syntax highlighting.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional language identifier for syntax highlighting.",
+                                )),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -687,11 +702,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The code content (plain text, no facets).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The code content (plain text, no facets).",
+                                )),
                                 max_length: Some(100000usize),
                                 ..Default::default()
                             }),
@@ -743,11 +756,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("headingBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A heading block with level, text, and optional facets.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A heading block with level, text, and optional facets.",
+                    )),
                     required: Some(vec![SmolStr::new_static("level")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -755,11 +766,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Annotations of text (formatting, mentions, links, etc).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Annotations of text (formatting, mentions, links, etc).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("com.deckbelcher.richtext.facet"),
                                     ..Default::default()
@@ -778,11 +787,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The plain text content (no markdown symbols).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The plain text content (no markdown symbols).",
+                                )),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
@@ -796,9 +803,7 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("horizontalRuleBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A horizontal rule (thematic break)."),
-                    ),
+                    description: Some(CowStr::new_static("A horizontal rule (thematic break).")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -810,22 +815,18 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A single list item with text, optional facets, and optional sublist.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A single list item with text, optional facets, and optional sublist.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Annotations of text (formatting, mentions, links, etc).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Annotations of text (formatting, mentions, links, etc).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("com.deckbelcher.richtext.facet"),
                                     ..Default::default()
@@ -836,14 +837,12 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sublist"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional nested sublist (bullet or ordered).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional nested sublist (bullet or ordered).",
+                                )),
                                 refs: vec![
                                     CowStr::new_static("#bulletListBlock"),
-                                    CowStr::new_static("#orderedListBlock")
+                                    CowStr::new_static("#orderedListBlock"),
                                 ],
                                 ..Default::default()
                             }),
@@ -851,11 +850,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The plain text content (no markdown symbols).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The plain text content (no markdown symbols).",
+                                )),
                                 max_length: Some(100000usize),
                                 max_graphemes: Some(10000usize),
                                 ..Default::default()
@@ -943,22 +940,18 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("paragraphBlock"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A paragraph block with text and optional facets.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A paragraph block with text and optional facets.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Annotations of text (formatting, mentions, links, etc).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Annotations of text (formatting, mentions, links, etc).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("com.deckbelcher.richtext.facet"),
                                     ..Default::default()
@@ -969,11 +962,9 @@ fn lexicon_doc_com_deckbelcher_richtext() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The plain text content (no markdown symbols).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The plain text content (no markdown symbols).",
+                                )),
                                 max_length: Some(500000usize),
                                 max_graphemes: Some(50000usize),
                                 ..Default::default()
@@ -997,9 +988,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1010,15 +1000,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod document_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1138,15 +1127,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod heading_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1279,10 +1267,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> HeadingBlock<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HeadingBlock<S> {
         HeadingBlock {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -1299,9 +1284,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1312,9 +1296,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1325,9 +1308,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1338,15 +1320,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod ordered_list_block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1377,10 +1358,7 @@ pub mod ordered_list_block_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OrderedListBlockBuilder<
-    St: ordered_list_block_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct OrderedListBlockBuilder<St: ordered_list_block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<richtext::ListItem<S>>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -1388,10 +1366,7 @@ pub struct OrderedListBlockBuilder<
 
 impl OrderedListBlock<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> OrderedListBlockBuilder<
-        ordered_list_block_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> OrderedListBlockBuilder<ordered_list_block_state::Empty, DefaultStr> {
         OrderedListBlockBuilder::new()
     }
 }
@@ -1471,10 +1446,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> OrderedListBlock<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OrderedListBlock<S> {
         OrderedListBlock {
             items: self._fields.0.unwrap(),
             start: self._fields.1,
@@ -1490,8 +1462,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

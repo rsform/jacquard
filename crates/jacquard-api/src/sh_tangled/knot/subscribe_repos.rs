@@ -10,29 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Datetime};
+use jacquard_common::types::string::{AtUri, Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::ref_update::RefUpdate;
 use crate::sh_tangled::knot::subscribe_repos;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GitSync1<S: BosStr = DefaultStr> {
-    ///Repository DID identifier
+    /// Repository DID identifier
     pub did: Did<S>,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
     #[serde(
         flatten,
@@ -43,13 +46,15 @@ pub struct GitSync1<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GitSync2<S: BosStr = DefaultStr> {
-    ///Repository AT-URI identifier
+    /// Repository AT-URI identifier
     pub repo: AtUri<S>,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
     #[serde(
         flatten,
@@ -60,13 +65,15 @@ pub struct GitSync2<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Identity<S: BosStr = DefaultStr> {
-    ///Repository DID identifier
+    /// Repository DID identifier
     pub did: Did<S>,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
     pub time: Datetime,
     #[serde(
@@ -78,14 +85,12 @@ pub struct Identity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,53 +110,40 @@ impl<S: BosStr> SubscribeReposMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
-            bytes,
-        )?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
         match header.t.as_str() {
             "#identity" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::Identity(Box::new(variant)))
             }
             "sh.tangled.git.refUpdate" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                 Ok(Self::RefUpdate(Box::new(variant)))
             }
-            unknown => {
-                Err(
-                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
-                )
-            }
+            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
+                unknown.into(),
+            )),
         }
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeReposError {
     #[serde(rename = "FutureCursor")]
-    FutureCursor(Option<SmolStr>),
+    FutureCursor(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.
     #[serde(rename = "ConsumerTooSlow")]
-    ConsumerTooSlow(Option<SmolStr>),
+    ConsumerTooSlow(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SubscribeReposError {
@@ -232,21 +224,24 @@ impl<S: BosStr> LexiconSchema for Identity<S> {
 pub struct SubscribeReposStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
     const NSID: &'static str = "sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeReposMessage<S>;
     type Error = SubscribeReposError;
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
     const NSID: &'static str = "sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeReposStream;
 }
 
 pub struct SubscribeReposEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeRepos;
     type Stream = SubscribeReposStream;
 }
@@ -258,15 +253,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod git_sync1_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -376,10 +370,7 @@ where
     St::Seq: git_sync1_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> GitSync1Builder<git_sync1_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> GitSync1Builder<git_sync1_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GitSync1Builder {
             _state: PhantomData,
@@ -414,10 +405,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.knot.subscribeRepos"),
@@ -426,18 +417,14 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gitSync1"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("seq"), SmolStr::new_static("did")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("seq"), SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Repository DID identifier"),
-                                ),
+                                description: Some(CowStr::new_static("Repository DID identifier")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -456,18 +443,19 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gitSync2"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("seq"), SmolStr::new_static("repo")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("seq"),
+                        SmolStr::new_static("repo"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("repo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Repository AT-URI identifier"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Repository AT-URI identifier",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -486,21 +474,18 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identity"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("seq"), SmolStr::new_static("did"),
-                            SmolStr::new_static("time")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("seq"),
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("time"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Repository DID identifier"),
-                                ),
+                                description: Some(CowStr::new_static("Repository DID identifier")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -526,22 +511,20 @@ fn lexicon_doc_sh_tangled_knot_subscribeRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(
-                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("cursor"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -558,15 +541,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod git_sync2_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -676,10 +658,7 @@ where
     St::Seq: git_sync2_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> GitSync2Builder<git_sync2_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> GitSync2Builder<git_sync2_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GitSync2Builder {
             _state: PhantomData,
@@ -720,15 +699,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -852,10 +830,7 @@ where
     St::Seq: identity_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(
-        mut self,
-        value: impl Into<i64>,
-    ) -> IdentityBuilder<identity_state::SetSeq<St>, S> {
+    pub fn seq(mut self, value: impl Into<i64>) -> IdentityBuilder<identity_state::SetSeq<St>, S> {
         self._fields.1 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
@@ -913,7 +888,7 @@ where
 
 pub mod subscribe_repos_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

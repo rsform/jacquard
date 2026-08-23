@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,25 +25,28 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::io_atcr::manifest;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::io_atcr::manifest;
+use serde::{Deserialize, Serialize};
 /// Reference to a blob stored in S3 or external storage
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlobReference<S: BosStr = DefaultStr> {
-    ///Optional OCI annotation metadata. Map of string keys to string values.
+    /// Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
-    ///Content digest (e.g., 'sha256:...')
+    /// Content digest (e.g., 'sha256:...')
     pub digest: S,
-    ///MIME type of the blob
+    /// MIME type of the blob
     pub media_type: S,
-    ///Size in bytes
+    /// Size in bytes
     pub size: i64,
-    ///Optional direct URLs to blob (for BYOS)
+    /// Optional direct URLs to blob (for BYOS)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub urls: Option<Vec<UriValue<S>>>,
     #[serde(
@@ -65,38 +68,38 @@ pub struct BlobReference<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Manifest<S: BosStr = DefaultStr> {
-    ///Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
+    /// Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
-    ///Reference to image configuration blob
+    /// Reference to image configuration blob
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<manifest::BlobReference<S>>,
-    ///Record creation timestamp
+    /// Record creation timestamp
     pub created_at: Datetime,
-    ///Content digest (e.g., 'sha256:abc123...')
+    /// Content digest (e.g., 'sha256:abc123...')
     pub digest: S,
-    ///DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.
+    /// DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hold_did: Option<Did<S>>,
-    ///Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.
+    /// Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hold_endpoint: Option<UriValue<S>>,
-    ///Filesystem layers (for image manifests)
+    /// Filesystem layers (for image manifests)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub layers: Option<Vec<manifest::BlobReference<S>>>,
-    ///The full OCI manifest stored as a blob in ATProto.
+    /// The full OCI manifest stored as a blob in ATProto.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifest_blob: Option<BlobRef<S>>,
-    ///Referenced manifests (for manifest lists/indexes)
+    /// Referenced manifests (for manifest lists/indexes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifests: Option<Vec<manifest::ManifestReference<S>>>,
-    ///OCI media type
+    /// OCI media type
     pub media_type: ManifestMediaType<S>,
-    ///Repository name (e.g., 'myapp'). Scoped to user's DID.
+    /// Repository name (e.g., 'myapp'). Scoped to user's DID.
     pub repository: S,
-    ///OCI schema version (typically 2)
+    /// OCI schema version (typically 2)
     pub schema_version: i64,
-    ///Optional reference to another manifest (for attestations, signatures)
+    /// Optional reference to another manifest (for attestations, signatures)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<manifest::BlobReference<S>>,
     #[serde(
@@ -128,9 +131,7 @@ impl<S: BosStr> ManifestMediaType<S> {
             Self::ApplicationVndDockerDistributionManifestV2Json => {
                 "application/vnd.docker.distribution.manifest.v2+json"
             }
-            Self::ApplicationVndOciImageIndexV1Json => {
-                "application/vnd.oci.image.index.v1+json"
-            }
+            Self::ApplicationVndOciImageIndexV1Json => "application/vnd.oci.image.index.v1+json",
             Self::ApplicationVndDockerDistributionManifestListV2Json => {
                 "application/vnd.docker.distribution.manifest.list.v2+json"
             }
@@ -146,9 +147,7 @@ impl<S: BosStr> ManifestMediaType<S> {
             "application/vnd.docker.distribution.manifest.v2+json" => {
                 Self::ApplicationVndDockerDistributionManifestV2Json
             }
-            "application/vnd.oci.image.index.v1+json" => {
-                Self::ApplicationVndOciImageIndexV1Json
-            }
+            "application/vnd.oci.image.index.v1+json" => Self::ApplicationVndOciImageIndexV1Json,
             "application/vnd.docker.distribution.manifest.list.v2+json" => {
                 Self::ApplicationVndDockerDistributionManifestListV2Json
             }
@@ -233,19 +232,22 @@ pub struct ManifestGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a manifest in a manifest list/index
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ManifestReference<S: BosStr = DefaultStr> {
-    ///Optional OCI annotation metadata. Map of string keys to string values.
+    /// Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
-    ///Content digest (e.g., 'sha256:...')
+    /// Content digest (e.g., 'sha256:...')
     pub digest: S,
-    ///Media type of the referenced manifest
+    /// Media type of the referenced manifest
     pub media_type: S,
-    ///Platform information for this manifest
+    /// Platform information for this manifest
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<manifest::Platform<S>>,
-    ///Size in bytes
+    /// Size in bytes
     pub size: i64,
     #[serde(
         flatten,
@@ -259,19 +261,22 @@ pub struct ManifestReference<S: BosStr = DefaultStr> {
 /// Platform information describing OS and architecture
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Platform<S: BosStr = DefaultStr> {
-    ///CPU architecture (e.g., 'amd64', 'arm64', 'arm')
+    /// CPU architecture (e.g., 'amd64', 'arm64', 'arm')
     pub architecture: S,
-    ///Operating system (e.g., 'linux', 'windows', 'darwin')
+    /// Operating system (e.g., 'linux', 'windows', 'darwin')
     pub os: S,
-    ///Optional OS features
+    /// Optional OS features
     #[serde(skip_serializing_if = "Option::is_none")]
     pub os_features: Option<Vec<S>>,
-    ///Optional OS version
+    /// Optional OS version
     #[serde(skip_serializing_if = "Option::is_none")]
     pub os_version: Option<S>,
-    ///Optional CPU variant (e.g., 'v7' for ARM)
+    /// Optional CPU variant (e.g., 'v7' for ARM)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub variant: Option<S>,
     #[serde(
@@ -514,15 +519,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod blob_reference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -579,10 +583,7 @@ pub mod blob_reference_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlobReferenceBuilder<
-    St: blob_reference_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct BlobReferenceBuilder<St: blob_reference_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -732,10 +733,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlobReference<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlobReference<S> {
         BlobReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),
@@ -748,10 +746,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.manifest"),
@@ -760,17 +758,14 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blobReference"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Reference to a blob stored in S3 or external storage",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("mediaType"),
-                            SmolStr::new_static("size"), SmolStr::new_static("digest")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Reference to a blob stored in S3 or external storage",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("mediaType"),
+                        SmolStr::new_static("size"),
+                        SmolStr::new_static("digest"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -783,9 +778,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("digest"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Content digest (e.g., 'sha256:...')"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Content digest (e.g., 'sha256:...')",
+                                )),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -793,9 +788,7 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mediaType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("MIME type of the blob"),
-                                ),
+                                description: Some(CowStr::new_static("MIME type of the blob")),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -809,11 +802,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("urls"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional direct URLs to blob (for BYOS)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional direct URLs to blob (for BYOS)",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
@@ -984,17 +975,14 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("manifestReference"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Reference to a manifest in a manifest list/index",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("mediaType"),
-                            SmolStr::new_static("size"), SmolStr::new_static("digest")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Reference to a manifest in a manifest list/index",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("mediaType"),
+                        SmolStr::new_static("size"),
+                        SmolStr::new_static("digest"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1007,9 +995,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("digest"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Content digest (e.g., 'sha256:...')"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Content digest (e.g., 'sha256:...')",
+                                )),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1017,9 +1005,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mediaType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Media type of the referenced manifest"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Media type of the referenced manifest",
+                                )),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1045,28 +1033,22 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("platform"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Platform information describing OS and architecture",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("architecture"),
-                            SmolStr::new_static("os")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Platform information describing OS and architecture",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("architecture"),
+                        SmolStr::new_static("os"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("architecture"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
+                                )),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -1074,11 +1056,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("os"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Operating system (e.g., 'linux', 'windows', 'darwin')",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Operating system (e.g., 'linux', 'windows', 'darwin')",
+                                )),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -1086,9 +1066,7 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("osFeatures"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Optional OS features"),
-                                ),
+                                description: Some(CowStr::new_static("Optional OS features")),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(64usize),
                                     ..Default::default()
@@ -1099,9 +1077,7 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("osVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional OS version"),
-                                ),
+                                description: Some(CowStr::new_static("Optional OS version")),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1109,11 +1085,9 @@ fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("variant"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional CPU variant (e.g., 'v7' for ARM)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional CPU variant (e.g., 'v7' for ARM)",
+                                )),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -1136,9 +1110,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1150,7 +1123,7 @@ where
 
 pub mod manifest_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1281,19 +1254,7 @@ impl ManifestBuilder<manifest_state::Empty, DefaultStr> {
         ManifestBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1306,19 +1267,7 @@ impl<S: BosStr> ManifestBuilder<manifest_state::Empty, S> {
         ManifestBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1340,10 +1289,7 @@ impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
 
 impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
     /// Set the `config` field (optional)
-    pub fn config(
-        mut self,
-        value: impl Into<Option<manifest::BlobReference<S>>>,
-    ) -> Self {
+    pub fn config(mut self, value: impl Into<Option<manifest::BlobReference<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1420,18 +1366,12 @@ impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
 
 impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
     /// Set the `layers` field (optional)
-    pub fn layers(
-        mut self,
-        value: impl Into<Option<Vec<manifest::BlobReference<S>>>>,
-    ) -> Self {
+    pub fn layers(mut self, value: impl Into<Option<Vec<manifest::BlobReference<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `layers` field to an Option value (optional)
-    pub fn maybe_layers(
-        mut self,
-        value: Option<Vec<manifest::BlobReference<S>>>,
-    ) -> Self {
+    pub fn maybe_layers(mut self, value: Option<Vec<manifest::BlobReference<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1460,10 +1400,7 @@ impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
         self
     }
     /// Set the `manifests` field to an Option value (optional)
-    pub fn maybe_manifests(
-        mut self,
-        value: Option<Vec<manifest::ManifestReference<S>>>,
-    ) -> Self {
+    pub fn maybe_manifests(mut self, value: Option<Vec<manifest::ManifestReference<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1528,10 +1465,7 @@ where
 
 impl<St: manifest_state::State, S: BosStr> ManifestBuilder<St, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(
-        mut self,
-        value: impl Into<Option<manifest::BlobReference<S>>>,
-    ) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<manifest::BlobReference<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
@@ -1598,15 +1532,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod manifest_reference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1663,10 +1596,7 @@ pub mod manifest_reference_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ManifestReferenceBuilder<
-    St: manifest_reference_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ManifestReferenceBuilder<St: manifest_reference_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -1680,10 +1610,7 @@ pub struct ManifestReferenceBuilder<
 
 impl ManifestReference<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ManifestReferenceBuilder<
-        manifest_reference_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ManifestReferenceBuilder<manifest_reference_state::Empty, DefaultStr> {
         ManifestReferenceBuilder::new()
     }
 }
@@ -1819,10 +1746,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ManifestReference<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ManifestReference<S> {
         ManifestReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),
@@ -1841,8 +1765,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

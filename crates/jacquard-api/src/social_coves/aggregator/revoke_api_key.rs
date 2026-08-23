@@ -10,65 +10,65 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeApiKey<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeApiKeyOutput<S: BosStr = DefaultStr> {
-    ///ISO8601 timestamp when the key was revoked
+    /// ISO8601 timestamp when the key was revoked
     pub revoked_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RevokeApiKeyError {
     /// Authentication is required to revoke an API key
     #[serde(rename = "AuthenticationRequired")]
-    AuthenticationRequired(Option<SmolStr>),
+    AuthenticationRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Only registered aggregators can revoke API keys
     #[serde(rename = "AggregatorRequired")]
-    AggregatorRequired(Option<SmolStr>),
+    AggregatorRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator not found
     #[serde(rename = "AggregatorNotFound")]
-    AggregatorNotFound(Option<SmolStr>),
+    AggregatorNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// No API key exists to revoke
     #[serde(rename = "ApiKeyNotFound")]
-    ApiKeyNotFound(Option<SmolStr>),
+    ApiKeyNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// API key has already been revoked
     #[serde(rename = "ApiKeyAlreadyRevoked")]
-    ApiKeyAlreadyRevoked(Option<SmolStr>),
+    ApiKeyAlreadyRevoked(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Failed to revoke the API key
     #[serde(rename = "RevocationFailed")]
-    RevocationFailed(Option<SmolStr>),
+    RevocationFailed(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RevokeApiKeyError {
@@ -140,9 +140,8 @@ impl jacquard_common::xrpc::XrpcResp for RevokeApiKeyResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RevokeApiKey<S> {
     const NSID: &'static str = "social.coves.aggregator.revokeApiKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RevokeApiKeyResponse;
 }
 
@@ -152,9 +151,8 @@ Path: `/xrpc/social.coves.aggregator.revokeApiKey`. The request payload type is 
 pub struct RevokeApiKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeApiKeyRequest {
     const PATH: &'static str = "/xrpc/social.coves.aggregator.revokeApiKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RevokeApiKey<S>;
     type Response = RevokeApiKeyResponse;
 }

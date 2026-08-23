@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::news_article;
@@ -34,10 +31,16 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// An image file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -346,7 +349,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -400,7 +402,6 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -444,7 +445,6 @@ pub enum EmbeddedAssociatedArticle<S: BosStr = DefaultStr> {
     NewsArticleEmbedded(Box<news_article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -469,7 +469,6 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -498,7 +497,6 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -555,7 +553,6 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -565,7 +562,6 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -601,7 +597,6 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -660,7 +655,6 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -742,7 +736,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -780,7 +773,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     Embedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -820,7 +812,6 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -828,7 +819,6 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -880,7 +870,6 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -888,7 +877,6 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -912,7 +900,6 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -944,7 +931,6 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -952,7 +938,6 @@ pub enum EmbeddedProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -963,7 +948,6 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -980,7 +964,6 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -988,7 +971,6 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1002,7 +984,6 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1064,7 +1045,6 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1082,7 +1062,6 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1104,7 +1083,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1117,7 +1095,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1147,7 +1124,6 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     Embedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1172,7 +1148,6 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1539,7 +1514,6 @@ pub struct ImageObject<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1593,7 +1567,6 @@ pub enum ImageObjectAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1637,7 +1610,6 @@ pub enum ImageObjectAssociatedArticle<S: BosStr = DefaultStr> {
     NewsArticleEmbedded(Box<news_article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1662,7 +1634,6 @@ pub enum ImageObjectAuthor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1691,7 +1662,6 @@ pub enum ImageObjectCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1748,7 +1718,6 @@ pub enum ImageObjectContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1758,7 +1727,6 @@ pub enum ImageObjectCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1794,7 +1762,6 @@ pub enum ImageObjectCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1853,7 +1820,6 @@ pub enum ImageObjectEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1935,7 +1901,6 @@ pub enum ImageObjectFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1973,7 +1938,6 @@ pub enum ImageObjectImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     Embedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2013,7 +1977,6 @@ pub enum ImageObjectIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2021,7 +1984,6 @@ pub enum ImageObjectIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2073,7 +2035,6 @@ pub enum ImageObjectMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2081,7 +2042,6 @@ pub enum ImageObjectMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2105,7 +2065,6 @@ pub enum ImageObjectOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2137,7 +2096,6 @@ pub enum ImageObjectProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2145,7 +2103,6 @@ pub enum ImageObjectProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2156,7 +2113,6 @@ pub enum ImageObjectProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2173,7 +2129,6 @@ pub enum ImageObjectPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2181,7 +2136,6 @@ pub enum ImageObjectPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2195,7 +2149,6 @@ pub enum ImageObjectRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2257,7 +2210,6 @@ pub enum ImageObjectSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2275,7 +2227,6 @@ pub enum ImageObjectSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2297,7 +2248,6 @@ pub enum ImageObjectSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2310,7 +2260,6 @@ pub enum ImageObjectSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2340,7 +2289,6 @@ pub enum ImageObjectThumbnail<S: BosStr = DefaultStr> {
     Embedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2365,7 +2313,6 @@ pub enum ImageObjectTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2497,17 +2444,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_ImageObject() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.ImageObject"),
@@ -5654,9 +5600,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -5668,7 +5613,7 @@ where
 
 pub mod image_object_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5862,155 +5807,17 @@ impl ImageObjectBuilder<image_object_state::Empty, DefaultStr> {
         ImageObjectBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -6023,155 +5830,17 @@ impl<S: BosStr> ImageObjectBuilder<image_object_state::Empty, S> {
         ImageObjectBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -6193,10 +5862,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `abstract` field (optional)
-    pub fn r#abstract(
-        mut self,
-        value: impl Into<Option<ImageObjectAbstract<S>>>,
-    ) -> Self {
+    pub fn r#abstract(mut self, value: impl Into<Option<ImageObjectAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -6209,10 +5875,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(
-        mut self,
-        value: impl Into<Option<ImageObjectAccessMode<S>>>,
-    ) -> Self {
+    pub fn access_mode(mut self, value: impl Into<Option<ImageObjectAccessMode<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -6385,10 +6048,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<ImageObjectAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<ImageObjectAdditionalType<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -6404,10 +6064,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(
-        mut self,
-        value: Option<ImageObjectAggregateRating<S>>,
-    ) -> Self {
+    pub fn maybe_aggregate_rating(mut self, value: Option<ImageObjectAggregateRating<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -6415,18 +6072,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(
-        mut self,
-        value: impl Into<Option<ImageObjectAlternateName<S>>>,
-    ) -> Self {
+    pub fn alternate_name(mut self, value: impl Into<Option<ImageObjectAlternateName<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<ImageObjectAlternateName<S>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<ImageObjectAlternateName<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -6453,10 +6104,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(
-        mut self,
-        value: impl Into<Option<ImageObjectArchivedAt<S>>>,
-    ) -> Self {
+    pub fn archived_at(mut self, value: impl Into<Option<ImageObjectArchivedAt<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
@@ -6509,10 +6157,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(
-        mut self,
-        value: Option<ImageObjectAssociatedMedia<S>>,
-    ) -> Self {
+    pub fn maybe_associated_media(mut self, value: Option<ImageObjectAssociatedMedia<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -6611,10 +6256,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `character` field (optional)
-    pub fn character(
-        mut self,
-        value: impl Into<Option<ImageObjectCharacter<S>>>,
-    ) -> Self {
+    pub fn character(mut self, value: impl Into<Option<ImageObjectCharacter<S>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
@@ -6653,18 +6295,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(
-        mut self,
-        value: impl Into<Option<ImageObjectCommentCount<S>>>,
-    ) -> Self {
+    pub fn comment_count(mut self, value: impl Into<Option<ImageObjectCommentCount<S>>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
-    pub fn maybe_comment_count(
-        mut self,
-        value: Option<ImageObjectCommentCount<S>>,
-    ) -> Self {
+    pub fn maybe_comment_count(mut self, value: Option<ImageObjectCommentCount<S>>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -6699,10 +6335,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(
-        mut self,
-        value: Option<ImageObjectContentLocation<S>>,
-    ) -> Self {
+    pub fn maybe_content_location(mut self, value: Option<ImageObjectContentLocation<S>>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -6710,18 +6343,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(
-        mut self,
-        value: impl Into<Option<ImageObjectContentRating<S>>>,
-    ) -> Self {
+    pub fn content_rating(mut self, value: impl Into<Option<ImageObjectContentRating<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(
-        mut self,
-        value: Option<ImageObjectContentRating<S>>,
-    ) -> Self {
+    pub fn maybe_content_rating(mut self, value: Option<ImageObjectContentRating<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -6748,18 +6375,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `contentSize` field (optional)
-    pub fn content_size(
-        mut self,
-        value: impl Into<Option<ImageObjectContentSize<S>>>,
-    ) -> Self {
+    pub fn content_size(mut self, value: impl Into<Option<ImageObjectContentSize<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `contentSize` field to an Option value (optional)
-    pub fn maybe_content_size(
-        mut self,
-        value: Option<ImageObjectContentSize<S>>,
-    ) -> Self {
+    pub fn maybe_content_size(mut self, value: Option<ImageObjectContentSize<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -6767,10 +6388,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `contentUrl` field (optional)
-    pub fn content_url(
-        mut self,
-        value: impl Into<Option<ImageObjectContentUrl<S>>>,
-    ) -> Self {
+    pub fn content_url(mut self, value: impl Into<Option<ImageObjectContentUrl<S>>>) -> Self {
         self._fields.35 = value.into();
         self
     }
@@ -6783,18 +6401,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(
-        mut self,
-        value: impl Into<Option<ImageObjectContributor<S>>>,
-    ) -> Self {
+    pub fn contributor(mut self, value: impl Into<Option<ImageObjectContributor<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
-    pub fn maybe_contributor(
-        mut self,
-        value: Option<ImageObjectContributor<S>>,
-    ) -> Self {
+    pub fn maybe_contributor(mut self, value: Option<ImageObjectContributor<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -6810,10 +6422,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(
-        mut self,
-        value: Option<ImageObjectCopyrightHolder<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_holder(mut self, value: Option<ImageObjectCopyrightHolder<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -6829,10 +6438,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(
-        mut self,
-        value: Option<ImageObjectCopyrightNotice<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_notice(mut self, value: Option<ImageObjectCopyrightNotice<S>>) -> Self {
         self._fields.38 = value;
         self
     }
@@ -6840,18 +6446,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(
-        mut self,
-        value: impl Into<Option<ImageObjectCopyrightYear<S>>>,
-    ) -> Self {
+    pub fn copyright_year(mut self, value: impl Into<Option<ImageObjectCopyrightYear<S>>>) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(
-        mut self,
-        value: Option<ImageObjectCopyrightYear<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_year(mut self, value: Option<ImageObjectCopyrightYear<S>>) -> Self {
         self._fields.39 = value;
         self
     }
@@ -6859,10 +6459,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `correction` field (optional)
-    pub fn correction(
-        mut self,
-        value: impl Into<Option<ImageObjectCorrection<S>>>,
-    ) -> Self {
+    pub fn correction(mut self, value: impl Into<Option<ImageObjectCorrection<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -6883,10 +6480,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(
-        mut self,
-        value: Option<ImageObjectCountryOfOrigin<S>>,
-    ) -> Self {
+    pub fn maybe_country_of_origin(mut self, value: Option<ImageObjectCountryOfOrigin<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6926,10 +6520,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(
-        mut self,
-        value: impl Into<Option<ImageObjectCreditText<S>>>,
-    ) -> Self {
+    pub fn credit_text(mut self, value: impl Into<Option<ImageObjectCreditText<S>>>) -> Self {
         self._fields.44 = value.into();
         self
     }
@@ -6942,18 +6533,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(
-        mut self,
-        value: impl Into<Option<ImageObjectDateCreated<S>>>,
-    ) -> Self {
+    pub fn date_created(mut self, value: impl Into<Option<ImageObjectDateCreated<S>>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
-    pub fn maybe_date_created(
-        mut self,
-        value: Option<ImageObjectDateCreated<S>>,
-    ) -> Self {
+    pub fn maybe_date_created(mut self, value: Option<ImageObjectDateCreated<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -6961,18 +6546,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(
-        mut self,
-        value: impl Into<Option<ImageObjectDateModified<S>>>,
-    ) -> Self {
+    pub fn date_modified(mut self, value: impl Into<Option<ImageObjectDateModified<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
-    pub fn maybe_date_modified(
-        mut self,
-        value: Option<ImageObjectDateModified<S>>,
-    ) -> Self {
+    pub fn maybe_date_modified(mut self, value: Option<ImageObjectDateModified<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -6980,18 +6559,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(
-        mut self,
-        value: impl Into<Option<ImageObjectDatePublished<S>>>,
-    ) -> Self {
+    pub fn date_published(mut self, value: impl Into<Option<ImageObjectDatePublished<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(
-        mut self,
-        value: Option<ImageObjectDatePublished<S>>,
-    ) -> Self {
+    pub fn maybe_date_published(mut self, value: Option<ImageObjectDatePublished<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -6999,18 +6572,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<ImageObjectDescription<S>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<ImageObjectDescription<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<ImageObjectDescription<S>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<ImageObjectDescription<S>>) -> Self {
         self._fields.48 = value;
         self
     }
@@ -7056,18 +6623,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(
-        mut self,
-        value: impl Into<Option<ImageObjectDiscussionUrl<S>>>,
-    ) -> Self {
+    pub fn discussion_url(mut self, value: impl Into<Option<ImageObjectDiscussionUrl<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(
-        mut self,
-        value: Option<ImageObjectDiscussionUrl<S>>,
-    ) -> Self {
+    pub fn maybe_discussion_url(mut self, value: Option<ImageObjectDiscussionUrl<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -7088,10 +6649,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `editEIDR` field (optional)
-    pub fn edit_eidr(
-        mut self,
-        value: impl Into<Option<ImageObjectEditEidr<S>>>,
-    ) -> Self {
+    pub fn edit_eidr(mut self, value: impl Into<Option<ImageObjectEditEidr<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
@@ -7163,10 +6721,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(
-        mut self,
-        value: Option<ImageObjectEducationalUse<S>>,
-    ) -> Self {
+    pub fn maybe_educational_use(mut self, value: Option<ImageObjectEducationalUse<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -7174,10 +6729,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `embedUrl` field (optional)
-    pub fn embed_url(
-        mut self,
-        value: impl Into<Option<ImageObjectEmbedUrl<S>>>,
-    ) -> Self {
+    pub fn embed_url(mut self, value: impl Into<Option<ImageObjectEmbedUrl<S>>>) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -7249,10 +6801,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(
-        mut self,
-        value: Option<ImageObjectEncodingFormat<S>>,
-    ) -> Self {
+    pub fn maybe_encoding_format(mut self, value: Option<ImageObjectEncodingFormat<S>>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -7260,10 +6809,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `encodings` field (optional)
-    pub fn encodings(
-        mut self,
-        value: impl Into<Option<ImageObjectEncodings<S>>>,
-    ) -> Self {
+    pub fn encodings(mut self, value: impl Into<Option<ImageObjectEncodings<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
@@ -7297,10 +6843,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(
-        mut self,
-        value: Option<ImageObjectExampleOfWork<S>>,
-    ) -> Self {
+    pub fn maybe_example_of_work(mut self, value: Option<ImageObjectExampleOfWork<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -7308,10 +6851,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `exifData` field (optional)
-    pub fn exif_data(
-        mut self,
-        value: impl Into<Option<ImageObjectExifData<S>>>,
-    ) -> Self {
+    pub fn exif_data(mut self, value: impl Into<Option<ImageObjectExifData<S>>>) -> Self {
         self._fields.66 = value.into();
         self
     }
@@ -7337,10 +6877,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(
-        mut self,
-        value: impl Into<Option<ImageObjectFileFormat<S>>>,
-    ) -> Self {
+    pub fn file_format(mut self, value: impl Into<Option<ImageObjectFileFormat<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
@@ -7431,10 +6968,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<ImageObjectIdentifier<S>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<ImageObjectIdentifier<S>>>) -> Self {
         self._fields.75 = value.into();
         self
     }
@@ -7460,10 +6994,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(
-        mut self,
-        value: impl Into<Option<ImageObjectInLanguage<S>>>,
-    ) -> Self {
+    pub fn in_language(mut self, value: impl Into<Option<ImageObjectInLanguage<S>>>) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -7571,10 +7102,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `isBasedOn` field (optional)
-    pub fn is_based_on(
-        mut self,
-        value: impl Into<Option<ImageObjectIsBasedOn<S>>>,
-    ) -> Self {
+    pub fn is_based_on(mut self, value: impl Into<Option<ImageObjectIsBasedOn<S>>>) -> Self {
         self._fields.83 = value.into();
         self
     }
@@ -7587,18 +7115,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(
-        mut self,
-        value: impl Into<Option<ImageObjectIsBasedOnUrl<S>>>,
-    ) -> Self {
+    pub fn is_based_on_url(mut self, value: impl Into<Option<ImageObjectIsBasedOnUrl<S>>>) -> Self {
         self._fields.84 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(
-        mut self,
-        value: Option<ImageObjectIsBasedOnUrl<S>>,
-    ) -> Self {
+    pub fn maybe_is_based_on_url(mut self, value: Option<ImageObjectIsBasedOnUrl<S>>) -> Self {
         self._fields.84 = value;
         self
     }
@@ -7625,10 +7147,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `isPartOf` field (optional)
-    pub fn is_part_of(
-        mut self,
-        value: impl Into<Option<ImageObjectIsPartOf<S>>>,
-    ) -> Self {
+    pub fn is_part_of(mut self, value: impl Into<Option<ImageObjectIsPartOf<S>>>) -> Self {
         self._fields.86 = value.into();
         self
     }
@@ -7694,10 +7213,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(
-        mut self,
-        value: Option<ImageObjectLocationCreated<S>>,
-    ) -> Self {
+    pub fn maybe_location_created(mut self, value: Option<ImageObjectLocationCreated<S>>) -> Self {
         self._fields.90 = value;
         self
     }
@@ -7705,10 +7221,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(
-        mut self,
-        value: impl Into<Option<ImageObjectMainEntity<S>>>,
-    ) -> Self {
+    pub fn main_entity(mut self, value: impl Into<Option<ImageObjectMainEntity<S>>>) -> Self {
         self._fields.91 = value.into();
         self
     }
@@ -7740,10 +7253,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `maintainer` field (optional)
-    pub fn maintainer(
-        mut self,
-        value: impl Into<Option<ImageObjectMaintainer<S>>>,
-    ) -> Self {
+    pub fn maintainer(mut self, value: impl Into<Option<ImageObjectMaintainer<S>>>) -> Self {
         self._fields.93 = value.into();
         self
     }
@@ -7777,10 +7287,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(
-        mut self,
-        value: Option<ImageObjectMaterialExtent<S>>,
-    ) -> Self {
+    pub fn maybe_material_extent(mut self, value: Option<ImageObjectMaterialExtent<S>>) -> Self {
         self._fields.95 = value;
         self
     }
@@ -7840,10 +7347,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `playerType` field (optional)
-    pub fn player_type(
-        mut self,
-        value: impl Into<Option<ImageObjectPlayerType<S>>>,
-    ) -> Self {
+    pub fn player_type(mut self, value: impl Into<Option<ImageObjectPlayerType<S>>>) -> Self {
         self._fields.100 = value.into();
         self
     }
@@ -7877,10 +7381,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(
-        mut self,
-        value: Option<ImageObjectPotentialAction<S>>,
-    ) -> Self {
+    pub fn maybe_potential_action(mut self, value: Option<ImageObjectPotentialAction<S>>) -> Self {
         self._fields.102 = value;
         self
     }
@@ -7933,18 +7434,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(
-        mut self,
-        value: impl Into<Option<ImageObjectPublication<S>>>,
-    ) -> Self {
+    pub fn publication(mut self, value: impl Into<Option<ImageObjectPublication<S>>>) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(
-        mut self,
-        value: Option<ImageObjectPublication<S>>,
-    ) -> Self {
+    pub fn maybe_publication(mut self, value: Option<ImageObjectPublication<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7952,10 +7447,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `publisher` field (optional)
-    pub fn publisher(
-        mut self,
-        value: impl Into<Option<ImageObjectPublisher<S>>>,
-    ) -> Self {
+    pub fn publisher(mut self, value: impl Into<Option<ImageObjectPublisher<S>>>) -> Self {
         self._fields.107 = value.into();
         self
     }
@@ -8006,10 +7498,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(
-        mut self,
-        value: impl Into<Option<ImageObjectRecordedAt<S>>>,
-    ) -> Self {
+    pub fn recorded_at(mut self, value: impl Into<Option<ImageObjectRecordedAt<S>>>) -> Self {
         self._fields.110 = value.into();
         self
     }
@@ -8030,10 +7519,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `regionsAllowed` field to an Option value (optional)
-    pub fn maybe_regions_allowed(
-        mut self,
-        value: Option<ImageObjectRegionsAllowed<S>>,
-    ) -> Self {
+    pub fn maybe_regions_allowed(mut self, value: Option<ImageObjectRegionsAllowed<S>>) -> Self {
         self._fields.111 = value;
         self
     }
@@ -8041,18 +7527,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(
-        mut self,
-        value: impl Into<Option<ImageObjectReleasedEvent<S>>>,
-    ) -> Self {
+    pub fn released_event(mut self, value: impl Into<Option<ImageObjectReleasedEvent<S>>>) -> Self {
         self._fields.112 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(
-        mut self,
-        value: Option<ImageObjectReleasedEvent<S>>,
-    ) -> Self {
+    pub fn maybe_released_event(mut self, value: Option<ImageObjectReleasedEvent<S>>) -> Self {
         self._fields.112 = value;
         self
     }
@@ -8137,18 +7617,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(
-        mut self,
-        value: impl Into<Option<ImageObjectSchemaVersion<S>>>,
-    ) -> Self {
+    pub fn schema_version(mut self, value: impl Into<Option<ImageObjectSchemaVersion<S>>>) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(
-        mut self,
-        value: Option<ImageObjectSchemaVersion<S>>,
-    ) -> Self {
+    pub fn maybe_schema_version(mut self, value: Option<ImageObjectSchemaVersion<S>>) -> Self {
         self._fields.118 = value;
         self
     }
@@ -8164,10 +7638,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(
-        mut self,
-        value: Option<ImageObjectSdDatePublished<S>>,
-    ) -> Self {
+    pub fn maybe_sd_date_published(mut self, value: Option<ImageObjectSdDatePublished<S>>) -> Self {
         self._fields.119 = value;
         self
     }
@@ -8175,10 +7646,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `sdLicense` field (optional)
-    pub fn sd_license(
-        mut self,
-        value: impl Into<Option<ImageObjectSdLicense<S>>>,
-    ) -> Self {
+    pub fn sd_license(mut self, value: impl Into<Option<ImageObjectSdLicense<S>>>) -> Self {
         self._fields.120 = value.into();
         self
     }
@@ -8191,18 +7659,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(
-        mut self,
-        value: impl Into<Option<ImageObjectSdPublisher<S>>>,
-    ) -> Self {
+    pub fn sd_publisher(mut self, value: impl Into<Option<ImageObjectSdPublisher<S>>>) -> Self {
         self._fields.121 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
-    pub fn maybe_sd_publisher(
-        mut self,
-        value: Option<ImageObjectSdPublisher<S>>,
-    ) -> Self {
+    pub fn maybe_sd_publisher(mut self, value: Option<ImageObjectSdPublisher<S>>) -> Self {
         self._fields.121 = value;
         self
     }
@@ -8276,10 +7738,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(
-        mut self,
-        value: Option<ImageObjectSpatialCoverage<S>>,
-    ) -> Self {
+    pub fn maybe_spatial_coverage(mut self, value: Option<ImageObjectSpatialCoverage<S>>) -> Self {
         self._fields.126 = value;
         self
     }
@@ -8300,10 +7759,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `startTime` field (optional)
-    pub fn start_time(
-        mut self,
-        value: impl Into<Option<ImageObjectStartTime<S>>>,
-    ) -> Self {
+    pub fn start_time(mut self, value: impl Into<Option<ImageObjectStartTime<S>>>) -> Self {
         self._fields.128 = value.into();
         self
     }
@@ -8316,10 +7772,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(
-        mut self,
-        value: impl Into<Option<ImageObjectSubjectOf<S>>>,
-    ) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<ImageObjectSubjectOf<S>>>) -> Self {
         self._fields.129 = value.into();
         self
     }
@@ -8390,10 +7843,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(
-        mut self,
-        value: impl Into<Option<ImageObjectThumbnail<S>>>,
-    ) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<ImageObjectThumbnail<S>>>) -> Self {
         self._fields.134 = value.into();
         self
     }
@@ -8406,18 +7856,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(
-        mut self,
-        value: impl Into<Option<ImageObjectThumbnailUrl<S>>>,
-    ) -> Self {
+    pub fn thumbnail_url(mut self, value: impl Into<Option<ImageObjectThumbnailUrl<S>>>) -> Self {
         self._fields.135 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
-    pub fn maybe_thumbnail_url(
-        mut self,
-        value: Option<ImageObjectThumbnailUrl<S>>,
-    ) -> Self {
+    pub fn maybe_thumbnail_url(mut self, value: Option<ImageObjectThumbnailUrl<S>>) -> Self {
         self._fields.135 = value;
         self
     }
@@ -8425,18 +7869,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(
-        mut self,
-        value: impl Into<Option<ImageObjectTimeRequired<S>>>,
-    ) -> Self {
+    pub fn time_required(mut self, value: impl Into<Option<ImageObjectTimeRequired<S>>>) -> Self {
         self._fields.136 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
-    pub fn maybe_time_required(
-        mut self,
-        value: Option<ImageObjectTimeRequired<S>>,
-    ) -> Self {
+    pub fn maybe_time_required(mut self, value: Option<ImageObjectTimeRequired<S>>) -> Self {
         self._fields.136 = value;
         self
     }
@@ -8463,10 +7901,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `translator` field (optional)
-    pub fn translator(
-        mut self,
-        value: impl Into<Option<ImageObjectTranslator<S>>>,
-    ) -> Self {
+    pub fn translator(mut self, value: impl Into<Option<ImageObjectTranslator<S>>>) -> Self {
         self._fields.138 = value.into();
         self
     }
@@ -8487,10 +7922,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(
-        mut self,
-        value: Option<ImageObjectTypicalAgeRange<S>>,
-    ) -> Self {
+    pub fn maybe_typical_age_range(mut self, value: Option<ImageObjectTypicalAgeRange<S>>) -> Self {
         self._fields.139 = value;
         self
     }
@@ -8498,10 +7930,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `uploadDate` field (optional)
-    pub fn upload_date(
-        mut self,
-        value: impl Into<Option<ImageObjectUploadDate<S>>>,
-    ) -> Self {
+    pub fn upload_date(mut self, value: impl Into<Option<ImageObjectUploadDate<S>>>) -> Self {
         self._fields.140 = value.into();
         self
     }
@@ -8527,10 +7956,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `usageInfo` field (optional)
-    pub fn usage_info(
-        mut self,
-        value: impl Into<Option<ImageObjectUsageInfo<S>>>,
-    ) -> Self {
+    pub fn usage_info(mut self, value: impl Into<Option<ImageObjectUsageInfo<S>>>) -> Self {
         self._fields.142 = value.into();
         self
     }
@@ -8582,10 +8008,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `wordCount` field (optional)
-    pub fn word_count(
-        mut self,
-        value: impl Into<Option<ImageObjectWordCount<S>>>,
-    ) -> Self {
+    pub fn word_count(mut self, value: impl Into<Option<ImageObjectWordCount<S>>>) -> Self {
         self._fields.146 = value.into();
         self
     }
@@ -8598,18 +8021,12 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
 
 impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(
-        mut self,
-        value: impl Into<Option<ImageObjectWorkExample<S>>>,
-    ) -> Self {
+    pub fn work_example(mut self, value: impl Into<Option<ImageObjectWorkExample<S>>>) -> Self {
         self._fields.147 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
-    pub fn maybe_work_example(
-        mut self,
-        value: Option<ImageObjectWorkExample<S>>,
-    ) -> Self {
+    pub fn maybe_work_example(mut self, value: Option<ImageObjectWorkExample<S>>) -> Self {
         self._fields.147 = value;
         self
     }
@@ -8625,10 +8042,7 @@ impl<St: image_object_state::State, S: BosStr> ImageObjectBuilder<St, S> {
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(
-        mut self,
-        value: Option<ImageObjectWorkTranslation<S>>,
-    ) -> Self {
+    pub fn maybe_work_translation(mut self, value: Option<ImageObjectWorkTranslation<S>>) -> Self {
         self._fields.148 = value;
         self
     }
@@ -8794,10 +8208,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageObject<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageObject<S> {
         ImageObject {
             about: self._fields.0,
             r#abstract: self._fields.1,

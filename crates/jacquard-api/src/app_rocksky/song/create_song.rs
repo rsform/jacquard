@@ -8,58 +8,63 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::song::SongViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::song::SongViewDetailed;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSong<S: BosStr = DefaultStr> {
-    ///The album of the song, if applicable
+    /// The album of the song, if applicable
     pub album: S,
-    ///The URL of the album art for the song
+    /// The URL of the album art for the song
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album_art: Option<UriValue<S>>,
-    ///The album artist of the song, if different from the main artist
+    /// The album artist of the song, if different from the main artist
     pub album_artist: S,
-    ///The artist of the song
+    /// The artist of the song
     pub artist: S,
-    ///The disc number of the song in the album, if applicable
+    /// The disc number of the song in the album, if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disc_number: Option<i64>,
-    ///The duration of the song in seconds
+    /// The duration of the song in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
-    ///The lyrics of the song, if available
+    /// The lyrics of the song, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lyrics: Option<S>,
-    ///The MusicBrainz ID of the song, if available
+    /// The MusicBrainz ID of the song, if available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mb_id: Option<S>,
-    ///The release date of the song, formatted as YYYY-MM-DD
+    /// The release date of the song, formatted as YYYY-MM-DD
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_date: Option<S>,
-    ///The title of the song
+    /// The title of the song
     pub title: S,
-    ///The track number of the song in the album, if applicable
+    /// The track number of the song in the album, if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_number: Option<i64>,
-    ///The year the song was released
+    /// The year the song was released
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSongOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SongViewDetailed<S>,
@@ -80,9 +85,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateSong<S> {
     const NSID: &'static str = "app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateSongResponse;
 }
 
@@ -92,9 +96,8 @@ Path: `/xrpc/app.rocksky.song.createSong`. The request payload type is `CreateSo
 pub struct CreateSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateSong<S>;
     type Response = CreateSongResponse;
 }

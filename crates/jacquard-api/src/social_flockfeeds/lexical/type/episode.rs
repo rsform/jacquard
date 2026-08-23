@@ -17,9 +17,6 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::music_group;
@@ -27,10 +24,16 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A media episode (e.g. TV, radio, video game) which can be part of a series or season.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -317,7 +320,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -371,7 +373,6 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -385,7 +386,6 @@ pub enum EmbeddedActor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -393,7 +393,6 @@ pub enum EmbeddedActors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -450,7 +449,6 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -468,7 +466,6 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -515,7 +512,6 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -525,7 +521,6 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -561,7 +556,6 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -601,7 +595,6 @@ pub enum EmbeddedDirector<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -609,7 +602,6 @@ pub enum EmbeddedDirectors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -638,7 +630,6 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -700,7 +691,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -733,7 +723,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -768,7 +757,6 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -776,7 +764,6 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -828,7 +815,6 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -836,7 +822,6 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -858,7 +843,6 @@ pub enum EmbeddedMusicBy<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -871,7 +855,6 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -908,7 +891,6 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -916,7 +898,6 @@ pub enum EmbeddedProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -927,7 +908,6 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -944,7 +924,6 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -952,7 +931,6 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -966,7 +944,6 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1013,7 +990,6 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1026,7 +1002,6 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1048,7 +1023,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1056,7 +1030,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1085,7 +1058,6 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1116,7 +1088,6 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1160,7 +1131,10 @@ pub enum EmbeddedWorkTranslation<S: BosStr = DefaultStr> {}
 /// A media episode (e.g. TV, radio, video game) which can be part of a series or season.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Episode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EpisodeAbout<S>>,
@@ -1447,7 +1421,6 @@ pub struct Episode<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1501,7 +1474,6 @@ pub enum EpisodeAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1515,7 +1487,6 @@ pub enum EpisodeActor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1523,7 +1494,6 @@ pub enum EpisodeActors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1580,7 +1550,6 @@ pub enum EpisodeAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1598,7 +1567,6 @@ pub enum EpisodeCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1645,7 +1613,6 @@ pub enum EpisodeContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1655,7 +1622,6 @@ pub enum EpisodeCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1691,7 +1657,6 @@ pub enum EpisodeCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1731,7 +1696,6 @@ pub enum EpisodeDirector<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1739,7 +1703,6 @@ pub enum EpisodeDirectors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1768,7 +1731,6 @@ pub enum EpisodeEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1830,7 +1792,6 @@ pub enum EpisodeFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1863,7 +1824,6 @@ pub enum EpisodeImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1898,7 +1858,6 @@ pub enum EpisodeIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1906,7 +1865,6 @@ pub enum EpisodeIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1958,7 +1916,6 @@ pub enum EpisodeMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1966,7 +1923,6 @@ pub enum EpisodeMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1988,7 +1944,6 @@ pub enum EpisodeMusicBy<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2001,7 +1956,6 @@ pub enum EpisodeOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2038,7 +1992,6 @@ pub enum EpisodeProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2046,7 +1999,6 @@ pub enum EpisodeProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2057,7 +2009,6 @@ pub enum EpisodeProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2074,7 +2025,6 @@ pub enum EpisodePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2082,7 +2032,6 @@ pub enum EpisodePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2096,7 +2045,6 @@ pub enum EpisodeRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2143,7 +2091,6 @@ pub enum EpisodeSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2156,7 +2103,6 @@ pub enum EpisodeSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2178,7 +2124,6 @@ pub enum EpisodeSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2186,7 +2131,6 @@ pub enum EpisodeSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2215,7 +2159,6 @@ pub enum EpisodeThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2246,7 +2189,6 @@ pub enum EpisodeTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2324,17 +2266,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Episode() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Episode"),
@@ -5251,8 +5192,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

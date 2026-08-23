@@ -10,13 +10,12 @@ pub mod begin;
 pub mod get_config;
 pub mod get_state;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,10 +26,10 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::ageassurance;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::ageassurance;
+use serde::{Deserialize, Serialize};
 /// The access level granted based on Age Assurance data we've processed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -112,11 +111,13 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Config<S: BosStr = DefaultStr> {
-    ///The per-region Age Assurance configuration.
+    /// The per-region Age Assurance configuration.
     pub regions: Vec<ageassurance::ConfigRegion<S>>,
     #[serde(
         flatten,
@@ -130,24 +131,25 @@ pub struct Config<S: BosStr = DefaultStr> {
 /// The Age Assurance configuration for a specific region.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegion<S: BosStr = DefaultStr> {
-    ///Verification methods permitted in this region in addition to the third-party (KWS) flow, which is always supported. `device` permits using the native on-device age APIs (e.g. Apple Declared Age Range, Google Play Age Signals).
+    /// Verification methods permitted in this region in addition to the third-party (KWS) flow, which is always supported. `device` permits using the native on-device age APIs (e.g. Apple Declared Age Range, Google Play Age Signals).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub additional_verification_methods: Option<
-        Vec<ConfigRegionAdditionalVerificationMethods<S>>,
-    >,
-    ///The ISO 3166-1 alpha-2 country code this configuration applies to.
+    pub additional_verification_methods: Option<Vec<ConfigRegionAdditionalVerificationMethods<S>>>,
+    /// The ISO 3166-1 alpha-2 country code this configuration applies to.
     pub country_code: S,
-    ///The minimum age (as a whole integer) required to use Bluesky in this region.
+    /// The minimum age (as a whole integer) required to use Bluesky in this region.
     pub min_access_age: i64,
-    ///The platforms this configuration applies to. If omitted, the configuration applies to all platforms.
+    /// The platforms this configuration applies to. If omitted, the configuration applies to all platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platforms: Option<Vec<ConfigRegionPlatforms<S>>>,
-    ///The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country.
+    /// The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_code: Option<S>,
-    ///The ordered list of Age Assurance rules that apply to this region. Rules should be applied in order, and the first matching rule determines the access level granted. The rules array should always include a default rule as the last item.
+    /// The ordered list of Age Assurance rules that apply to this region. Rules should be applied in order, and the first matching rule determines the access level granted. The rules array should always include a default rule as the last item.
     pub rules: Vec<ConfigRegionRulesItem<S>>,
     #[serde(
         flatten,
@@ -157,7 +159,6 @@ pub struct ConfigRegion<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigRegionAdditionalVerificationMethods<S: BosStr = DefaultStr> {
@@ -203,7 +204,8 @@ impl<S: BosStr> Serialize for ConfigRegionAdditionalVerificationMethods<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ConfigRegionAdditionalVerificationMethods<S> {
+    for ConfigRegionAdditionalVerificationMethods<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -219,8 +221,7 @@ impl<S: BosStr + Default> Default for ConfigRegionAdditionalVerificationMethods<
     }
 }
 
-impl<S: BosStr> jacquard_common::IntoStatic
-for ConfigRegionAdditionalVerificationMethods<S>
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigRegionAdditionalVerificationMethods<S>
 where
     S: BosStr + jacquard_common::IntoStatic,
     S::Output: BosStr,
@@ -237,7 +238,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigRegionPlatforms<S: BosStr = DefaultStr> {
@@ -315,13 +315,10 @@ where
             ConfigRegionPlatforms::Web => ConfigRegionPlatforms::Web,
             ConfigRegionPlatforms::Ios => ConfigRegionPlatforms::Ios,
             ConfigRegionPlatforms::Android => ConfigRegionPlatforms::Android,
-            ConfigRegionPlatforms::Other(v) => {
-                ConfigRegionPlatforms::Other(v.into_static())
-            }
+            ConfigRegionPlatforms::Other(v) => ConfigRegionPlatforms::Other(v.into_static()),
         }
     }
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -330,35 +327,26 @@ pub enum ConfigRegionRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleDefault")]
     ConfigRegionRuleDefault(Box<ageassurance::ConfigRegionRuleDefault<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfDeclaredOverAge")]
-    ConfigRegionRuleIfDeclaredOverAge(
-        Box<ageassurance::ConfigRegionRuleIfDeclaredOverAge<S>>,
-    ),
+    ConfigRegionRuleIfDeclaredOverAge(Box<ageassurance::ConfigRegionRuleIfDeclaredOverAge<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfDeclaredUnderAge")]
-    ConfigRegionRuleIfDeclaredUnderAge(
-        Box<ageassurance::ConfigRegionRuleIfDeclaredUnderAge<S>>,
-    ),
+    ConfigRegionRuleIfDeclaredUnderAge(Box<ageassurance::ConfigRegionRuleIfDeclaredUnderAge<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfAssuredOverAge")]
-    ConfigRegionRuleIfAssuredOverAge(
-        Box<ageassurance::ConfigRegionRuleIfAssuredOverAge<S>>,
-    ),
+    ConfigRegionRuleIfAssuredOverAge(Box<ageassurance::ConfigRegionRuleIfAssuredOverAge<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfAssuredUnderAge")]
-    ConfigRegionRuleIfAssuredUnderAge(
-        Box<ageassurance::ConfigRegionRuleIfAssuredUnderAge<S>>,
-    ),
+    ConfigRegionRuleIfAssuredUnderAge(Box<ageassurance::ConfigRegionRuleIfAssuredUnderAge<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfAccountNewerThan")]
-    ConfigRegionRuleIfAccountNewerThan(
-        Box<ageassurance::ConfigRegionRuleIfAccountNewerThan<S>>,
-    ),
+    ConfigRegionRuleIfAccountNewerThan(Box<ageassurance::ConfigRegionRuleIfAccountNewerThan<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfAccountOlderThan")]
-    ConfigRegionRuleIfAccountOlderThan(
-        Box<ageassurance::ConfigRegionRuleIfAccountOlderThan<S>>,
-    ),
+    ConfigRegionRuleIfAccountOlderThan(Box<ageassurance::ConfigRegionRuleIfAccountOlderThan<S>>),
 }
 
 /// Age Assurance rule that applies by default.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleDefault<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     #[serde(
@@ -373,10 +361,13 @@ pub struct ConfigRegionRuleDefault<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the account is equal-to or newer than a certain date.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfAccountNewerThan<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The date threshold as a datetime string.
+    /// The date threshold as a datetime string.
     pub date: Datetime,
     #[serde(
         flatten,
@@ -390,10 +381,13 @@ pub struct ConfigRegionRuleIfAccountNewerThan<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the account is older than a certain date.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfAccountOlderThan<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The date threshold as a datetime string.
+    /// The date threshold as a datetime string.
     pub date: Datetime,
     #[serde(
         flatten,
@@ -407,10 +401,13 @@ pub struct ConfigRegionRuleIfAccountOlderThan<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the user has been assured to be equal-to or over a certain age.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfAssuredOverAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The age threshold as a whole integer.
+    /// The age threshold as a whole integer.
     pub age: i64,
     #[serde(
         flatten,
@@ -424,10 +421,13 @@ pub struct ConfigRegionRuleIfAssuredOverAge<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the user has been assured to be under a certain age.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfAssuredUnderAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The age threshold as a whole integer.
+    /// The age threshold as a whole integer.
     pub age: i64,
     #[serde(
         flatten,
@@ -441,10 +441,13 @@ pub struct ConfigRegionRuleIfAssuredUnderAge<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the user has declared themselves equal-to or over a certain age.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfDeclaredOverAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The age threshold as a whole integer.
+    /// The age threshold as a whole integer.
     pub age: i64,
     #[serde(
         flatten,
@@ -458,10 +461,13 @@ pub struct ConfigRegionRuleIfDeclaredOverAge<S: BosStr = DefaultStr> {
 /// Age Assurance rule that applies if the user has declared themselves under a certain age.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConfigRegionRuleIfDeclaredUnderAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The age threshold as a whole integer.
+    /// The age threshold as a whole integer.
     pub age: i64,
     #[serde(
         flatten,
@@ -475,35 +481,38 @@ pub struct ConfigRegionRuleIfDeclaredUnderAge<S: BosStr = DefaultStr> {
 /// Object used to store Age Assurance data in stash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Event<S: BosStr = DefaultStr> {
-    ///The access level granted based on Age Assurance data we've processed.
+    /// The access level granted based on Age Assurance data we've processed.
     pub access: EventAccess<S>,
-    ///The unique identifier for this instance of the Age Assurance flow, in UUID format.
+    /// The unique identifier for this instance of the Age Assurance flow, in UUID format.
     pub attempt_id: S,
-    ///The IP address used when completing the Age Assurance flow.
+    /// The IP address used when completing the Age Assurance flow.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complete_ip: Option<S>,
-    ///The user agent used when completing the Age Assurance flow.
+    /// The user agent used when completing the Age Assurance flow.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complete_ua: Option<S>,
-    ///The ISO 3166-1 alpha-2 country code provided when beginning the Age Assurance flow.
+    /// The ISO 3166-1 alpha-2 country code provided when beginning the Age Assurance flow.
     pub country_code: S,
-    ///The date and time of this write operation.
+    /// The date and time of this write operation.
     pub created_at: Datetime,
-    ///The email used for Age Assurance.
+    /// The email used for Age Assurance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<S>,
-    ///The IP address used when initiating the Age Assurance flow.
+    /// The IP address used when initiating the Age Assurance flow.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub init_ip: Option<S>,
-    ///The user agent used when initiating the Age Assurance flow.
+    /// The user agent used when initiating the Age Assurance flow.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub init_ua: Option<S>,
-    ///The ISO 3166-2 region code provided when beginning the Age Assurance flow.
+    /// The ISO 3166-2 region code provided when beginning the Age Assurance flow.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_code: Option<S>,
-    ///The status of the Age Assurance process.
+    /// The status of the Age Assurance process.
     pub status: EventStatus<S>,
     #[serde(
         flatten,
@@ -691,10 +700,13 @@ where
 /// The user's computed Age Assurance state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct State<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
-    ///The timestamp when this state was last updated.
+    /// The timestamp when this state was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_initiated_at: Option<Datetime>,
     pub status: ageassurance::Status<S>,
@@ -710,9 +722,12 @@ pub struct State<S: BosStr = DefaultStr> {
 /// Additional metadata needed to compute Age Assurance state client-side.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StateMetadata<S: BosStr = DefaultStr> {
-    ///The account creation timestamp.
+    /// The account creation timestamp.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_created_at: Option<Datetime>,
     #[serde(
@@ -992,15 +1007,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1114,10 +1128,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.ageassurance.defs"),
@@ -1126,11 +1140,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("access"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "The access level granted based on Age Assurance data we've processed.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The access level granted based on Age Assurance data we've processed.",
+                    )),
                     ..Default::default()
                 }),
             );
@@ -1145,11 +1157,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("regions"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The per-region Age Assurance configuration.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The per-region Age Assurance configuration.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "app.bsky.ageassurance.defs#configRegion",
@@ -1269,9 +1279,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("configRegionRuleDefault"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Age Assurance rule that applies by default."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Age Assurance rule that applies by default.",
+                    )),
                     required: Some(vec![SmolStr::new_static("access")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1279,9 +1289,7 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("access"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#access",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.ageassurance.defs#access"),
                                 ..Default::default()
                             }),
                         );
@@ -1653,34 +1661,29 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("state"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("The user's computed Age Assurance state."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("status"), SmolStr::new_static("access")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The user's computed Age Assurance state.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("status"),
+                        SmolStr::new_static("access"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("access"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#access",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.ageassurance.defs#access"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastInitiatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The timestamp when this state was last updated.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The timestamp when this state was last updated.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1688,9 +1691,7 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.ageassurance.defs#status",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.ageassurance.defs#status"),
                                 ..Default::default()
                             }),
                         );
@@ -1702,11 +1703,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("stateMetadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Additional metadata needed to compute Age Assurance state client-side.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Additional metadata needed to compute Age Assurance state client-side.",
+                    )),
                     required: Some(vec![]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1714,9 +1713,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("accountCreatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The account creation timestamp."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The account creation timestamp.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1729,9 +1728,9 @@ fn lexicon_doc_app_bsky_ageassurance_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("status"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("The status of the Age Assurance process."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The status of the Age Assurance process.",
+                    )),
                     ..Default::default()
                 }),
             );
@@ -1748,15 +1747,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1921,18 +1919,12 @@ where
 
 impl<St: config_region_state::State, S: BosStr> ConfigRegionBuilder<St, S> {
     /// Set the `platforms` field (optional)
-    pub fn platforms(
-        mut self,
-        value: impl Into<Option<Vec<ConfigRegionPlatforms<S>>>>,
-    ) -> Self {
+    pub fn platforms(mut self, value: impl Into<Option<Vec<ConfigRegionPlatforms<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `platforms` field to an Option value (optional)
-    pub fn maybe_platforms(
-        mut self,
-        value: Option<Vec<ConfigRegionPlatforms<S>>>,
-    ) -> Self {
+    pub fn maybe_platforms(mut self, value: Option<Vec<ConfigRegionPlatforms<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1990,10 +1982,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ConfigRegion<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConfigRegion<S> {
         ConfigRegion {
             additional_verification_methods: self._fields.0,
             country_code: self._fields.1.unwrap(),
@@ -2013,15 +2002,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_default_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2063,28 +2051,20 @@ pub struct ConfigRegionRuleDefaultBuilder<
 
 impl ConfigRegionRuleDefault<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ConfigRegionRuleDefaultBuilder<
-        config_region_rule_default_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::Empty, DefaultStr> {
         ConfigRegionRuleDefaultBuilder::new()
     }
 }
 
 impl<S: BosStr> ConfigRegionRuleDefault<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ConfigRegionRuleDefaultBuilder<
-        config_region_rule_default_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::Empty, S> {
         ConfigRegionRuleDefaultBuilder::builder()
     }
 }
 
-impl ConfigRegionRuleDefaultBuilder<
-    config_region_rule_default_state::Empty,
-    DefaultStr,
-> {
+impl ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleDefaultBuilder {
@@ -2095,9 +2075,7 @@ impl ConfigRegionRuleDefaultBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::Empty, S> {
+impl<S: BosStr> ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleDefaultBuilder {
@@ -2117,10 +2095,7 @@ where
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
-    ) -> ConfigRegionRuleDefaultBuilder<
-        config_region_rule_default_state::SetAccess<St>,
-        S,
-    > {
+    ) -> ConfigRegionRuleDefaultBuilder<config_region_rule_default_state::SetAccess<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleDefaultBuilder {
             _state: PhantomData,
@@ -2161,15 +2136,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_account_newer_than_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2241,10 +2215,12 @@ impl<S: BosStr> ConfigRegionRuleIfAccountNewerThan<S> {
     }
 }
 
-impl ConfigRegionRuleIfAccountNewerThanBuilder<
-    config_region_rule_if_account_newer_than_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfAccountNewerThanBuilder<
+        config_region_rule_if_account_newer_than_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountNewerThanBuilder {
@@ -2255,12 +2231,12 @@ impl ConfigRegionRuleIfAccountNewerThanBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfAccountNewerThanBuilder<
-    config_region_rule_if_account_newer_than_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfAccountNewerThanBuilder<
+        config_region_rule_if_account_newer_than_state::Empty,
+        S,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfAccountNewerThanBuilder {
@@ -2349,15 +2325,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_account_older_than_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2429,10 +2404,12 @@ impl<S: BosStr> ConfigRegionRuleIfAccountOlderThan<S> {
     }
 }
 
-impl ConfigRegionRuleIfAccountOlderThanBuilder<
-    config_region_rule_if_account_older_than_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfAccountOlderThanBuilder<
+        config_region_rule_if_account_older_than_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountOlderThanBuilder {
@@ -2443,12 +2420,12 @@ impl ConfigRegionRuleIfAccountOlderThanBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfAccountOlderThanBuilder<
-    config_region_rule_if_account_older_than_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfAccountOlderThanBuilder<
+        config_region_rule_if_account_older_than_state::Empty,
+        S,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfAccountOlderThanBuilder {
@@ -2537,15 +2514,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_assured_over_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2617,10 +2593,12 @@ impl<S: BosStr> ConfigRegionRuleIfAssuredOverAge<S> {
     }
 }
 
-impl ConfigRegionRuleIfAssuredOverAgeBuilder<
-    config_region_rule_if_assured_over_age_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfAssuredOverAgeBuilder<
+        config_region_rule_if_assured_over_age_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredOverAgeBuilder {
@@ -2631,12 +2609,9 @@ impl ConfigRegionRuleIfAssuredOverAgeBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfAssuredOverAgeBuilder<
-    config_region_rule_if_assured_over_age_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfAssuredOverAgeBuilder<config_region_rule_if_assured_over_age_state::Empty, S>
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfAssuredOverAgeBuilder {
@@ -2725,15 +2700,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_assured_under_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2805,10 +2779,12 @@ impl<S: BosStr> ConfigRegionRuleIfAssuredUnderAge<S> {
     }
 }
 
-impl ConfigRegionRuleIfAssuredUnderAgeBuilder<
-    config_region_rule_if_assured_under_age_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfAssuredUnderAgeBuilder<
+        config_region_rule_if_assured_under_age_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
@@ -2819,12 +2795,12 @@ impl ConfigRegionRuleIfAssuredUnderAgeBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfAssuredUnderAgeBuilder<
-    config_region_rule_if_assured_under_age_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfAssuredUnderAgeBuilder<
+        config_region_rule_if_assured_under_age_state::Empty,
+        S,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
@@ -2913,15 +2889,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_declared_over_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2993,10 +2968,12 @@ impl<S: BosStr> ConfigRegionRuleIfDeclaredOverAge<S> {
     }
 }
 
-impl ConfigRegionRuleIfDeclaredOverAgeBuilder<
-    config_region_rule_if_declared_over_age_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfDeclaredOverAgeBuilder<
+        config_region_rule_if_declared_over_age_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
@@ -3007,12 +2984,12 @@ impl ConfigRegionRuleIfDeclaredOverAgeBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfDeclaredOverAgeBuilder<
-    config_region_rule_if_declared_over_age_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfDeclaredOverAgeBuilder<
+        config_region_rule_if_declared_over_age_state::Empty,
+        S,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
@@ -3101,15 +3078,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod config_region_rule_if_declared_under_age_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3181,10 +3157,12 @@ impl<S: BosStr> ConfigRegionRuleIfDeclaredUnderAge<S> {
     }
 }
 
-impl ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-    config_region_rule_if_declared_under_age_state::Empty,
-    DefaultStr,
-> {
+impl
+    ConfigRegionRuleIfDeclaredUnderAgeBuilder<
+        config_region_rule_if_declared_under_age_state::Empty,
+        DefaultStr,
+    >
+{
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
@@ -3195,12 +3173,12 @@ impl ConfigRegionRuleIfDeclaredUnderAgeBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-    config_region_rule_if_declared_under_age_state::Empty,
-    S,
-> {
+impl<S: BosStr>
+    ConfigRegionRuleIfDeclaredUnderAgeBuilder<
+        config_region_rule_if_declared_under_age_state::Empty,
+        S,
+    >
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
@@ -3289,15 +3267,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3425,7 +3402,9 @@ impl EventBuilder<event_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3436,7 +3415,9 @@ impl<S: BosStr> EventBuilder<event_state::Empty, S> {
     pub fn builder() -> Self {
         EventBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3667,15 +3648,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3848,8 +3828,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

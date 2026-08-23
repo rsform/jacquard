@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,22 +24,25 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_protoimsg::chat::community;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_protoimsg::chat::community;
+use serde::{Deserialize, Serialize};
 /// A named group of community members.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityGroup<S: BosStr = DefaultStr> {
-    ///Whether this is an inner circle group for presence visibility.  Defaults to `false`.
+    /// Whether this is an inner circle group for presence visibility.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_community_group_is_inner_circle")]
     pub is_inner_circle: Option<bool>,
-    ///DIDs of group members.
+    /// DIDs of group members.
     pub members: Vec<community::CommunityMember<S>>,
-    ///Group label.
+    /// Group label.
     pub name: S,
     #[serde(
         flatten,
@@ -53,11 +56,14 @@ pub struct CommunityGroup<S: BosStr = DefaultStr> {
 /// A member in a community group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityMember<S: BosStr = DefaultStr> {
-    ///When this member was added.
+    /// When this member was added.
     pub added_at: Datetime,
-    ///The member's DID.
+    /// The member's DID.
     pub did: Did<S>,
     #[serde(
         flatten,
@@ -78,7 +84,7 @@ pub struct CommunityMember<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Community<S: BosStr = DefaultStr> {
-    ///Named groups of community members, like AIM's buddy list categories.
+    /// Named groups of community members, like AIM's buddy list categories.
     pub groups: Vec<community::CommunityGroup<S>>,
     #[serde(
         flatten,
@@ -218,9 +224,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -230,7 +235,7 @@ fn _default_community_group_is_inner_circle() -> Option<bool> {
 
 pub mod community_group_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -273,12 +278,13 @@ pub mod community_group_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityGroupBuilder<
-    St: community_group_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CommunityGroupBuilder<St: community_group_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<bool>, Option<Vec<community::CommunityMember<S>>>, Option<S>),
+    _fields: (
+        Option<bool>,
+        Option<Vec<community::CommunityMember<S>>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -385,10 +391,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityGroup<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityGroup<S> {
         CommunityGroup {
             is_inner_circle: self._fields.0.or_else(|| Some(false)),
             members: self._fields.1.unwrap(),
@@ -399,10 +402,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.community"),
@@ -411,12 +414,11 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityGroup"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A named group of community members."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("members")],
-                    ),
+                    description: Some(CowStr::new_static("A named group of community members.")),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("members"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -429,9 +431,7 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("members"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("DIDs of group members."),
-                                ),
+                                description: Some(CowStr::new_static("DIDs of group members.")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#communityMember"),
                                     ..Default::default()
@@ -456,21 +456,20 @@ fn lexicon_doc_app_protoimsg_chat_community() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A member in a community group."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("addedAt")],
-                    ),
+                    description: Some(CowStr::new_static("A member in a community group.")),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("addedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When this member was added."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When this member was added.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -538,15 +537,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod community_member_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -589,10 +587,7 @@ pub mod community_member_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityMemberBuilder<
-    St: community_member_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CommunityMemberBuilder<St: community_member_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -687,10 +682,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityMember<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityMember<S> {
         CommunityMember {
             added_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -706,9 +698,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -720,7 +711,7 @@ where
 
 pub mod community_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -825,10 +816,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Community<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Community<S> {
         Community {
             groups: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

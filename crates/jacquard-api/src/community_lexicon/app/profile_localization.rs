@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::community_lexicon::app::Image;
 use crate::community_lexicon::app::Link;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A locale-specific override for an app profile. This record should be published by the same DID as the canonical app profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,26 +39,26 @@ use crate::community_lexicon::app::Link;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ProfileLocalization<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when this localization was created.
+    /// Client-declared timestamp when this localization was created.
     pub created_at: Datetime,
-    ///Localized description of what the app does.
+    /// Localized description of what the app does.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Localized visual assets for directories and stores, such as icons, hero images, screenshots, banners, and social cards.
+    /// Localized visual assets for directories and stores, such as icons, hero images, screenshots, banners, and social cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<Image<S>>>,
-    ///Localized destinations for the app. The first link should be the primary destination for this locale.
+    /// Localized destinations for the app. The first link should be the primary destination for this locale.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Vec<Link<S>>>,
-    ///BCP 47 language tag for this localized metadata.
+    /// BCP 47 language tag for this localized metadata.
     pub locale: Language,
-    ///Localized display name of the app.
+    /// Localized display name of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Localized discovery tags for filtering and search.
+    /// Localized discovery tags for filtering and search.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Client-declared timestamp when this localization was last updated.
+    /// Client-declared timestamp when this localization was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -224,8 +224,7 @@ impl<S: BosStr> LexiconSchema for ProfileLocalization<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 32usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -247,9 +246,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -261,7 +259,7 @@ where
 
 pub mod profile_localization_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -304,10 +302,8 @@ pub mod profile_localization_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileLocalizationBuilder<
-    St: profile_localization_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ProfileLocalizationBuilder<St: profile_localization_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -324,20 +320,14 @@ pub struct ProfileLocalizationBuilder<
 
 impl ProfileLocalization<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ProfileLocalizationBuilder<
-        profile_localization_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ProfileLocalizationBuilder<profile_localization_state::Empty, DefaultStr> {
         ProfileLocalizationBuilder::new()
     }
 }
 
 impl<S: BosStr> ProfileLocalization<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ProfileLocalizationBuilder<
-        profile_localization_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ProfileLocalizationBuilder<profile_localization_state::Empty, S> {
         ProfileLocalizationBuilder::builder()
     }
 }
@@ -383,10 +373,7 @@ where
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -399,10 +386,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<Image<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -415,10 +399,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `links` field (optional)
     pub fn links(mut self, value: impl Into<Option<Vec<Link<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -450,10 +431,7 @@ where
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -466,10 +444,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -482,10 +457,7 @@ impl<
     }
 }
 
-impl<
-    St: profile_localization_state::State,
-    S: BosStr,
-> ProfileLocalizationBuilder<St, S> {
+impl<St: profile_localization_state::State, S: BosStr> ProfileLocalizationBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -519,10 +491,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileLocalization<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileLocalization<S> {
         ProfileLocalization {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -538,10 +507,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_app_profileLocalization() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.app.profileLocalization"),

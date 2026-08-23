@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A fridge-poetry composition made in the Anisota Lab's Word Magnets studio, where word tiles drawn from the author's own recent posts are arranged on a field into a short poem. The record keeps the assembled text, the placed tiles with their positions (so the arrangement can be reopened), and at-uri references to the posts the used words were drawn from.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,20 +37,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Poetry<S: BosStr = DefaultStr> {
-    ///Optional snapshot of the studio board taken at save time, so the arrangement can be re-laid faithfully at any size: { aspect, font, bx, by, bw, bh } — the bounding box of the placed tiles (bx/by/bw/bh as 0..1000 of the surface, matching tile x/y), the box's width:height aspect, and the tile font size as a fraction of the box width.
+    /// Optional snapshot of the studio board taken at save time, so the arrangement can be re-laid faithfully at any size: { aspect, font, bx, by, bw, bh } — the bounding box of the placed tiles (bx/by/bw/bh as 0..1000 of the surface, matching tile x/y), the box's width:height aspect, and the tile font size as a fraction of the box width.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub board: Option<Data<S>>,
-    ///When the poem was saved
+    /// When the poem was saved
     pub created_at: Datetime,
-    ///Optional title for the poem
+    /// Optional title for the poem
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///at-uri references to the author's own posts that the used words were drawn from
+    /// at-uri references to the author's own posts that the used words were drawn from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sources: Option<Vec<AtUri<S>>>,
-    ///The assembled poem — the placed word tiles read top-to-bottom, left-to-right
+    /// The assembled poem — the placed word tiles read top-to-bottom, left-to-right
     pub text: S,
-    ///The placed word tiles and their positions, so the arrangement can be reopened. Each is an object: { word, fragment, x, y, rot } where x/y are the tile centre as a 0..1000 fraction of the field and rot is degrees.
+    /// The placed word tiles and their positions, so the arrangement can be reopened. Each is an object: { word, fragment, x, y, rot } where x/y are the tile centre as a 0..1000 fraction of the field and rot is degrees.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tiles: Option<Vec<Data<S>>>,
     #[serde(
@@ -194,9 +194,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -208,7 +207,7 @@ where
 
 pub mod poetry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -364,10 +363,7 @@ where
     St::Text: poetry_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> PoetryBuilder<poetry_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> PoetryBuilder<poetry_state::SetText<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PoetryBuilder {
             _state: PhantomData,
@@ -423,10 +419,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_poetry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.poetry"),

@@ -10,65 +10,65 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreatePin<S: BosStr = DefaultStr> {
-    ///Optional expiration time for this pin.
+    /// Optional expiration time for this pin.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    ///The AT-URI of the chat message to pin.
+    /// The AT-URI of the chat message to pin.
     pub message_uri: AtUri<S>,
-    ///The DID of the streamer.
+    /// The DID of the streamer.
     pub streamer: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreatePinOutput<S: BosStr = DefaultStr> {
-    ///The CID of the created pinned record.
+    /// The CID of the created pinned record.
     pub cid: Cid<S>,
-    ///The AT-URI of the created pinned record.
+    /// The AT-URI of the created pinned record.
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreatePinError {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<SmolStr>),
+    Unauthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The caller does not have permission to pin messages for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(Option<SmolStr>),
+    Forbidden(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(Option<SmolStr>),
+    SessionNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreatePinError {
@@ -119,9 +119,8 @@ impl jacquard_common::xrpc::XrpcResp for CreatePinResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreatePin<S> {
     const NSID: &'static str = "place.stream.moderation.createPin";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreatePinResponse;
 }
 
@@ -131,16 +130,15 @@ Path: `/xrpc/place.stream.moderation.createPin`. The request payload type is `Cr
 pub struct CreatePinRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePinRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.createPin";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreatePin<S>;
     type Response = CreatePinResponse;
 }
 
 pub mod create_pin_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -292,10 +290,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreatePin<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreatePin<S> {
         CreatePin {
             expires_at: self._fields.0,
             message_uri: self._fields.1.unwrap(),

@@ -13,20 +13,19 @@ pub mod list_statuses;
 pub mod list_statuses_by;
 pub mod status;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -34,10 +33,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::repo::pull;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::repo::pull;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -86,7 +85,10 @@ pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
 /// revisions of this pull request, newer rounds are appended to this array. appviews may reject records do not treat this field as append-only. the blob format is gzipped text-based git-format-patches.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Round<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub patch_blob: BlobRef<S>,
@@ -99,9 +101,11 @@ pub struct Round<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
     pub branch: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -115,9 +119,11 @@ pub struct Source<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Target<S: BosStr = DefaultStr> {
     pub branch: S,
     pub repo: Did<S>,
@@ -194,19 +200,16 @@ impl<S: BosStr> LexiconSchema for Round<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["application/gzip"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("patch_blob"),
@@ -257,9 +260,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -271,7 +273,7 @@ where
 
 pub mod pull_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -538,10 +540,7 @@ where
     St::Title: pull_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> PullBuilder<pull_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> PullBuilder<pull_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
@@ -594,10 +593,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.pull"),
@@ -608,20 +607,21 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("target"), SmolStr::new_static("title"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("rounds")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("target"),
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("rounds"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("blobs"),
                                 LexObjectProperty::Array(LexArray {
-                                    items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
+                                    items: LexArrayItem::Blob(LexBlob {
+                                        ..Default::default()
+                                    }),
                                     ..Default::default()
                                 }),
                             );
@@ -744,7 +744,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("repo"),
@@ -761,15 +763,18 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("target"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("repo"), SmolStr::new_static("branch")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("repo"),
+                        SmolStr::new_static("branch"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("repo"),
@@ -796,15 +801,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod round_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -958,9 +962,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -971,15 +974,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod target_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1070,10 +1072,7 @@ where
     St::Branch: target_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(
-        mut self,
-        value: impl Into<S>,
-    ) -> TargetBuilder<target_state::SetBranch<St>, S> {
+    pub fn branch(mut self, value: impl Into<S>) -> TargetBuilder<target_state::SetBranch<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
@@ -1089,10 +1088,7 @@ where
     St::Repo: target_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> TargetBuilder<target_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> TargetBuilder<target_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,

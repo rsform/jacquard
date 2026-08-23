@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Ephemeral player state for cross-device sync. Singleton record (rkey: self), overwritten via putRecord.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,76 +37,76 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct State<S: BosStr = DefaultStr> {
-    ///ISO datetime the player most recently accepted the Terms of Service / Privacy Policy.
+    /// ISO datetime the player most recently accepted the Terms of Service / Privacy Policy.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_terms_at: Option<Datetime>,
-    ///The highest Terms of Service / Privacy Policy version this player has accepted (see src/utils/termsVersion.js TERMS_VERSION). Drives the first-run acceptance gate; when this is below the current TERMS_VERSION the user is re-prompted to accept.
+    /// The highest Terms of Service / Privacy Policy version this player has accepted (see src/utils/termsVersion.js TERMS_VERSION). Drives the first-run acceptance gate; when this is below the current TERMS_VERSION the user is re-prompted to accept.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_terms_version: Option<i64>,
-    ///Target active blocks per day (decimal string, e.g. '6')
+    /// Target active blocks per day (decimal string, e.g. '6')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_blocks_intention_daily: Option<S>,
-    ///Deprecated: use activityIntentionTotal7d. Target weekly consuming count.
+    /// Deprecated: use activityIntentionTotal7d. Target weekly consuming count.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_consuming7d: Option<S>,
-    ///Deprecated: use activityIntentionTotal7d. Target weekly creating count.
+    /// Deprecated: use activityIntentionTotal7d. Target weekly creating count.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_creating7d: Option<S>,
-    ///Target total weekly activity count, sum of all actions (decimal string, e.g. '500')
+    /// Target total weekly activity count, sum of all actions (decimal string, e.g. '500')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_total7d: Option<S>,
-    ///Activity style intention X position as grid percentage (0-100, consuming axis)
+    /// Activity style intention X position as grid percentage (0-100, consuming axis)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_x: Option<S>,
-    ///Activity style intention Y position as grid percentage (0-100, creating axis)
+    /// Activity style intention Y position as grid percentage (0-100, creating axis)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_y: Option<S>,
-    ///Chosen app experience: 'story' (full immersive) or 'open' (simpler). Authoritative cross-device value for the mode picked during onboarding.
+    /// Chosen app experience: 'story' (full immersive) or 'open' (simpler). Authoritative cross-device value for the mode picked during onboarding.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub app_mode: Option<S>,
-    ///Object mapping completed story/onboarding chapter ids (e.g. 'welcome') to the ISO datetime they were completed. Drives whether the onboarding/changelog overlays are shown.
+    /// Object mapping completed story/onboarding chapter ids (e.g. 'welcome') to the ISO datetime they were completed. Drives whether the onboarding/changelog overlays are shown.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_chapters: Option<Data<S>>,
-    ///Current light charge in Wh (decimal string, e.g. '280.0')
+    /// Current light charge in Wh (decimal string, e.g. '280.0')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_light: Option<S>,
-    ///Current stamina level (decimal string, e.g. '42.5')
+    /// Current stamina level (decimal string, e.g. '42.5')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_stamina: Option<S>,
-    ///Equipment slots: object mapping slotId (hands, backpack, camp) to arrays of equipped item ID strings
+    /// Equipment slots: object mapping slotId (hands, backpack, camp) to arrays of equipped item ID strings
     #[serde(skip_serializing_if = "Option::is_none")]
     pub equipped: Option<Data<S>>,
-    ///Whether the v2 inventory/equipment migration has been applied for this player.
+    /// Whether the v2 inventory/equipment migration has been applied for this player.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inventory_migration_v2: Option<bool>,
-    ///Whether the v3 inventory/equipment migration (power-station id remap) has been applied for this player.
+    /// Whether the v3 inventory/equipment migration (power-station id remap) has been applied for this player.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inventory_migration_v3: Option<bool>,
-    ///When the current session started (for multi-device awareness)
+    /// When the current session started (for multi-device awareness)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_session_start: Option<Datetime>,
-    ///Whether light drain was active when state was saved
+    /// Whether light drain was active when state was saved
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light_drain_active: Option<bool>,
-    ///Rest ledger high-water-mark: the longest rest stretch ever (time away from the forest between walks) in minutes, as a decimal string. Monotonic — only ever increases. Everything else the rest ledger shows is computed on read from the walk records; this is the one durable figure.
+    /// Rest ledger high-water-mark: the longest rest stretch ever (time away from the forest between walks) in minutes, as a decimal string. Monotonic — only ever increases. Everything else the rest ledger shows is computed on read from the walk records; this is the one durable figure.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub longest_rest_minutes: Option<S>,
-    ///Comma-joined list of goal ids the player selected during onboarding (e.g. 'offline-more,reply-more'). Stored as a string to avoid depending on array support.
+    /// Comma-joined list of goal ids the player selected during onboarding (e.g. 'offline-more,reply-more'). Stored as a string to avoid depending on array support.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub onboarding_goals: Option<S>,
-    ///Slot capacity overrides: object mapping slotId to integer capacity (for upgrades). Slots not listed use default capacity.
+    /// Slot capacity overrides: object mapping slotId to integer capacity (for upgrades). Slots not listed use default capacity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slot_capacity: Option<Data<S>>,
-    ///Whether the player has received their starter items
+    /// Whether the player has received their starter items
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starter_items_granted: Option<bool>,
-    ///What caused this state snapshot (visibility_hidden, session_end, stamina_depleted, manual)
+    /// What caused this state snapshot (visibility_hidden, session_end, stamina_depleted, manual)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_source: Option<S>,
-    ///When the player completed (or skipped) the interactive tutorial. Presence of this field means the tutorial is done; absence means it has not been completed.
+    /// When the player completed (or skipped) the interactive tutorial. Presence of this field means the tutorial is done; absence means it has not been completed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tutorial_completed_at: Option<Datetime>,
-    ///When this state snapshot was taken
+    /// When this state snapshot was taken
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -183,9 +183,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -197,7 +196,7 @@ where
 
 pub mod state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -279,30 +278,8 @@ impl StateBuilder<state_state::Empty, DefaultStr> {
         StateBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -315,30 +292,8 @@ impl<S: BosStr> StateBuilder<state_state::Empty, S> {
         StateBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -386,10 +341,7 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionConsuming7d` field (optional)
-    pub fn activity_intention_consuming7d(
-        mut self,
-        value: impl Into<Option<S>>,
-    ) -> Self {
+    pub fn activity_intention_consuming7d(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -734,10 +686,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_player_state() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.player.state"),

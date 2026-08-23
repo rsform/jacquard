@@ -10,17 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotifySpaceDeleted<S: BosStr = DefaultStr> {
-    ///Reference to the deleted space.
+    /// Reference to the deleted space.
     pub space: AtSpaceUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,9 +54,8 @@ impl jacquard_common::xrpc::XrpcResp for NotifySpaceDeletedResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifySpaceDeleted<S> {
     const NSID: &'static str = "com.atproto.space.notifySpaceDeleted";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = NotifySpaceDeletedResponse;
 }
 
@@ -63,16 +65,15 @@ Path: `/xrpc/com.atproto.space.notifySpaceDeleted`. The request payload type is 
 pub struct NotifySpaceDeletedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifySpaceDeletedRequest {
     const PATH: &'static str = "/xrpc/com.atproto.space.notifySpaceDeleted";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = NotifySpaceDeleted<S>;
     type Response = NotifySpaceDeletedResponse;
 }
 
 pub mod notify_space_deleted_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,10 +104,8 @@ pub mod notify_space_deleted_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotifySpaceDeletedBuilder<
-    St: notify_space_deleted_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct NotifySpaceDeletedBuilder<St: notify_space_deleted_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtSpaceUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -114,10 +113,7 @@ pub struct NotifySpaceDeletedBuilder<
 
 impl NotifySpaceDeleted<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> NotifySpaceDeletedBuilder<
-        notify_space_deleted_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> NotifySpaceDeletedBuilder<notify_space_deleted_state::Empty, DefaultStr> {
         NotifySpaceDeletedBuilder::new()
     }
 }
@@ -183,10 +179,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotifySpaceDeleted<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotifySpaceDeleted<S> {
         NotifySpaceDeleted {
             space: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

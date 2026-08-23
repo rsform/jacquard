@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,19 +25,22 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::me_linkna::linkinbio;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::me_linkna::linkinbio;
+use serde::{Deserialize, Serialize};
 /// Saved service credentials/identifiers for pre-filling widget forms.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConnectedServices<S: BosStr = DefaultStr> {
-    ///GitHub username.
+    /// GitHub username.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub github_username: Option<S>,
-    ///Goodreads numeric user ID.
+    /// Goodreads numeric user ID.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goodreads_user_id: Option<S>,
     #[serde(
@@ -52,13 +55,16 @@ pub struct ConnectedServices<S: BosStr = DefaultStr> {
 /// A single day's contribution data from GitHub.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GithubContributionDay<S: BosStr = DefaultStr> {
-    ///Number of contributions on this day.
+    /// Number of contributions on this day.
     pub count: i64,
-    ///Date in YYYY-MM-DD format.
+    /// Date in YYYY-MM-DD format.
     pub date: S,
-    ///Contribution intensity level (0=none, 4=highest).
+    /// Contribution intensity level (0=none, 4=highest).
     pub level: i64,
     #[serde(
         flatten,
@@ -72,20 +78,23 @@ pub struct GithubContributionDay<S: BosStr = DefaultStr> {
 /// A book from a Goodreads shelf.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GoodreadsBook<S: BosStr = DefaultStr> {
-    ///Book author.
+    /// Book author.
     pub author: S,
-    ///URL to the book cover image.
+    /// URL to the book cover image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_url: Option<S>,
-    ///URL to the book on Goodreads.
+    /// URL to the book on Goodreads.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<S>,
-    ///User's rating (1-5), or absent if unrated.
+    /// User's rating (1-5), or absent if unrated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
-    ///Book title.
+    /// Book title.
     pub title: S,
     #[serde(
         flatten,
@@ -99,24 +108,27 @@ pub struct GoodreadsBook<S: BosStr = DefaultStr> {
 /// A standard link card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LinkCard<S: BosStr = DefaultStr> {
-    ///Whether the card is visible on the public page. Defaults to true.
+    /// Whether the card is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///Whether the card is visually highlighted.
+    /// Whether the card is visually highlighted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub highlighted: Option<bool>,
-    ///Unique identifier for the card.
+    /// Unique identifier for the card.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
-    ///Display text for the card (falls back to URL domain if empty).
+    /// Display text for the card (falls back to URL domain if empty).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    ///Card type discriminator. Value: 'link' or absent for link cards.
+    /// Card type discriminator. Value: 'link' or absent for link cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
-    ///URL the card links to.
+    /// URL the card links to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
     #[serde(
@@ -138,14 +150,14 @@ pub struct LinkCard<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Linkinbio<S: BosStr = DefaultStr> {
-    ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
+    /// Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
     pub cards: Vec<LinkinbioCardsItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub connected_services: Option<linkinbio::ConnectedServices<S>>,
-    ///Social media icons displayed on the profile.
+    /// Social media icons displayed on the profile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_icons: Option<Vec<linkinbio::SocialIcon<S>>>,
-    ///Deprecated: use themeConfig instead.
+    /// Deprecated: use themeConfig instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub theme: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,7 +170,6 @@ pub struct Linkinbio<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -188,13 +199,16 @@ pub struct LinkinbioGetRecordOutput<S: BosStr = DefaultStr> {
 /// A social media icon link.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SocialIcon<S: BosStr = DefaultStr> {
-    ///Unique identifier for the icon.
+    /// Unique identifier for the icon.
     pub id: S,
-    ///Platform identifier (e.g., 'bluesky', 'twitter', 'instagram').
+    /// Platform identifier (e.g., 'bluesky', 'twitter', 'instagram').
     pub platform: S,
-    ///URL to the user's profile on this platform.
+    /// URL to the user's profile on this platform.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -208,23 +222,26 @@ pub struct SocialIcon<S: BosStr = DefaultStr> {
 /// A recently played track from teal.fm.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TealfmPlay<S: BosStr = DefaultStr> {
-    ///Artist name(s).
+    /// Artist name(s).
     pub artist_name: S,
-    ///URL to the album cover image (from Cover Art Archive).
+    /// URL to the album cover image (from Cover Art Archive).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_url: Option<S>,
-    ///URL to the track on the original music service.
+    /// URL to the track on the original music service.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin_url: Option<S>,
-    ///When the track was played.
+    /// When the track was played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
-    ///Album/release name.
+    /// Album/release name.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_name: Option<S>,
-    ///Track/song name.
+    /// Track/song name.
     pub track_name: S,
     #[serde(
         flatten,
@@ -238,93 +255,96 @@ pub struct TealfmPlay<S: BosStr = DefaultStr> {
 /// Theme configuration for the page appearance.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ThemeConfig<S: BosStr = DefaultStr> {
-    ///Page background color.
+    /// Page background color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<S>,
-    ///CSS gradient for the page background.
+    /// CSS gradient for the page background.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_gradient: Option<S>,
-    ///Background wallpaper image blob.
+    /// Background wallpaper image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_image: Option<BlobRef<S>>,
-    ///Optional credit URL for the wallpaper image artist. Stored for attribution purposes only, not displayed on the public page.
+    /// Optional credit URL for the wallpaper image artist. Stored for attribution purposes only, not displayed on the public page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_image_credit: Option<UriValue<S>>,
-    ///Button content alignment. Default: left.
+    /// Button content alignment. Default: left.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub button_alignment: Option<ThemeConfigButtonAlignment<S>>,
-    ///Whether buttons glow on hover. Default: false.
+    /// Whether buttons glow on hover. Default: false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub button_hover_glow: Option<bool>,
-    ///Color for the button hover glow effect.
+    /// Color for the button hover glow effect.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub button_hover_glow_color: Option<S>,
-    ///Individual card/button background color.
+    /// Individual card/button background color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_background_color: Option<S>,
-    ///Card/button border color.
+    /// Card/button border color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_border_color: Option<S>,
-    ///Card/button border radius.
+    /// Card/button border radius.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_border_radius: Option<ThemeConfigCardBorderRadius<S>>,
-    ///Card/button border color on hover.
+    /// Card/button border color on hover.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_hover_color: Option<S>,
-    ///Card/button shadow intensity.
+    /// Card/button shadow intensity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_shadow: Option<ThemeConfigCardShadow<S>>,
-    ///Card/button text color.
+    /// Card/button text color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_text_color: Option<S>,
-    ///Card container background color.
+    /// Card container background color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_card_color: Option<S>,
-    ///Whether cursor has sparkle trail. Default: false.
+    /// Whether cursor has sparkle trail. Default: false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor_sparkles: Option<bool>,
-    ///Custom cursor style. Default: default.
+    /// Custom cursor style. Default: default.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor_style: Option<ThemeConfigCursorStyle<S>>,
-    ///Font family for the page.
+    /// Font family for the page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub font_family: Option<S>,
-    ///Font size. Default: md.
+    /// Font size. Default: md.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub font_size: Option<ThemeConfigFontSize<S>>,
-    ///Background particle effect. Default: none.
+    /// Background particle effect. Default: none.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub particles: Option<ThemeConfigParticles<S>>,
-    ///Theme preset ID.
+    /// Theme preset ID.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preset: Option<S>,
-    ///Profile section alignment. Default: center.
+    /// Profile section alignment. Default: center.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_alignment: Option<ThemeConfigProfileAlignment<S>>,
-    ///Profile picture shape. Default: circle.
+    /// Profile picture shape. Default: circle.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_picture_shape: Option<ThemeConfigProfilePictureShape<S>>,
-    ///Profile picture size. Default: sm.
+    /// Profile picture size. Default: sm.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_picture_size: Option<ThemeConfigProfilePictureSize<S>>,
-    ///Profile section text color.
+    /// Profile section text color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_text_color: Option<S>,
-    ///Whether Linkname branding is visible. Default: true.
+    /// Whether Linkname branding is visible. Default: true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_branding: Option<bool>,
-    ///Border color for social icons dock/sphere.
+    /// Border color for social icons dock/sphere.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_icons_border_color: Option<S>,
-    ///Social icons color.
+    /// Social icons color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_icons_color: Option<S>,
-    ///Social icons container shape. Default: dock.
+    /// Social icons container shape. Default: dock.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_icons_shape: Option<ThemeConfigSocialIconsShape<S>>,
-    ///Background color for social icons dock/sphere.
+    /// Background color for social icons dock/sphere.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_icons_shape_color: Option<S>,
     #[serde(
@@ -384,8 +404,7 @@ impl<S: BosStr> Serialize for ThemeConfigButtonAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigButtonAlignment<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigButtonAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -475,8 +494,7 @@ impl<S: BosStr> Serialize for ThemeConfigCardBorderRadius<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigCardBorderRadius<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigCardBorderRadius<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -598,9 +616,7 @@ where
             ThemeConfigCardShadow::Md => ThemeConfigCardShadow::Md,
             ThemeConfigCardShadow::Lg => ThemeConfigCardShadow::Lg,
             ThemeConfigCardShadow::Xl => ThemeConfigCardShadow::Xl,
-            ThemeConfigCardShadow::Other(v) => {
-                ThemeConfigCardShadow::Other(v.into_static())
-            }
+            ThemeConfigCardShadow::Other(v) => ThemeConfigCardShadow::Other(v.into_static()),
         }
     }
 }
@@ -679,9 +695,7 @@ where
         match self {
             ThemeConfigCursorStyle::Default => ThemeConfigCursorStyle::Default,
             ThemeConfigCursorStyle::HelloKitty => ThemeConfigCursorStyle::HelloKitty,
-            ThemeConfigCursorStyle::Other(v) => {
-                ThemeConfigCursorStyle::Other(v.into_static())
-            }
+            ThemeConfigCursorStyle::Other(v) => ThemeConfigCursorStyle::Other(v.into_static()),
         }
     }
 }
@@ -851,9 +865,7 @@ where
             ThemeConfigParticles::White => ThemeConfigParticles::White,
             ThemeConfigParticles::Blue => ThemeConfigParticles::Blue,
             ThemeConfigParticles::Leaves => ThemeConfigParticles::Leaves,
-            ThemeConfigParticles::Other(v) => {
-                ThemeConfigParticles::Other(v.into_static())
-            }
+            ThemeConfigParticles::Other(v) => ThemeConfigParticles::Other(v.into_static()),
         }
     }
 }
@@ -909,8 +921,7 @@ impl<S: BosStr> Serialize for ThemeConfigProfileAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigProfileAlignment<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfileAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -995,8 +1006,7 @@ impl<S: BosStr> Serialize for ThemeConfigProfilePictureShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigProfilePictureShape<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfilePictureShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1020,15 +1030,9 @@ where
     type Output = ThemeConfigProfilePictureShape<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ThemeConfigProfilePictureShape::Circle => {
-                ThemeConfigProfilePictureShape::Circle
-            }
-            ThemeConfigProfilePictureShape::Rounded => {
-                ThemeConfigProfilePictureShape::Rounded
-            }
-            ThemeConfigProfilePictureShape::Square => {
-                ThemeConfigProfilePictureShape::Square
-            }
+            ThemeConfigProfilePictureShape::Circle => ThemeConfigProfilePictureShape::Circle,
+            ThemeConfigProfilePictureShape::Rounded => ThemeConfigProfilePictureShape::Rounded,
+            ThemeConfigProfilePictureShape::Square => ThemeConfigProfilePictureShape::Square,
             ThemeConfigProfilePictureShape::Other(v) => {
                 ThemeConfigProfilePictureShape::Other(v.into_static())
             }
@@ -1087,8 +1091,7 @@ impl<S: BosStr> Serialize for ThemeConfigProfilePictureSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigProfilePictureSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigProfilePictureSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1170,8 +1173,7 @@ impl<S: BosStr> Serialize for ThemeConfigSocialIconsShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ThemeConfigSocialIconsShape<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigSocialIconsShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1207,27 +1209,30 @@ where
 /// A GitHub contributions graph widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WidgetGithub<S: BosStr = DefaultStr> {
-    ///Contribution data for the last year.
+    /// Contribution data for the last year.
     pub contributions: Vec<linkinbio::GithubContributionDay<S>>,
-    ///Whether the widget is visible on the public page. Defaults to true.
+    /// Whether the widget is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///GitHub username.
+    /// GitHub username.
     pub github_username: S,
-    ///Unique identifier for the card.
+    /// Unique identifier for the card.
     pub id: S,
-    ///When the contribution data was last fetched from GitHub.
+    /// When the contribution data was last fetched from GitHub.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_synced_at: Option<Datetime>,
-    ///Widget display size. Default: 1x1.
+    /// Widget display size. Default: 1x1.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<WidgetGithubSize<S>>,
-    ///Total number of contributions in the last year.
+    /// Total number of contributions in the last year.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_contributions: Option<i64>,
-    ///Card type discriminator.
+    /// Card type discriminator.
     pub r#type: S,
     #[serde(
         flatten,
@@ -1324,29 +1329,32 @@ where
 /// A Goodreads bookshelf widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WidgetGoodreads<S: BosStr = DefaultStr> {
-    ///Books on the currently-reading shelf.
+    /// Books on the currently-reading shelf.
     pub books: Vec<linkinbio::GoodreadsBook<S>>,
-    ///Whether the widget is visible on the public page. Defaults to true.
+    /// Whether the widget is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///Goodreads numeric user ID.
+    /// Goodreads numeric user ID.
     pub goodreads_user_id: S,
-    ///Unique identifier for the card.
+    /// Unique identifier for the card.
     pub id: S,
-    ///When the book data was last fetched from Goodreads.
+    /// When the book data was last fetched from Goodreads.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_synced_at: Option<Datetime>,
-    ///Books on the read shelf (used by 1x2 size).
+    /// Books on the read shelf (used by 1x2 size).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub read_books: Option<Vec<linkinbio::GoodreadsBook<S>>>,
-    ///Shelf name (currently-reading, read, or to-read).
+    /// Shelf name (currently-reading, read, or to-read).
     pub shelf: S,
-    ///Widget display size. Default: 1x1.
+    /// Widget display size. Default: 1x1.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<WidgetGoodreadsSize<S>>,
-    ///Card type discriminator.
+    /// Card type discriminator.
     pub r#type: S,
     #[serde(
         flatten,
@@ -1443,25 +1451,28 @@ where
 /// A teal.fm recently played tracks widget card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct WidgetTealfm<S: BosStr = DefaultStr> {
-    ///Copyright notice for cover art images.
+    /// Copyright notice for cover art images.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_art_notice: Option<S>,
-    ///Whether the widget is visible on the public page. Defaults to true.
+    /// Whether the widget is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///Unique identifier for the card.
+    /// Unique identifier for the card.
     pub id: S,
-    ///When the play data was last fetched from the PDS.
+    /// When the play data was last fetched from the PDS.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_synced_at: Option<Datetime>,
-    ///Recently played tracks.
+    /// Recently played tracks.
     pub plays: Vec<linkinbio::TealfmPlay<S>>,
-    ///Widget display size. Default: 1x1.
+    /// Widget display size. Default: 1x1.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<WidgetTealfmSize<S>>,
-    ///Card type discriminator.
+    /// Card type discriminator.
     pub r#type: S,
     #[serde(
         flatten,
@@ -1768,25 +1779,23 @@ impl<S: BosStr> LexiconSchema for ThemeConfig<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("background_image"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -1849,17 +1858,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("me.linkna.linkinbio"),
@@ -1868,11 +1876,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("connectedServices"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Saved service credentials/identifiers for pre-filling widget forms.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Saved service credentials/identifiers for pre-filling widget forms.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1886,9 +1892,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("goodreadsUserId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Goodreads numeric user ID."),
-                                ),
+                                description: Some(CowStr::new_static("Goodreads numeric user ID.")),
                                 ..Default::default()
                             }),
                         );
@@ -1900,17 +1904,14 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("githubContributionDay"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A single day's contribution data from GitHub.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("date"), SmolStr::new_static("count"),
-                            SmolStr::new_static("level")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A single day's contribution data from GitHub.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("date"),
+                        SmolStr::new_static("count"),
+                        SmolStr::new_static("level"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1923,9 +1924,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Date in YYYY-MM-DD format."),
-                                ),
+                                description: Some(CowStr::new_static("Date in YYYY-MM-DD format.")),
                                 ..Default::default()
                             }),
                         );
@@ -1945,12 +1944,11 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("goodreadsBook"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A book from a Goodreads shelf."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("title"), SmolStr::new_static("author")],
-                    ),
+                    description: Some(CowStr::new_static("A book from a Goodreads shelf.")),
+                    required: Some(vec![
+                        SmolStr::new_static("title"),
+                        SmolStr::new_static("author"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1964,18 +1962,18 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("coverUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to the book cover image."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to the book cover image.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL to the book on Goodreads."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to the book on Goodreads.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -2197,15 +2195,11 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tealfmPlay"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A recently played track from teal.fm."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("trackName"),
-                            SmolStr::new_static("artistName")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("A recently played track from teal.fm.")),
+                    required: Some(vec![
+                        SmolStr::new_static("trackName"),
+                        SmolStr::new_static("artistName"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2219,31 +2213,25 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("coverUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URL to the album cover image (from Cover Art Archive).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to the album cover image (from Cover Art Archive).",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("originUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URL to the track on the original music service.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to the track on the original music service.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("playedTime"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the track was played."),
-                                ),
+                                description: Some(CowStr::new_static("When the track was played.")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2251,9 +2239,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("releaseName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Album/release name."),
-                                ),
+                                description: Some(CowStr::new_static("Album/release name.")),
                                 ..Default::default()
                             }),
                         );
@@ -2554,25 +2540,24 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetGithub"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A GitHub contributions graph widget card."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("type"),
-                            SmolStr::new_static("githubUsername"),
-                            SmolStr::new_static("contributions")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A GitHub contributions graph widget card.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("githubUsername"),
+                        SmolStr::new_static("contributions"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("contributions"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Contribution data for the last year."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Contribution data for the last year.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#githubContributionDay"),
                                     ..Default::default()
@@ -2596,20 +2581,18 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique identifier for the card."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique identifier for the card.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When the contribution data was last fetched from GitHub.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the contribution data was last fetched from GitHub.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2617,9 +2600,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Widget display size. Default: 1x1."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Widget display size. Default: 1x1.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -2632,9 +2615,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Card type discriminator."),
-                                ),
+                                description: Some(CowStr::new_static("Card type discriminator.")),
                                 ..Default::default()
                             }),
                         );
@@ -2646,25 +2627,23 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetGoodreads"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A Goodreads bookshelf widget card."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("type"),
-                            SmolStr::new_static("goodreadsUserId"),
-                            SmolStr::new_static("shelf"), SmolStr::new_static("books")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("A Goodreads bookshelf widget card.")),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("goodreadsUserId"),
+                        SmolStr::new_static("shelf"),
+                        SmolStr::new_static("books"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("books"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Books on the currently-reading shelf."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Books on the currently-reading shelf.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#goodreadsBook"),
                                     ..Default::default()
@@ -2681,29 +2660,25 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("goodreadsUserId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Goodreads numeric user ID."),
-                                ),
+                                description: Some(CowStr::new_static("Goodreads numeric user ID.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique identifier for the card."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique identifier for the card.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When the book data was last fetched from Goodreads.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the book data was last fetched from Goodreads.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2711,11 +2686,9 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("readBooks"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Books on the read shelf (used by 1x2 size).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Books on the read shelf (used by 1x2 size).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#goodreadsBook"),
                                     ..Default::default()
@@ -2726,29 +2699,25 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("shelf"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Shelf name (currently-reading, read, or to-read).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Shelf name (currently-reading, read, or to-read).",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Widget display size. Default: 1x1."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Widget display size. Default: 1x1.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Card type discriminator."),
-                                ),
+                                description: Some(CowStr::new_static("Card type discriminator.")),
                                 ..Default::default()
                             }),
                         );
@@ -2760,26 +2729,23 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("widgetTealfm"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A teal.fm recently played tracks widget card.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("type"),
-                            SmolStr::new_static("plays")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A teal.fm recently played tracks widget card.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("plays"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("coverArtNotice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Copyright notice for cover art images."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Copyright notice for cover art images.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -2792,20 +2758,18 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique identifier for the card."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique identifier for the card.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("lastSyncedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When the play data was last fetched from the PDS.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the play data was last fetched from the PDS.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2813,9 +2777,7 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("plays"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Recently played tracks."),
-                                ),
+                                description: Some(CowStr::new_static("Recently played tracks.")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#tealfmPlay"),
                                     ..Default::default()
@@ -2826,18 +2788,16 @@ fn lexicon_doc_me_linkna_linkinbio() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Widget display size. Default: 1x1."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Widget display size. Default: 1x1.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Card type discriminator."),
-                                ),
+                                description: Some(CowStr::new_static("Card type discriminator.")),
                                 ..Default::default()
                             }),
                         );
@@ -2859,15 +2819,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod github_contribution_day_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2935,20 +2894,14 @@ pub struct GithubContributionDayBuilder<
 
 impl GithubContributionDay<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GithubContributionDayBuilder<
-        github_contribution_day_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GithubContributionDayBuilder<github_contribution_day_state::Empty, DefaultStr> {
         GithubContributionDayBuilder::new()
     }
 }
 
 impl<S: BosStr> GithubContributionDay<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GithubContributionDayBuilder<
-        github_contribution_day_state::Empty,
-        S,
-    > {
+    pub fn builder() -> GithubContributionDayBuilder<github_contribution_day_state::Empty, S> {
         GithubContributionDayBuilder::builder()
     }
 }
@@ -3069,9 +3022,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3082,9 +3034,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3095,9 +3046,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -3109,7 +3059,7 @@ where
 
 pub mod linkinbio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3228,18 +3178,12 @@ impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
 
 impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `socialIcons` field (optional)
-    pub fn social_icons(
-        mut self,
-        value: impl Into<Option<Vec<linkinbio::SocialIcon<S>>>>,
-    ) -> Self {
+    pub fn social_icons(mut self, value: impl Into<Option<Vec<linkinbio::SocialIcon<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `socialIcons` field to an Option value (optional)
-    pub fn maybe_social_icons(
-        mut self,
-        value: Option<Vec<linkinbio::SocialIcon<S>>>,
-    ) -> Self {
+    pub fn maybe_social_icons(mut self, value: Option<Vec<linkinbio::SocialIcon<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3260,18 +3204,12 @@ impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
 
 impl<St: linkinbio_state::State, S: BosStr> LinkinbioBuilder<St, S> {
     /// Set the `themeConfig` field (optional)
-    pub fn theme_config(
-        mut self,
-        value: impl Into<Option<linkinbio::ThemeConfig<S>>>,
-    ) -> Self {
+    pub fn theme_config(mut self, value: impl Into<Option<linkinbio::ThemeConfig<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `themeConfig` field to an Option value (optional)
-    pub fn maybe_theme_config(
-        mut self,
-        value: Option<linkinbio::ThemeConfig<S>>,
-    ) -> Self {
+    pub fn maybe_theme_config(mut self, value: Option<linkinbio::ThemeConfig<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -3294,10 +3232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Linkinbio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Linkinbio<S> {
         Linkinbio {
             cards: self._fields.0.unwrap(),
             connected_services: self._fields.1,
@@ -3316,15 +3251,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod social_icon_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3429,10 +3363,7 @@ where
     St::Id: social_icon_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> SocialIconBuilder<social_icon_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<S>) -> SocialIconBuilder<social_icon_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
@@ -3497,10 +3428,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SocialIcon<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SocialIcon<S> {
         SocialIcon {
             id: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -3517,9 +3445,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3530,9 +3457,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -3543,15 +3469,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod widget_github_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3826,10 +3751,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> WidgetGithub<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetGithub<S> {
         WidgetGithub {
             contributions: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3851,15 +3773,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod widget_goodreads_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3950,10 +3871,7 @@ pub mod widget_goodreads_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct WidgetGoodreadsBuilder<
-    St: widget_goodreads_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct WidgetGoodreadsBuilder<St: widget_goodreads_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<linkinbio::GoodreadsBook<S>>>,
@@ -4098,10 +4016,7 @@ impl<St: widget_goodreads_state::State, S: BosStr> WidgetGoodreadsBuilder<St, S>
         self
     }
     /// Set the `readBooks` field to an Option value (optional)
-    pub fn maybe_read_books(
-        mut self,
-        value: Option<Vec<linkinbio::GoodreadsBook<S>>>,
-    ) -> Self {
+    pub fn maybe_read_books(mut self, value: Option<Vec<linkinbio::GoodreadsBook<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -4183,10 +4098,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> WidgetGoodreads<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetGoodreads<S> {
         WidgetGoodreads {
             books: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -4209,15 +4121,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod widget_tealfm_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4454,10 +4365,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> WidgetTealfm<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WidgetTealfm<S> {
         WidgetTealfm {
             cover_art_notice: self._fields.0,
             enabled: self._fields.1,

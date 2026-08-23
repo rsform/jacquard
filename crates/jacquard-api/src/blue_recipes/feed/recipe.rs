@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,21 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue_recipes::feed::recipe;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue_recipes::feed::recipe;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Ingredient<S: BosStr = DefaultStr> {
-    ///The amount of the ingredient needed.
+    /// The amount of the ingredient needed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<S>,
-    ///The name of the ingredient.
+    /// The name of the ingredient.
     pub name: S,
     #[serde(
         flatten,
@@ -59,18 +62,18 @@ pub struct Ingredient<S: BosStr = DefaultStr> {
 pub struct Recipe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<S>,
-    ///Free-form recipe description text.
+    /// Free-form recipe description text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Image representing the recipe.
+    /// Image representing the recipe.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<BlobRef<S>>,
     pub ingredients: Vec<recipe::Ingredient<S>>,
-    ///The number of servings the recipe prepares.
+    /// The number of servings the recipe prepares.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub serves: Option<i64>,
     pub steps: Vec<recipe::Step<S>>,
-    ///The amount of time (in minutes) it takes to complete the recipe.
+    /// The amount of time (in minutes) it takes to complete the recipe.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time: Option<i64>,
     pub title: S,
@@ -94,11 +97,13 @@ pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Recipe<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Step<S: BosStr = DefaultStr> {
-    ///The instruction to provide to the user.
+    /// The instruction to provide to the user.
     pub text: S,
     #[serde(
         flatten,
@@ -230,25 +235,20 @@ impl<S: BosStr> LexiconSchema for Recipe<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -328,17 +328,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.recipes.feed.recipe"),
@@ -354,18 +353,18 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("amount"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The amount of the ingredient needed."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The amount of the ingredient needed.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the ingredient."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The name of the ingredient.",
+                                )),
                                 max_length: Some(3000usize),
                                 max_graphemes: Some(300usize),
                                 ..Default::default()
@@ -382,12 +381,11 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("Record containing a recipe.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"), SmolStr::new_static("steps"),
-                                SmolStr::new_static("ingredients")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("steps"),
+                            SmolStr::new_static("ingredients"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -400,9 +398,9 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Free-form recipe description text."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Free-form recipe description text.",
+                                    )),
                                     max_length: Some(3000usize),
                                     max_graphemes: Some(300usize),
                                     ..Default::default()
@@ -410,7 +408,9 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("ingredients"),
@@ -469,11 +469,9 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The instruction to provide to the user.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The instruction to provide to the user.",
+                                )),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(500usize),
                                 ..Default::default()
@@ -497,9 +495,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -511,7 +508,7 @@ where
 
 pub mod recipe_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -728,10 +725,7 @@ where
     St::Title: recipe_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> RecipeBuilder<recipe_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> RecipeBuilder<recipe_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
@@ -785,8 +779,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

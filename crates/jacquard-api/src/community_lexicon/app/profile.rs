@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,15 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::community_lexicon::app::AccountIndicator;
 use crate::community_lexicon::app::Image;
 use crate::community_lexicon::app::LexiconInterop;
 use crate::community_lexicon::app::Link;
 use crate::community_lexicon::app::Platform;
 use crate::community_lexicon::app::Status;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// The canonical self-published profile for an app built on or for the AT Protocol.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -43,34 +43,34 @@ use crate::community_lexicon::app::Status;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Records whose presence in an account can indicate that the account probably uses this app.
+    /// Records whose presence in an account can indicate that the account probably uses this app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_indicators: Option<Vec<AccountIndicator<S>>>,
-    ///Client-declared timestamp when this profile was created.
+    /// Client-declared timestamp when this profile was created.
     pub created_at: Datetime,
-    ///A short description of what the app does.
+    /// A short description of what the app does.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Visual assets for directories and stores, such as icons, hero images, screenshots, banners, and social cards.
+    /// Visual assets for directories and stores, such as icons, hero images, screenshots, banners, and social cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<Image<S>>>,
-    ///Self-declared AT Protocol lexicon interoperability signals.
+    /// Self-declared AT Protocol lexicon interoperability signals.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lexicons: Option<LexiconInterop<S>>,
-    ///Relevant destinations for the app. The first link should be the primary destination.
+    /// Relevant destinations for the app. The first link should be the primary destination.
     pub links: Vec<Link<S>>,
-    ///The display name of the app.
+    /// The display name of the app.
     pub name: S,
-    ///Platforms where this app is available.
+    /// Platforms where this app is available.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platforms: Option<Vec<Platform<S>>>,
-    ///Current release or maintenance status of the app.
+    /// Current release or maintenance status of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<Status<S>>,
-    ///Open discovery tags for filtering and search, preferably lowercase. Do not use tags for platforms or lexicon interoperability.
+    /// Open discovery tags for filtering and search, preferably lowercase. Do not use tags for platforms or lexicon interoperability.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Client-declared timestamp when this profile was last updated.
+    /// Client-declared timestamp when this profile was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -260,8 +260,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 32usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -283,9 +282,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -297,7 +295,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -391,7 +389,9 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -402,7 +402,9 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
     pub fn builder() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -418,10 +420,7 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
         self
     }
     /// Set the `accountIndicators` field to an Option value (optional)
-    pub fn maybe_account_indicators(
-        mut self,
-        value: Option<Vec<AccountIndicator<S>>>,
-    ) -> Self {
+    pub fn maybe_account_indicators(mut self, value: Option<Vec<AccountIndicator<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -510,10 +509,7 @@ where
     St::Name: profile_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProfileBuilder<profile_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ProfileBuilder<profile_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -619,10 +615,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_app_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.app.profile"),

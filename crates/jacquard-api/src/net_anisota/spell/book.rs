@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,25 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::spell::book;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::spell::book;
+use serde::{Deserialize, Serialize};
 /// A reference to one of the user's spells plus its cast state and position.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Entry<S: BosStr = DefaultStr> {
-    ///Whether the spell is currently cast (active). Defaults to false when absent.
+    /// Whether the spell is currently cast (active). Defaults to false when absent.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cast: Option<bool>,
-    ///Zero-based display order within the spell book.
+    /// Zero-based display order within the spell book.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<i64>,
-    ///Record key of the net.anisota.spell.custom record this entry points to, in the same repo.
+    /// Record key of the net.anisota.spell.custom record this entry points to, in the same repo.
     pub rkey: S,
     #[serde(
         flatten,
@@ -60,12 +63,12 @@ pub struct Entry<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Book<S: BosStr = DefaultStr> {
-    ///Legacy: identifiers of built-in preset spells the user had activated before presets were replaced by real shared spell records. Retained for backward compatibility.
+    /// Legacy: identifiers of built-in preset spells the user had activated before presets were replaced by real shared spell records. Retained for backward compatibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_presets: Option<Vec<S>>,
-    ///The user's spells, in display order, each referencing a net.anisota.spell.custom record in the same repo.
+    /// The user's spells, in display order, each referencing a net.anisota.spell.custom record in the same repo.
     pub entries: Vec<book::Entry<S>>,
-    ///When the spell book was last modified
+    /// When the spell book was last modified
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -189,17 +192,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_net_anisota_spell_book() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.spell.book"),
@@ -326,9 +328,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -340,7 +341,7 @@ where
 
 pub mod book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,7 +386,11 @@ pub mod book_state {
 /// Builder for constructing an instance of this type.
 pub struct BookBuilder<St: book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<S>>, Option<Vec<book::Entry<S>>>, Option<Datetime>),
+    _fields: (
+        Option<Vec<S>>,
+        Option<Vec<book::Entry<S>>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 

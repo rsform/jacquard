@@ -16,8 +16,8 @@ use smol_str::{SmolStr, format_smolstr};
 use super::archive::{JetstreamClient, JetstreamError, PlanSnapshotPage};
 use jacquard_api::network_bsky::jetstream::plan_snapshot::PlanSnapshotKinds;
 
-/// The event-kind filter vocabulary: the generated
-/// [`SubscribeEventsKinds`] enum from the lexicon's `kinds` parameter.
+/// The event-kind filter vocabulary: the generated [`EventKind`] enum from the
+/// lexicon's `kinds` parameter.
 pub use jacquard_api::network_bsky::jetstream::subscribe_events::SubscribeEventsKinds as EventKind;
 
 /// A collection filter: an exact NSID or a namespace wildcard
@@ -130,7 +130,7 @@ impl<S: BosStr + Clone> ReplayFilters<S> {
 /// Errors from the plan loop.
 #[derive(Debug)]
 pub enum PlanError<E> {
-    /// Transport-level failure (see [`ArchiveError`]).
+    /// Transport-level failure (see [`JetstreamError`]).
     Archive(JetstreamError<E>),
     /// A page claimed no progress; paging would loop forever.
     NoProgress {

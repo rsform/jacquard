@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Definition of a sticker
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,32 +37,32 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Sticker<S: BosStr = DefaultStr> {
-    ///The image content, either a string URL (for CDN/Blob) or a BlobRef.
+    /// The image content, either a string URL (for CDN/Blob) or a BlobRef.
     pub image: Data<S>,
-    ///Type of the image source.
+    /// Type of the image source.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image_type: Option<StickerImageType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
-    ///Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
+    /// Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
     pub model: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///The timestamp when this sticker was obtained.
+    /// The timestamp when this sticker was obtained.
     pub obtained_at: Datetime,
-    ///The DID of the user from whom this sticker was obtained (for provenance).
+    /// The DID of the user from whom this sticker was obtained (for provenance).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub obtained_from: Option<Did<S>>,
-    ///The DID of the original creator/minter of this sticker.
+    /// The DID of the original creator/minter of this sticker.
     pub original_owner: Did<S>,
-    ///The shape of the sticker canvas.
+    /// The shape of the sticker canvas.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shape: Option<StickerShape<S>>,
-    ///Cryptographic signature from the server verifying the sticker's authenticity/provenance.
+    /// Cryptographic signature from the server verifying the sticker's authenticity/provenance.
     pub signature: S,
-    ///The original JSON payload that was signed by the server.
+    /// The original JSON payload that was signed by the server.
     pub signed_payload: S,
-    ///The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
+    /// The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -435,8 +435,7 @@ impl<S: BosStr> LexiconSchema for Sticker<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -458,9 +457,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -472,7 +470,7 @@ where
 
 pub mod sticker_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -623,19 +621,7 @@ impl StickerBuilder<sticker_state::Empty, DefaultStr> {
         StickerBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -648,19 +634,7 @@ impl<S: BosStr> StickerBuilder<sticker_state::Empty, S> {
         StickerBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -718,10 +692,7 @@ where
     St::Model: sticker_state::IsUnset,
 {
     /// Set the `model` field (required)
-    pub fn model(
-        mut self,
-        value: impl Into<S>,
-    ) -> StickerBuilder<sticker_state::SetModel<St>, S> {
+    pub fn model(mut self, value: impl Into<S>) -> StickerBuilder<sticker_state::SetModel<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StickerBuilder {
             _state: PhantomData,
@@ -923,10 +894,10 @@ where
 }
 
 fn lexicon_doc_com_suibari_atsumeat_sticker() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.suibari.atsumeat.sticker"),

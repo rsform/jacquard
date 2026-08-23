@@ -14,35 +14,37 @@ pub mod profile_status;
 pub mod search_actors;
 pub mod status;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, Cid, Datetime};
+use jacquard_common::types::string::{Cid, Datetime, Did, Handle};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
+use crate::fm_teal::actor;
 use crate::fm_teal::actor::profile::FeaturedItem;
 use crate::fm_teal::feed::PlayView;
-use crate::fm_teal::actor;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MiniProfileView<S: BosStr = DefaultStr> {
-    ///IPLD of the avatar
+    /// IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<Cid<S>>,
-    ///The decentralized identifier of the actor
+    /// The decentralized identifier of the actor
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,30 +60,32 @@ pub struct MiniProfileView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
-    ///IPLD of the avatar
+    /// IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<Cid<S>>,
-    ///IPLD of the banner image
+    /// IPLD of the banner image
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Annotations of text in the profile description (mentions, URLs, hashtags, etc). May be changed to another (backwards compatible) lexicon.
+    /// Annotations of text in the profile description (mentions, URLs, hashtags, etc). May be changed to another (backwards compatible) lexicon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Facet<S>>>,
-    ///The decentralized identifier of the actor
+    /// The decentralized identifier of the actor
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///The user's most recent item featured on their profile.
+    /// The user's most recent item featured on their profile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub featured_item: Option<FeaturedItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -98,14 +102,17 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// A declaration of the status of the actor.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StatusView<S: BosStr = DefaultStr> {
-    ///The datetime after which the status is no longer current.
+    /// The datetime after which the status is no longer current.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item: Option<PlayView<S>>,
-    ///The datetime at which the status was recorded.
+    /// The datetime at which the status was recorded.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time: Option<Datetime>,
     #[serde(
@@ -169,17 +176,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_fm_teal_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.actor.defs"),
@@ -202,18 +208,18 @@ fn lexicon_doc_fm_teal_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The decentralized identifier of the actor",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The decentralized identifier of the actor",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
@@ -322,20 +328,18 @@ fn lexicon_doc_fm_teal_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("statusView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A declaration of the status of the actor."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A declaration of the status of the actor.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("expiry"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime after which the status is no longer current.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime after which the status is no longer current.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -350,11 +354,9 @@ fn lexicon_doc_fm_teal_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("time"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime at which the status was recorded.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime at which the status was recorded.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -377,9 +379,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -390,8 +391,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

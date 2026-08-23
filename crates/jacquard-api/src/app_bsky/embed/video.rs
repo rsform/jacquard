@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,14 +22,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::app_bsky::embed::video;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Caption<S: BosStr = DefaultStr> {
     pub file: BlobRef<S>,
     pub lang: Language,
@@ -42,21 +45,23 @@ pub struct Caption<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Video<S: BosStr = DefaultStr> {
-    ///Alt text description of the video, for accessibility.
+    /// Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aspect_ratio: Option<AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub captions: Option<Vec<video::Caption<S>>>,
-    ///A hint to the client about how to present the video.
+    /// A hint to the client about how to present the video.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub presentation: Option<VideoPresentation<S>>,
-    ///The mp4 video file. May be up to 300mb, formerly limited to 100mb.
+    /// The mp4 video file. May be up to 300mb, formerly limited to 100mb.
     pub video: BlobRef<S>,
     #[serde(
         flatten,
@@ -146,9 +151,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -156,7 +163,7 @@ pub struct View<S: BosStr = DefaultStr> {
     pub aspect_ratio: Option<AspectRatio<S>>,
     pub cid: Cid<S>,
     pub playlist: UriValue<S>,
-    ///A hint to the client about how to present the video.
+    /// A hint to the client about how to present the video.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub presentation: Option<ViewPresentation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -278,19 +285,16 @@ impl<S: BosStr> LexiconSchema for Caption<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["text/vtt"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("file"),
@@ -343,19 +347,16 @@ impl<S: BosStr> LexiconSchema for Video<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["video/mp4"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("video"),
@@ -391,15 +392,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod caption_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -547,10 +547,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.embed.video"),
@@ -559,15 +559,18 @@ fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("caption"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("lang"), SmolStr::new_static("file")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("lang"),
+                        SmolStr::new_static("file"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("file"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("lang"),
@@ -591,20 +594,16 @@ fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Alt text description of the video, for accessibility.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alt text description of the video, for accessibility.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.embed.defs#aspectRatio",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
                                 ..Default::default()
                             }),
                         );
@@ -622,17 +621,17 @@ fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("presentation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A hint to the client about how to present the video.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A hint to the client about how to present the video.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("video"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -642,22 +641,23 @@ fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("cid"), SmolStr::new_static("playlist")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("playlist"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.embed.defs#aspectRatio",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
                                 ..Default::default()
                             }),
                         );
@@ -678,11 +678,9 @@ fn lexicon_doc_app_bsky_embed_video() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("presentation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A hint to the client about how to present the video.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A hint to the client about how to present the video.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -711,15 +709,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod video_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -839,10 +836,7 @@ impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
 
 impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `presentation` field (optional)
-    pub fn presentation(
-        mut self,
-        value: impl Into<Option<VideoPresentation<S>>>,
-    ) -> Self {
+    pub fn presentation(mut self, value: impl Into<Option<VideoPresentation<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -908,15 +902,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1040,10 +1033,7 @@ where
     St::Cid: view_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(
-        mut self,
-        value: impl Into<Cid<S>>,
-    ) -> ViewBuilder<view_state::SetCid<St>, S> {
+    pub fn cid(mut self, value: impl Into<Cid<S>>) -> ViewBuilder<view_state::SetCid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
@@ -1074,10 +1064,7 @@ where
 
 impl<St: view_state::State, S: BosStr> ViewBuilder<St, S> {
     /// Set the `presentation` field (optional)
-    pub fn presentation(
-        mut self,
-        value: impl Into<Option<ViewPresentation<S>>>,
-    ) -> Self {
+    pub fn presentation(mut self, value: impl Into<Option<ViewPresentation<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }

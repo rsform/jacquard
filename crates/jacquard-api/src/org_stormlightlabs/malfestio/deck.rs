@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A collection of flashcards and sources.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,30 +37,30 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Deck<S: BosStr = DefaultStr> {
-    ///Ordered list of references to cards in this deck.
+    /// Ordered list of references to cards in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_refs: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
-    ///Description of the deck context.
+    /// Description of the deck context.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Language code for the deck content (e.g., 'en', 'es', 'fr').
+    /// Language code for the deck content (e.g., 'en', 'es', 'fr').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
-    ///License for the deck content.
+    /// License for the deck content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub license: Option<S>,
-    ///References to source materials (articles, lectures) used in this deck.
+    /// References to source materials (articles, lectures) used in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_refs: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Title of the deck.
+    /// Title of the deck.
     pub title: S,
-    ///Timestamp of last update.
+    /// Timestamp of last update.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///Visibility setting for the deck.  Defaults to `"public"`.
+    /// Visibility setting for the deck.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_deck_visibility")]
     pub visibility: Option<DeckVisibility<S>>,
@@ -295,9 +295,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -307,15 +306,14 @@ where
     Ok(data)
 }
 
-fn _default_deck_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    DeckVisibility<S>,
-> {
+fn _default_deck_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<DeckVisibility<S>>
+{
     Some(<DeckVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod deck_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -514,10 +512,7 @@ where
     St::Title: deck_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> DeckBuilder<deck_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> DeckBuilder<deck_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         DeckBuilder {
             _state: PhantomData,
@@ -594,10 +589,10 @@ where
 }
 
 fn lexicon_doc_org_stormlightlabs_malfestio_deck() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.stormlightlabs.malfestio.deck"),

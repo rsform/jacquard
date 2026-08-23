@@ -551,11 +551,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
-                .filter_map(move |msg| decode_json_msg_with::<S, _>(msg, &transform))
+                .filter_map(move |msg| decode_json_msg_with::<S, _, Str>(msg, &transform))
                 .boxed_local(),
             MessageEncoding::DagCbor => rx
                 .into_inner()
-                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
                 .boxed_local(),
         };
 

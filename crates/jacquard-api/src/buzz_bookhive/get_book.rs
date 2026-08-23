@@ -8,23 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::string::Datetime;
-use jacquard_common::types::value::Data;
-use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::Activity;
 use crate::buzz_bookhive::BookProgress;
 use crate::buzz_bookhive::Comment;
 use crate::buzz_bookhive::Review;
 use crate::buzz_bookhive::hive_book::HiveBook;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::string::Datetime;
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::IntoStatic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goodreads_id: Option<S>,
@@ -36,37 +39,39 @@ pub struct GetBook<S: BosStr = DefaultStr> {
     pub isbn13: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBookOutput<S: BosStr = DefaultStr> {
-    ///Other users' activity on the book
+    /// Other users' activity on the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<Vec<Activity<S>>>,
-    ///The hive book's info
+    /// The hive book's info
     pub book: HiveBook<S>,
-    ///Reading progress for the user
+    /// Reading progress for the user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub book_progress: Option<BookProgress<S>>,
-    ///Comments on the book
+    /// Comments on the book
     pub comments: Vec<Comment<S>>,
-    ///Cover image of the book
+    /// Cover image of the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///The date the user finished reading the book
+    /// The date the user finished reading the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Datetime>,
-    ///The book's review
+    /// The book's review
     #[serde(skip_serializing_if = "Option::is_none")]
     pub review: Option<S>,
-    ///Reviews of the book
+    /// Reviews of the book
     pub reviews: Vec<Review<S>>,
-    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stars: Option<i64>,
-    ///The date the user started reading the book
+    /// The date the user started reading the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,7 +79,6 @@ pub struct GetBookOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetBookOutputStatus<S: BosStr = DefaultStr> {
@@ -195,7 +199,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
 
 pub mod get_book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

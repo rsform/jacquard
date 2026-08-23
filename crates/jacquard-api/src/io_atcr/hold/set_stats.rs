@@ -10,67 +10,67 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SetStats<S: BosStr = DefaultStr> {
-    ///RFC3339 timestamp of last pull
+    /// RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
-    ///RFC3339 timestamp of last push
+    /// RFC3339 timestamp of last push
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_push: Option<Datetime>,
-    ///DID of the repository owner
+    /// DID of the repository owner
     pub owner_did: Did<S>,
-    ///Absolute pull count to set
+    /// Absolute pull count to set
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pull_count: Option<i64>,
-    ///Absolute push count to set
+    /// Absolute push count to set
     #[serde(skip_serializing_if = "Option::is_none")]
     pub push_count: Option<i64>,
-    ///Repository name
+    /// Repository name
     pub repository: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SetStatsOutput<S: BosStr = DefaultStr> {
-    ///Whether the stats were successfully updated
+    /// Whether the stats were successfully updated
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SetStatsError {
     #[serde(rename = "InvalidOwner")]
-    InvalidOwner(Option<SmolStr>),
+    InvalidOwner(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(Option<SmolStr>),
+    InvalidRepository(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SetStatsError {
@@ -114,9 +114,8 @@ impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetStats<S> {
     const NSID: &'static str = "io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SetStatsResponse;
 }
 
@@ -126,16 +125,15 @@ Path: `/xrpc/io.atcr.hold.setStats`. The request payload type is `SetStats<S>`; 
 pub struct SetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = SetStats<S>;
     type Response = SetStatsResponse;
 }
 
 pub mod set_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

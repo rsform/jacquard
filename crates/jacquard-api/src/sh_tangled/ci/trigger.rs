@@ -7,33 +7,36 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::string::{AtUri, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::ci::trigger;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::ci::trigger;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Manual<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<trigger::Pair<S>>>,
-    ///optional ref the SHA was resolved from, for display and TANGLED_REF
+    /// optional ref the SHA was resolved from, for display and TANGLED_REF
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
-    ///commit SHA the manual run targets
+    /// commit SHA the manual run targets
     pub sha: S,
-    ///Repository DID to check out code and workflow definitions from, if different from the target repo.
+    /// Repository DID to check out code and workflow definitions from, if different from the target repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_repo: Option<Did<S>>,
     #[serde(
@@ -45,9 +48,11 @@ pub struct Manual<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Pair<S: BosStr = DefaultStr> {
     pub key: S,
     pub value: S,
@@ -63,17 +68,20 @@ pub struct Pair<S: BosStr = DefaultStr> {
 /// TODO: reference PR record with strongRef instead of embedding raw values
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PullRequest<S: BosStr = DefaultStr> {
-    ///the pull request lifecycle action that produced this trigger
+    /// the pull request lifecycle action that produced this trigger
     #[serde(skip_serializing_if = "Option::is_none")]
     pub action: Option<PullRequestAction<S>>,
-    ///AT-URI of the sh.tangled.repo.pull record this run belongs to
+    /// AT-URI of the sh.tangled.repo.pull record this run belongs to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pull: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_branch: Option<S>,
-    ///Repository DID to check out code and workflow definitions from, if different from the target repo.
+    /// Repository DID to check out code and workflow definitions from, if different from the target repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_repo: Option<Did<S>>,
     pub source_sha: S,
@@ -178,9 +186,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Push<S: BosStr = DefaultStr> {
     pub new_sha: S,
     pub old_sha: S,
@@ -349,17 +359,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_sh_tangled_ci_trigger() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.ci.trigger"),
@@ -424,19 +433,24 @@ fn lexicon_doc_sh_tangled_ci_trigger() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pair"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("key"), SmolStr::new_static("value")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("key"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("key"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -519,12 +533,11 @@ fn lexicon_doc_sh_tangled_ci_trigger() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("push"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("ref"), SmolStr::new_static("newSha"),
-                            SmolStr::new_static("oldSha")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("ref"),
+                        SmolStr::new_static("newSha"),
+                        SmolStr::new_static("oldSha"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -546,7 +559,9 @@ fn lexicon_doc_sh_tangled_ci_trigger() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("ref"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -566,9 +581,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -579,9 +593,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -592,8 +605,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

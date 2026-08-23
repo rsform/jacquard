@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_tangled::repo::list_collaborators::ListItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::repo::list_collaborators::ListItem;
+use serde::{Deserialize, Serialize};
 /// Sort direction by createdAt.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -65,8 +65,7 @@ impl<S: BosStr> Serialize for ListCollaboratorsByOrder<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ListCollaboratorsByOrder<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListCollaboratorsByOrder<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -92,16 +91,16 @@ where
         match self {
             ListCollaboratorsByOrder::Asc => ListCollaboratorsByOrder::Asc,
             ListCollaboratorsByOrder::Desc => ListCollaboratorsByOrder::Desc,
-            ListCollaboratorsByOrder::Other(v) => {
-                ListCollaboratorsByOrder::Other(v.into_static())
-            }
+            ListCollaboratorsByOrder::Other(v) => ListCollaboratorsByOrder::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListCollaboratorsBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -116,9 +115,11 @@ pub struct ListCollaboratorsBy<S: BosStr = DefaultStr> {
     pub subject: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListCollaboratorsByOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -159,15 +160,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    ListCollaboratorsByOrder<S>,
-> {
-    Some(<ListCollaboratorsByOrder<S>>::from_value(S::from_static("desc")))
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<ListCollaboratorsByOrder<S>> {
+    Some(<ListCollaboratorsByOrder<S>>::from_value(S::from_static(
+        "desc",
+    )))
 }
 
 pub mod list_collaborators_by_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -214,20 +216,14 @@ pub struct ListCollaboratorsByBuilder<
 
 impl ListCollaboratorsBy<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListCollaboratorsByBuilder<
-        list_collaborators_by_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, DefaultStr> {
         ListCollaboratorsByBuilder::new()
     }
 }
 
 impl<S: BosStr> ListCollaboratorsBy<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ListCollaboratorsByBuilder<
-        list_collaborators_by_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, S> {
         ListCollaboratorsByBuilder::builder()
     }
 }
@@ -254,10 +250,7 @@ impl<S: BosStr> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, S
     }
 }
 
-impl<
-    St: list_collaborators_by_state::State,
-    S: BosStr,
-> ListCollaboratorsByBuilder<St, S> {
+impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -270,10 +263,7 @@ impl<
     }
 }
 
-impl<
-    St: list_collaborators_by_state::State,
-    S: BosStr,
-> ListCollaboratorsByBuilder<St, S> {
+impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -286,15 +276,9 @@ impl<
     }
 }
 
-impl<
-    St: list_collaborators_by_state::State,
-    S: BosStr,
-> ListCollaboratorsByBuilder<St, S> {
+impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
     /// Set the `order` field (optional)
-    pub fn order(
-        mut self,
-        value: impl Into<Option<ListCollaboratorsByOrder<S>>>,
-    ) -> Self {
+    pub fn order(mut self, value: impl Into<Option<ListCollaboratorsByOrder<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }

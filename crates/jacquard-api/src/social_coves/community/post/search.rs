@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::feed::FeedViewPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::social_coves::feed::FeedViewPost;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchSort<S: BosStr = DefaultStr> {
@@ -98,7 +98,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchTimeframe<S: BosStr = DefaultStr> {
@@ -284,9 +283,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Search<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
@@ -315,9 +316,11 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub r#type: Option<SearchType<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -358,21 +361,19 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    SearchSort<S>,
-> {
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<SearchSort<S>> {
     Some(<SearchSort<S>>::from_value(S::from_static("relevance")))
 }
 
-fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    SearchTimeframe<S>,
-> {
+fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<SearchTimeframe<S>> {
     Some(<SearchTimeframe<S>>::from_value(S::from_static("all")))
 }
 
 pub mod search_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

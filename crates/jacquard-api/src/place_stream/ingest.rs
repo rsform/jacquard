@@ -8,13 +8,12 @@
 //! Generated bindings for the `place.stream.ingest` Lexicon namespace/module.
 pub mod get_ingest_urls;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,15 +26,18 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// An ingest URL for a Streamplace station.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Ingest<S: BosStr = DefaultStr> {
-    ///The type of ingest endpoint, currently 'rtmp' and 'whip' are supported.
+    /// The type of ingest endpoint, currently 'rtmp' and 'whip' are supported.
     pub r#type: S,
-    ///The URL of the ingest endpoint.
+    /// The URL of the ingest endpoint.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -68,15 +70,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod ingest_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,10 +168,7 @@ where
     St::Type: ingest_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(
-        mut self,
-        value: impl Into<S>,
-    ) -> IngestBuilder<ingest_state::SetType<St>, S> {
+    pub fn r#type(mut self, value: impl Into<S>) -> IngestBuilder<ingest_state::SetType<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IngestBuilder {
             _state: PhantomData,
@@ -224,10 +222,10 @@ where
 }
 
 fn lexicon_doc_place_stream_ingest_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.ingest.defs"),

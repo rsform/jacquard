@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::observatory::layout;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::observatory::layout;
+use serde::{Deserialize, Serialize};
 /// Attribution for the original crafter of this layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreatedBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
@@ -49,21 +52,24 @@ pub struct CreatedBy<S: BosStr = DefaultStr> {
 /// The grid configuration captured by this layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Layout<S: BosStr = DefaultStr> {
-    ///Built-in button overrides keyed by button key (enter, atmosphere, post, chronicle, inventory, harvest, tutorial). Each value may carry enabled, order, size, and variant.
+    /// Built-in button overrides keyed by button key (enter, atmosphere, post, chronicle, inventory, harvest, tutorial). Each value may carry enabled, order, size, and variant.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub buttons: Option<Data<S>>,
-    ///Patterns visualization configuration captured with this layout
+    /// Patterns visualization configuration captured with this layout
     #[serde(skip_serializing_if = "Option::is_none")]
     pub patterns_indicator: Option<Data<S>>,
-    ///Row-based layout. Each row sits on a shared six-column track; tile spans are derived from the row's tile count and balance and always sum to 6. Rows are the authority for geometry; tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. When rows is absent, or disagrees with tileOrder, a client re-derives rows from tileOrder. No maxLength: every row holds at least one tile, so rows.length can never exceed tileOrder.length, which is itself uncapped — a cap here and not there would make a legal tileOrder unrepresentable.
+    /// Row-based layout. Each row sits on a shared six-column track; tile spans are derived from the row's tile count and balance and always sum to 6. Rows are the authority for geometry; tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. When rows is absent, or disagrees with tileOrder, a client re-derives rows from tileOrder. No maxLength: every row holds at least one tile, so rows.length can never exceed tileOrder.length, which is itself uncapped — a cap here and not there would make a legal tileOrder unrepresentable.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rows: Option<Vec<layout::Row<S>>>,
-    ///Whether tiles shuffle within divider-bounded groups each session. Retained for compatibility with clients that still shuffle; a client using the row model preserves the stored value on write but does not act on it, because rows describe a stable layout.
+    /// Whether tiles shuffle within divider-bounded groups each session. Retained for compatibility with clients that still shuffle; a client using the row model preserves the stored value on write but does not act on it, because rows describe a stable layout.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shuffle_layout: Option<bool>,
-    ///The flattened projection of rows: rows in order, tiles in order within each row. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array. rows is the geometry authority and this field is the compatibility flattening kept for clients that predate the row model — a reader that understands rows uses it only to reconcile (dropping tokens no row claims, appending tokens no row carries).
+    /// The flattened projection of rows: rows in order, tiles in order within each row. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array. rows is the geometry authority and this field is the compatibility flattening kept for clients that predate the row model — a reader that understands rows uses it only to reconcile (dropping tokens no row claims, appending tokens no row carries).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tile_order: Option<Vec<S>>,
     #[serde(
@@ -85,25 +91,25 @@ pub struct Layout<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct LayoutRecord<S: BosStr = DefaultStr> {
-    ///When this layout was first saved
+    /// When this layout was first saved
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<layout::CreatedBy<S>>,
-    ///Optional description of what this layout is for
+    /// Optional description of what this layout is for
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Embedded snapshots of the custom elements this layout uses. Each entry mirrors the shape of a net.anisota.observatory.element record body (type, name, description, plus the type-specific payload: button, note, quote, reminder, divider, spacer, heading, or widget).
+    /// Embedded snapshots of the custom elements this layout uses. Each entry mirrors the shape of a net.anisota.observatory.element record body (type, name, description, plus the type-specific payload: button, note, quote, reminder, divider, spacer, heading, or widget).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub elements: Option<Vec<Data<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub layout: Option<layout::Layout<S>>,
-    ///Display name for this layout
+    /// Display name for this layout
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub schedule: Option<layout::Schedule<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<layout::Source<S>>,
-    ///When this layout was last modified
+    /// When this layout was last modified
     pub updated_at: Datetime,
     #[serde(
         flatten,
@@ -128,12 +134,15 @@ pub struct LayoutRecordGetRecordOutput<S: BosStr = DefaultStr> {
 /// One row of the Observatory grid. 'tiles' rows hold 1-3 tiles across the six-column track. 'ledger' rows render their tiles as hairline lines (label left, meta right) and absorb the long tail. 'structure' rows hold exactly one divider, heading or empty-space element and act as a boundary between rows. Entries in the tiles array use the same token vocabulary as tileOrder: 'builtin:<key>' or 'element:<index>'. kind, band and balance use knownValues and are therefore open: a reader that does not recognise a value clamps it for that session only and must not rewrite the stored value.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Row<S: BosStr = DefaultStr> {
-    ///How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.
+    /// How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub balance: Option<RowBalance<S>>,
-    ///The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.
+    /// The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub band: Option<RowBand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -318,7 +327,6 @@ where
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RowKind<S: BosStr = DefaultStr> {
     Tiles,
@@ -403,18 +411,21 @@ where
 /// Optional daily activation window. When enabled, the layout takes over the Observatory between startTime and endTime (wrapping past midnight when startTime > endTime), optionally restricted to certain days of the week.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Schedule<S: BosStr = DefaultStr> {
-    ///Days the window applies to (0 = Sunday … 6 = Saturday). Empty or absent means every day.
+    /// Days the window applies to (0 = Sunday … 6 = Saturday). Empty or absent means every day.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub days_of_week: Option<Vec<i64>>,
-    ///Whether the schedule is active
+    /// Whether the schedule is active
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///Window end as 'HH:MM' (24-hour, local time)
+    /// Window end as 'HH:MM' (24-hour, local time)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_time: Option<S>,
-    ///Window start as 'HH:MM' (24-hour, local time)
+    /// Window start as 'HH:MM' (24-hour, local time)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_time: Option<S>,
     #[serde(
@@ -429,12 +440,15 @@ pub struct Schedule<S: BosStr = DefaultStr> {
 /// Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), 'migrated' marks the layout the one-time unify migration captured from the user's live grid, and 'starter' marks the layout a published generation of the starter grid wrote when it moved an account onto that generation. The last two are those passes' idempotency sentinels and must be preserved when a record is re-saved, or the pass will run again and duplicate the layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
-    ///DID of the user this layout was learned from
+    /// DID of the user this layout was learned from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_did: Option<Did<S>>,
-    ///AT URI of the record this layout was learned from
+    /// AT URI of the record this layout was learned from
     #[serde(skip_serializing_if = "Option::is_none")]
     pub original_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -447,7 +461,6 @@ pub struct Source<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SourceType<S: BosStr = DefaultStr> {
@@ -800,17 +813,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.observatory.layout"),
@@ -819,11 +831,9 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("createdBy"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Attribution for the original crafter of this layout.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Attribution for the original crafter of this layout.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1198,9 +1208,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1211,9 +1220,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1225,7 +1233,7 @@ where
 
 pub mod layout_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1492,10 +1500,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LayoutRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LayoutRecord<S> {
         LayoutRecord {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1,
@@ -1518,15 +1523,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod row_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1649,10 +1653,7 @@ where
     St::Tiles: row_state::IsUnset,
 {
     /// Set the `tiles` field (required)
-    pub fn tiles(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> RowBuilder<row_state::SetTiles<St>, S> {
+    pub fn tiles(mut self, value: impl Into<Vec<S>>) -> RowBuilder<row_state::SetTiles<St>, S> {
         self._fields.3 = Option::Some(value.into());
         RowBuilder {
             _state: PhantomData,
@@ -1696,9 +1697,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1709,8 +1709,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

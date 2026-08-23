@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A subscription to a community
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,16 +37,16 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Subscription<S: BosStr = DefaultStr> {
-    ///Content visibility level (1=only best content, 5=all content)  Defaults to `3`.
+    /// Content visibility level (1=only best content, 5=all content)  Defaults to `3`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_subscription_content_visibility")]
     pub content_visibility: Option<i64>,
-    ///When the subscription started
+    /// When the subscription started
     pub created_at: Datetime,
-    ///When the subscription ended (null if current)
+    /// When the subscription ended (null if current)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<Datetime>,
-    ///DID of the community being subscribed to
+    /// DID of the community being subscribed to
     pub subject: Did<S>,
     #[serde(
         flatten,
@@ -141,9 +141,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -159,7 +158,7 @@ fn _default_subscription_content_visibility() -> Option<i64> {
 
 pub mod subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -204,7 +203,12 @@ pub mod subscription_state {
 /// Builder for constructing an instance of this type.
 pub struct SubscriptionBuilder<St: subscription_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<Datetime>, Option<Datetime>, Option<Did<S>>),
+    _fields: (
+        Option<i64>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -325,10 +329,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Subscription<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subscription<S> {
         Subscription {
             content_visibility: self._fields.0.or_else(|| Some(3i64)),
             created_at: self._fields.1.unwrap(),
@@ -340,10 +341,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_subscription() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.subscription"),
@@ -352,17 +353,13 @@ fn lexicon_doc_social_coves_community_subscription() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A subscription to a community"),
-                    ),
+                    description: Some(CowStr::new_static("A subscription to a community")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("subject"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -377,9 +374,9 @@ fn lexicon_doc_social_coves_community_subscription() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When the subscription started"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the subscription started",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -387,11 +384,9 @@ fn lexicon_doc_social_coves_community_subscription() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("endedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "When the subscription ended (null if current)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When the subscription ended (null if current)",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -399,11 +394,9 @@ fn lexicon_doc_social_coves_community_subscription() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "DID of the community being subscribed to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "DID of the community being subscribed to",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),

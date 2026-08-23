@@ -10,35 +10,39 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AbortUpload<S: BosStr = DefaultStr> {
     pub job_id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AbortUploadOutput<S: BosStr = DefaultStr> {
-    ///Present only when state is completed.
+    /// Present only when state is completed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_job_id: Option<S>,
-    ///Present only when state is failed.
+    /// Present only when state is failed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failure_reason: Option<S>,
     pub state: AbortUploadOutputState<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AbortUploadOutputState<S: BosStr = DefaultStr> {
@@ -120,36 +124,29 @@ where
             AbortUploadOutputState::Completed => AbortUploadOutputState::Completed,
             AbortUploadOutputState::Failed => AbortUploadOutputState::Failed,
             AbortUploadOutputState::Expired => AbortUploadOutputState::Expired,
-            AbortUploadOutputState::Other(v) => {
-                AbortUploadOutputState::Other(v.into_static())
-            }
+            AbortUploadOutputState::Other(v) => AbortUploadOutputState::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum AbortUploadError {
     /// The job ID is unknown or aged out of retention; known terminal sessions return their outcome and are never reported as not found.
     #[serde(rename = "UploadNotFound")]
-    UploadNotFound(Option<SmolStr>),
+    UploadNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// A finish is in progress; check getUploadStatus and retry.
     #[serde(rename = "UploadNotReady")]
-    UploadNotReady(Option<SmolStr>),
+    UploadNotReady(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for AbortUploadError {
@@ -193,9 +190,8 @@ impl jacquard_common::xrpc::XrpcResp for AbortUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AbortUpload<S> {
     const NSID: &'static str = "app.bsky.video.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AbortUploadResponse;
 }
 
@@ -205,9 +201,8 @@ Path: `/xrpc/app.bsky.video.abortUpload`. The request payload type is `AbortUplo
 pub struct AbortUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AbortUploadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.abortUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AbortUpload<S>;
     type Response = AbortUploadResponse;
 }

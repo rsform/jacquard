@@ -10,69 +10,69 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Datetime, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateUpload<S: BosStr = DefaultStr> {
-    ///Optional ats:// URI of a draft VOD created via place.stream.vod.createDraft. When supplied, the upload's processing fills that draft (rather than creating a new one), so the user can edit metadata while the upload runs and re-upload if it fails. The draft's origin_upload_id is set to this upload.
+    /// Optional ats:// URI of a draft VOD created via place.stream.vod.createDraft. When supplied, the upload's processing fills that draft (rather than creating a new one), so the user can edit metadata while the upload runs and re-upload if it fails. The draft's origin_upload_id is set to this upload.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub draft_uri: Option<S>,
-    ///Optional filename hint to attach as upload metadata.
+    /// Optional filename hint to attach as upload metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filename: Option<S>,
-    ///MIME type of the content being uploaded (e.g. video/mp4).
+    /// MIME type of the content being uploaded (e.g. video/mp4).
     pub mime_type: S,
-    ///Total size of the upload in bytes.
+    /// Total size of the upload in bytes.
     pub size: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateUploadOutput<S: BosStr = DefaultStr> {
-    ///When the upload token expires.
+    /// When the upload token expires.
     pub expires_at: Datetime,
-    ///Server-side identifier for this upload.
+    /// Server-side identifier for this upload.
     pub upload_id: S,
-    ///Short-lived bearer token bound to this upload. Send as 'Authorization: Bearer <token>' on TUS requests.
+    /// Short-lived bearer token bound to this upload. Send as 'Authorization: Bearer <token>' on TUS requests.
     pub upload_token: S,
-    ///Absolute URL to PATCH/HEAD per the TUS protocol.
+    /// Absolute URL to PATCH/HEAD per the TUS protocol.
     pub upload_url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateUploadError {
     /// The requested upload exceeds the server's maximum allowed size.
     #[serde(rename = "UploadTooLarge")]
-    UploadTooLarge(Option<SmolStr>),
+    UploadTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The server does not accept this MIME type for upload.
     #[serde(rename = "UnsupportedMimeType")]
-    UnsupportedMimeType(Option<SmolStr>),
+    UnsupportedMimeType(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateUploadError {
@@ -116,9 +116,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateUpload<S> {
     const NSID: &'static str = "place.stream.media.createUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateUploadResponse;
 }
 
@@ -128,16 +127,15 @@ Path: `/xrpc/place.stream.media.createUpload`. The request payload type is `Crea
 pub struct CreateUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateUploadRequest {
     const PATH: &'static str = "/xrpc/place.stream.media.createUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateUpload<S>;
     type Response = CreateUploadResponse;
 }
 
 pub mod create_upload_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -303,10 +301,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateUpload<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateUpload<S> {
         CreateUpload {
             draft_uri: self._fields.0,
             filename: self._fields.1,

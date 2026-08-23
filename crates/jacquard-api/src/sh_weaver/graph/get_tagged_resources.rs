@@ -8,16 +8,16 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetTaggedResourcesResourceType<S: BosStr = DefaultStr> {
@@ -68,8 +68,7 @@ impl<S: BosStr> Serialize for GetTaggedResourcesResourceType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for GetTaggedResourcesResourceType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetTaggedResourcesResourceType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -93,12 +92,8 @@ where
     type Output = GetTaggedResourcesResourceType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetTaggedResourcesResourceType::Notebook => {
-                GetTaggedResourcesResourceType::Notebook
-            }
-            GetTaggedResourcesResourceType::Entry => {
-                GetTaggedResourcesResourceType::Entry
-            }
+            GetTaggedResourcesResourceType::Notebook => GetTaggedResourcesResourceType::Notebook,
+            GetTaggedResourcesResourceType::Entry => GetTaggedResourcesResourceType::Entry,
             GetTaggedResourcesResourceType::All => GetTaggedResourcesResourceType::All,
             GetTaggedResourcesResourceType::Other(v) => {
                 GetTaggedResourcesResourceType::Other(v.into_static())
@@ -106,7 +101,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetTaggedResourcesSort<S: BosStr = DefaultStr> {
@@ -180,16 +174,16 @@ where
         match self {
             GetTaggedResourcesSort::Recent => GetTaggedResourcesSort::Recent,
             GetTaggedResourcesSort::Popular => GetTaggedResourcesSort::Popular,
-            GetTaggedResourcesSort::Other(v) => {
-                GetTaggedResourcesSort::Other(v.into_static())
-            }
+            GetTaggedResourcesSort::Other(v) => GetTaggedResourcesSort::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -216,9 +210,11 @@ pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     pub tag: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -228,7 +224,6 @@ pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -280,21 +275,23 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_resource_type<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetTaggedResourcesResourceType<S>,
-> {
-    Some(<GetTaggedResourcesResourceType<S>>::from_value(S::from_static("all")))
+fn _default_resource_type<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetTaggedResourcesResourceType<S>> {
+    Some(<GetTaggedResourcesResourceType<S>>::from_value(
+        S::from_static("all"),
+    ))
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetTaggedResourcesSort<S>,
-> {
-    Some(<GetTaggedResourcesSort<S>>::from_value(S::from_static("recent")))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetTaggedResourcesSort<S>> {
+    Some(<GetTaggedResourcesSort<S>>::from_value(S::from_static(
+        "recent",
+    )))
 }
 
 pub mod get_tagged_resources_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -325,10 +322,8 @@ pub mod get_tagged_resources_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTaggedResourcesBuilder<
-    St: get_tagged_resources_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetTaggedResourcesBuilder<St: get_tagged_resources_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -344,10 +339,7 @@ pub struct GetTaggedResourcesBuilder<
 
 impl GetTaggedResources<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetTaggedResourcesBuilder<
-        get_tagged_resources_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, DefaultStr> {
         GetTaggedResourcesBuilder::new()
     }
 }
@@ -443,10 +435,7 @@ impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder
         self
     }
     /// Set the `resourceType` field to an Option value (optional)
-    pub fn maybe_resource_type(
-        mut self,
-        value: Option<GetTaggedResourcesResourceType<S>>,
-    ) -> Self {
+    pub fn maybe_resource_type(mut self, value: Option<GetTaggedResourcesResourceType<S>>) -> Self {
         self._fields.4 = value;
         self
     }

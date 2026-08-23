@@ -10,66 +10,66 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Disable<S: BosStr = DefaultStr> {
-    ///DID of the aggregator to disable
+    /// DID of the aggregator to disable
     pub aggregator_did: Did<S>,
-    ///DID or handle of the community
+    /// DID or handle of the community
     pub community: AtIdentifier<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DisableOutput<S: BosStr = DefaultStr> {
-    ///CID of the updated authorization record
+    /// CID of the updated authorization record
     pub cid: Cid<S>,
-    ///When the aggregator was disabled
+    /// When the aggregator was disabled
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled_at: Option<Datetime>,
-    ///AT-URI of the updated authorization record
+    /// AT-URI of the updated authorization record
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DisableError {
     /// Caller is not a moderator of this community
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator is not enabled for this community
     #[serde(rename = "AuthorizationNotFound")]
-    AuthorizationNotFound(Option<SmolStr>),
+    AuthorizationNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator is already disabled
     #[serde(rename = "AlreadyDisabled")]
-    AlreadyDisabled(Option<SmolStr>),
+    AlreadyDisabled(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DisableError {
@@ -120,9 +120,8 @@ impl jacquard_common::xrpc::XrpcResp for DisableResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Disable<S> {
     const NSID: &'static str = "social.coves.aggregator.disable";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DisableResponse;
 }
 
@@ -132,16 +131,15 @@ Path: `/xrpc/social.coves.aggregator.disable`. The request payload type is `Disa
 pub struct DisableRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableRequest {
     const PATH: &'static str = "/xrpc/social.coves.aggregator.disable";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Disable<S>;
     type Response = DisableResponse;
 }
 
 pub mod disable_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

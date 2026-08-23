@@ -10,25 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ModTool;
 use crate::tools_ozone::moderation::schedule_action;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FailedScheduling<S: BosStr = DefaultStr> {
     pub error: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,25 +46,29 @@ pub struct FailedScheduling<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduleAction<S: BosStr = DefaultStr> {
     pub action: schedule_action::Takedown<S>,
     pub created_by: Did<S>,
-    ///This will be propagated to the moderation event when it is applied
+    /// This will be propagated to the moderation event when it is applied
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mod_tool: Option<ModTool<S>>,
     pub scheduling: schedule_action::SchedulingConfig<S>,
-    ///Array of DID subjects to schedule the action for
+    /// Array of DID subjects to schedule the action for
     pub subjects: Vec<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduleActionOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -69,9 +76,11 @@ pub struct ScheduleActionOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduledActionResults<S: BosStr = DefaultStr> {
     pub failed: Vec<schedule_action::FailedScheduling<S>>,
     pub succeeded: Vec<Did<S>>,
@@ -87,15 +96,18 @@ pub struct ScheduledActionResults<S: BosStr = DefaultStr> {
 /// Configuration for when the action should be executed
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SchedulingConfig<S: BosStr = DefaultStr> {
-    ///Earliest time to execute the action (for randomized scheduling)
+    /// Earliest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub execute_after: Option<Datetime>,
-    ///Exact time to execute the action
+    /// Exact time to execute the action
     #[serde(skip_serializing_if = "Option::is_none")]
     pub execute_at: Option<Datetime>,
-    ///Latest time to execute the action (for randomized scheduling)
+    /// Latest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub execute_until: Option<Datetime>,
     #[serde(
@@ -110,32 +122,35 @@ pub struct SchedulingConfig<S: BosStr = DefaultStr> {
 /// Schedule a takedown action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Takedown<S: BosStr = DefaultStr> {
-    ///If true, all other reports on content authored by this account will be resolved (acknowledged).
+    /// If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub acknowledge_account_subjects: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Indicates how long the takedown should be in effect before automatically expiring.
+    /// Indicates how long the takedown should be in effect before automatically expiring.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_in_hours: Option<i64>,
-    ///Email content to be sent to the user upon takedown.
+    /// Email content to be sent to the user upon takedown.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_content: Option<S>,
-    ///Subject of the email to be sent to the user upon takedown.
+    /// Subject of the email to be sent to the user upon takedown.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_subject: Option<S>,
-    ///Names/Keywords of the policies that drove the decision.
+    /// Names/Keywords of the policies that drove the decision.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub policies: Option<Vec<S>>,
-    ///Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
+    /// Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub severity_level: Option<S>,
-    ///Number of strikes to assign to the user when takedown is applied.
+    /// Number of strikes to assign to the user when takedown is applied.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strike_count: Option<i64>,
-    ///When the strike should expire. If not provided, the strike never expires.
+    /// When the strike should expire. If not provided, the strike never expires.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strike_expires_at: Option<Datetime>,
     #[serde(
@@ -175,9 +190,8 @@ impl jacquard_common::xrpc::XrpcResp for ScheduleActionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ScheduleAction<S> {
     const NSID: &'static str = "tools.ozone.moderation.scheduleAction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ScheduleActionResponse;
 }
 
@@ -187,9 +201,8 @@ Path: `/xrpc/tools.ozone.moderation.scheduleAction`. The request payload type is
 pub struct ScheduleActionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.scheduleAction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ScheduleAction<S>;
     type Response = ScheduleActionResponse;
 }
@@ -256,15 +269,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod failed_scheduling_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -307,10 +319,7 @@ pub mod failed_scheduling_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FailedSchedulingBuilder<
-    St: failed_scheduling_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct FailedSchedulingBuilder<St: failed_scheduling_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -419,10 +428,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FailedScheduling<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FailedScheduling<S> {
         FailedScheduling {
             error: self._fields.0.unwrap(),
             error_code: self._fields.1,
@@ -433,10 +439,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.moderation.scheduleAction"),
@@ -445,21 +451,24 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("failedScheduling"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("subject"), SmolStr::new_static("error")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("error"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("error"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("errorCode"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("subject"),
@@ -478,70 +487,64 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(
-                                    vec![
-                                        SmolStr::new_static("action"),
-                                        SmolStr::new_static("subjects"),
-                                        SmolStr::new_static("createdBy"),
-                                        SmolStr::new_static("scheduling")
-                                    ],
-                                ),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("action"),
-                                        LexObjectProperty::Union(LexRefUnion {
-                                            refs: vec![CowStr::new_static("#takedown")],
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("createdBy"),
-                                        LexObjectProperty::String(LexString {
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![
+                                SmolStr::new_static("action"),
+                                SmolStr::new_static("subjects"),
+                                SmolStr::new_static("createdBy"),
+                                SmolStr::new_static("scheduling"),
+                            ]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("action"),
+                                    LexObjectProperty::Union(LexRefUnion {
+                                        refs: vec![CowStr::new_static("#takedown")],
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("createdBy"),
+                                    LexObjectProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("modTool"),
+                                    LexObjectProperty::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
+                                            "tools.ozone.moderation.defs#modTool",
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("scheduling"),
+                                    LexObjectProperty::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#schedulingConfig"),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("subjects"),
+                                    LexObjectProperty::Array(LexArray {
+                                        description: Some(CowStr::new_static(
+                                            "Array of DID subjects to schedule the action for",
+                                        )),
+                                        items: LexArrayItem::String(LexString {
                                             format: Some(LexStringFormat::Did),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("modTool"),
-                                        LexObjectProperty::Ref(LexRef {
-                                            r#ref: CowStr::new_static(
-                                                "tools.ozone.moderation.defs#modTool",
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("scheduling"),
-                                        LexObjectProperty::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#schedulingConfig"),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("subjects"),
-                                        LexObjectProperty::Array(LexArray {
-                                            description: Some(
-                                                CowStr::new_static(
-                                                    "Array of DID subjects to schedule the action for",
-                                                ),
-                                            ),
-                                            items: LexArrayItem::String(LexString {
-                                                format: Some(LexStringFormat::Did),
-                                                ..Default::default()
-                                            }),
-                                            max_length: Some(100usize),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        max_length: Some(100usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -550,12 +553,10 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("scheduledActionResults"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("succeeded"),
-                            SmolStr::new_static("failed")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("succeeded"),
+                        SmolStr::new_static("failed"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -736,7 +737,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
 
 pub mod schedule_action_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -809,10 +810,7 @@ pub mod schedule_action_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScheduleActionBuilder<
-    St: schedule_action_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ScheduleActionBuilder<St: schedule_action_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<schedule_action::Takedown<S>>,
@@ -969,10 +967,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ScheduleAction<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScheduleAction<S> {
         ScheduleAction {
             action: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -991,15 +986,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod scheduled_action_results_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1047,26 +1041,24 @@ pub struct ScheduledActionResultsBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<schedule_action::FailedScheduling<S>>>, Option<Vec<Did<S>>>),
+    _fields: (
+        Option<Vec<schedule_action::FailedScheduling<S>>>,
+        Option<Vec<Did<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ScheduledActionResults<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ScheduledActionResultsBuilder<
-        scheduled_action_results_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ScheduledActionResultsBuilder<scheduled_action_results_state::Empty, DefaultStr>
+    {
         ScheduledActionResultsBuilder::new()
     }
 }
 
 impl<S: BosStr> ScheduledActionResults<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ScheduledActionResultsBuilder<
-        scheduled_action_results_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ScheduledActionResultsBuilder<scheduled_action_results_state::Empty, S> {
         ScheduledActionResultsBuilder::builder()
     }
 }
@@ -1102,10 +1094,7 @@ where
     pub fn failed(
         mut self,
         value: impl Into<Vec<schedule_action::FailedScheduling<S>>>,
-    ) -> ScheduledActionResultsBuilder<
-        scheduled_action_results_state::SetFailed<St>,
-        S,
-    > {
+    ) -> ScheduledActionResultsBuilder<scheduled_action_results_state::SetFailed<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ScheduledActionResultsBuilder {
             _state: PhantomData,
@@ -1124,10 +1113,7 @@ where
     pub fn succeeded(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> ScheduledActionResultsBuilder<
-        scheduled_action_results_state::SetSucceeded<St>,
-        S,
-    > {
+    ) -> ScheduledActionResultsBuilder<scheduled_action_results_state::SetSucceeded<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ScheduledActionResultsBuilder {
             _state: PhantomData,
@@ -1171,9 +1157,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1184,8 +1169,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

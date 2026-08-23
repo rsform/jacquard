@@ -10,24 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HydrateRecord<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -36,29 +41,24 @@ pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum HydrateRecordError {
     /// The requested record does not exist
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<SmolStr>),
+    RecordNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Access to the record is blocked due to boundary restrictions
     #[serde(rename = "RecordBlocked")]
-    RecordBlocked(Option<SmolStr>),
+    RecordBlocked(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for HydrateRecordError {
@@ -119,7 +119,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
 
 pub mod hydrate_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,10 +150,7 @@ pub mod hydrate_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydrateRecordBuilder<
-    St: hydrate_record_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct HydrateRecordBuilder<St: hydrate_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

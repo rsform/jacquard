@@ -8,51 +8,53 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{AtUri, Cid, Language};
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::social_coves::embed::external::ExternalRecord;
 use crate::social_coves::embed::images::Images;
 use crate::social_coves::embed::post::Post;
 use crate::social_coves::embed::video::Video;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtUri, Cid, Language};
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Create<S: BosStr = DefaultStr> {
-    ///DID or handle of the community to post in
+    /// DID or handle of the community to post in
     pub community: AtIdentifier<S>,
-    ///Post content - supports rich text via facets
+    /// Post content - supports rich text via facets
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
-    ///Embedded media, external links, or quoted posts
+    /// Embedded media, external links, or quoted posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<CreateEmbed<S>>,
-    ///Annotations for rich text (mentions, links, formatting, block structure)
+    /// Annotations for rich text (mentions, links, formatting, block structure)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
-    ///Self-applied content labels (NSFW, spoilers, etc.)
+    /// Self-applied content labels (NSFW, spoilers, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Languages used in the post content (ISO 639-1)
+    /// Languages used in the post content (ISO 639-1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
-    ///User-applied topic tags
+    /// User-applied topic tags
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    ///Post title (optional for media-only posts)
+    /// Post title (optional for media-only posts)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,50 +70,47 @@ pub enum CreateEmbed<S: BosStr = DefaultStr> {
     Post(Box<Post<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateOutput<S: BosStr = DefaultStr> {
-    ///CID of the created post
+    /// CID of the created post
     pub cid: Cid<S>,
-    ///AT-URI of the created post
+    /// AT-URI of the created post
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateError {
     /// Community not found
     #[serde(rename = "CommunityNotFound")]
-    CommunityNotFound(Option<SmolStr>),
+    CommunityNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User is not authorized to post in this community
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User is banned from this community
     #[serde(rename = "Banned")]
-    Banned(Option<SmolStr>),
+    Banned(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Post content violates community rules
     #[serde(rename = "InvalidContent")]
-    InvalidContent(Option<SmolStr>),
+    InvalidContent(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Post violates community content rules (e.g., embeds not allowed, text too short)
     #[serde(rename = "ContentRuleViolation")]
-    ContentRuleViolation(Option<SmolStr>),
+    ContentRuleViolation(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateError {
@@ -176,9 +175,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Create<S> {
     const NSID: &'static str = "social.coves.community.post.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateResponse;
 }
 
@@ -188,16 +186,15 @@ Path: `/xrpc/social.coves.community.post.create`. The request payload type is `C
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.post.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Create<S>;
     type Response = CreateResponse;
 }
 
 pub mod create_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

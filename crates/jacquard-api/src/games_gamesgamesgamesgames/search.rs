@@ -8,18 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::CollectionSummaryView;
 use crate::games_gamesgamesgamesgames::EngineSummaryView;
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 use crate::games_gamesgamesgamesgames::PlatformSummaryView;
 use crate::games_gamesgamesgamesgames::ProfileSummaryView;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchApplicationTypes<S: BosStr = DefaultStr> {
@@ -151,13 +151,10 @@ where
                 SearchApplicationTypes::StandaloneExpansion
             }
             SearchApplicationTypes::Update => SearchApplicationTypes::Update,
-            SearchApplicationTypes::Other(v) => {
-                SearchApplicationTypes::Other(v.into_static())
-            }
+            SearchApplicationTypes::Other(v) => SearchApplicationTypes::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchSort<S: BosStr = DefaultStr> {
@@ -243,7 +240,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SearchTypes<S: BosStr = DefaultStr> {
@@ -334,9 +330,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Search<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<S>>,
@@ -371,20 +369,21 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub types: Option<Vec<SearchTypes<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub results: Vec<SearchOutputResultsItem<S>>,
-    ///Total number of results matching the query above the relevance threshold.
+    /// Total number of results matching the query above the relevance threshold.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_results: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -444,7 +443,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -515,19 +514,7 @@ impl SearchBuilder<search_state::Empty, DefaultStr> {
         SearchBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -540,19 +527,7 @@ impl<S: BosStr> SearchBuilder<search_state::Empty, S> {
         SearchBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }

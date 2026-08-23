@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// User profile for ATCR registry. Stores preferences like default hold for blob storage.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,21 +37,21 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Automatically delete manifest records that become untagged after a tag overwrite. Layers are cleaned up by hold garbage collection.
+    /// Automatically delete manifest records that become untagged after a tag overwrite. Layers are cleaned up by hold garbage collection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auto_remove_untagged: Option<bool>,
-    ///Profile creation timestamp
+    /// Profile creation timestamp
     pub created_at: Datetime,
-    ///Default hold DID for blob storage. If null, user has opted out of defaults.
+    /// Default hold DID for blob storage. If null, user has opted out of defaults.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_hold: Option<Did<S>>,
-    ///Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.
+    /// Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub oci_client: Option<ProfileOciClient<S>>,
-    ///Preferred registry domain for UI display. Must be one of the appview's configured registry domains. Empty means the primary (first configured) domain.
+    /// Preferred registry domain for UI display. Must be one of the appview's configured registry domains. Empty means the primary (first configured) domain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub registry_domain: Option<S>,
-    ///Profile last updated timestamp
+    /// Profile last updated timestamp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -244,9 +244,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -258,7 +257,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -454,10 +453,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_sailor_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.sailor.profile"),

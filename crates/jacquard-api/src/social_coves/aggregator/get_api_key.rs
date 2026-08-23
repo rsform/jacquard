@@ -8,14 +8,14 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::aggregator::ApiKeyView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::aggregator::ApiKeyView;
+use serde::{Deserialize, Serialize};
 /// No parameters required. Returns key info for the authenticated aggregator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -23,43 +23,41 @@ use crate::social_coves::aggregator::ApiKeyView;
 pub struct GetApiKey;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetApiKeyOutput<S: BosStr = DefaultStr> {
-    ///Whether the aggregator has an API key (active or revoked)
+    /// Whether the aggregator has an API key (active or revoked)
     pub has_key: bool,
-    ///API key metadata. Only present if hasKey is true.
+    /// API key metadata. Only present if hasKey is true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub key_info: Option<ApiKeyView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetApiKeyError {
     /// Authentication is required to get API key info
     #[serde(rename = "AuthenticationRequired")]
-    AuthenticationRequired(Option<SmolStr>),
+    AuthenticationRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Only registered aggregators can get API key info
     #[serde(rename = "AggregatorRequired")]
-    AggregatorRequired(Option<SmolStr>),
+    AggregatorRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator not found
     #[serde(rename = "AggregatorNotFound")]
-    AggregatorNotFound(Option<SmolStr>),
+    AggregatorNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetApiKeyError {

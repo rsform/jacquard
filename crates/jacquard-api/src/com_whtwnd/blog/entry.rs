@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_whtwnd::blog::BlobMetadata;
 use crate::com_whtwnd::blog::Ogp;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A declaration of a post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,7 +44,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
     pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///(DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
+    /// (DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_draft: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,7 +55,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
     pub theme: Option<EntryTheme<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///Tells the visibility of the article to AppView.  Defaults to `"public"`.
+    /// Tells the visibility of the article to AppView.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
     pub visibility: Option<EntryVisibility<S>>,
@@ -67,7 +67,6 @@ pub struct Entry<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EntryTheme<S: BosStr = DefaultStr> {
@@ -322,9 +321,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -334,15 +332,14 @@ where
     Ok(data)
 }
 
-fn _default_entry_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    EntryVisibility<S>,
-> {
+fn _default_entry_visibility<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<EntryVisibility<S>> {
     Some(<EntryVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -444,10 +441,7 @@ where
     St::Content: entry_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> EntryBuilder<entry_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> EntryBuilder<entry_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -586,10 +580,10 @@ where
 }
 
 fn lexicon_doc_com_whtwnd_blog_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.whtwnd.blog.entry"),
@@ -667,11 +661,9 @@ fn lexicon_doc_com_whtwnd_blog_entry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("visibility"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Tells the visibility of the article to AppView.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Tells the visibility of the article to AppView.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

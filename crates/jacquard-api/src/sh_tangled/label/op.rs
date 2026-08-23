@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::label::op;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::label::op;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -40,7 +40,7 @@ pub struct Op<S: BosStr = DefaultStr> {
     pub add: Vec<op::Operand<S>>,
     pub delete: Vec<op::Operand<S>>,
     pub performed_at: Datetime,
-    ///The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
+    /// The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
     pub subject: AtUri<S>,
     #[serde(
         flatten,
@@ -62,13 +62,15 @@ pub struct OpGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Op<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Operand<S: BosStr = DefaultStr> {
-    ///ATURI to the label definition
+    /// ATURI to the label definition
     pub key: AtUri<S>,
-    ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
+    /// Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
     pub value: S,
     #[serde(
         flatten,
@@ -149,9 +151,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -163,7 +164,7 @@ where
 
 pub mod op_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -346,10 +347,7 @@ where
     St::Subject: op_state::IsUnset,
 {
     /// Set the `subject` field (required)
-    pub fn subject(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> OpBuilder<op_state::SetSubject<St>, S> {
+    pub fn subject(mut self, value: impl Into<AtUri<S>>) -> OpBuilder<op_state::SetSubject<St>, S> {
         self._fields.3 = Option::Some(value.into());
         OpBuilder {
             _state: PhantomData,
@@ -390,10 +388,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_label_op() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.label.op"),
@@ -508,15 +506,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod operand_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -626,10 +623,7 @@ where
     St::Value: operand_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(
-        mut self,
-        value: impl Into<S>,
-    ) -> OperandBuilder<operand_state::SetValue<St>, S> {
+    pub fn value(mut self, value: impl Into<S>) -> OperandBuilder<operand_state::SetValue<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OperandBuilder {
             _state: PhantomData,

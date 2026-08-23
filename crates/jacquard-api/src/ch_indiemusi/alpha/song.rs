@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,15 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::ch_indiemusi::alpha::actor::publishing_owner::PublishingOwner;
 use crate::ch_indiemusi::alpha::song;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// An interested party associated with the song (author, composer, publisher)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InterestedParty<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collecting_society: Option<S>,
@@ -40,17 +43,17 @@ pub struct InterestedParty<S: BosStr = DefaultStr> {
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ipi: Option<S>,
-    ///Percentage of mechanical royalties allocated to this interested party, 10000 = 100%
+    /// Percentage of mechanical royalties allocated to this interested party, 10000 = 100%
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mechanical_royalties_percentage: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Percentage of performance royalties allocated to this interested party, 10000 = 100%
+    /// Percentage of performance royalties allocated to this interested party, 10000 = 100%
     #[serde(skip_serializing_if = "Option::is_none")]
     pub performance_royalties_percentage: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub publishing_owner: Option<PublishingOwner<S>>,
-    ///Role of the interested party (e.g., 'author', 'composer', 'publisher')
+    /// Role of the interested party (e.g., 'author', 'composer', 'publisher')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role: Option<S>,
     #[serde(
@@ -72,9 +75,9 @@ pub struct InterestedParty<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Song<S: BosStr = DefaultStr> {
-    ///List of interested parties (authors, composers, publishers) associated with this song
+    /// List of interested parties (authors, composers, publishers) associated with this song
     pub interested_parties: Vec<song::InterestedParty<S>>,
-    ///ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
+    /// ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iswc: Option<S>,
     pub title: S,
@@ -240,17 +243,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_song() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.song"),
@@ -407,9 +409,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -421,7 +422,7 @@ where
 
 pub mod song_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -544,10 +545,7 @@ where
     St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> SongBuilder<song_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> SongBuilder<song_state::SetTitle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,

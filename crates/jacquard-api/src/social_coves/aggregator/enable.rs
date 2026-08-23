@@ -8,74 +8,74 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::aggregator::AuthorizationView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::aggregator::AuthorizationView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Enable<S: BosStr = DefaultStr> {
-    ///DID of the aggregator to enable
+    /// DID of the aggregator to enable
     pub aggregator_did: Did<S>,
-    ///DID or handle of the community
+    /// DID or handle of the community
     pub community: AtIdentifier<S>,
-    ///Aggregator-specific configuration. Must conform to the aggregator's configSchema.
+    /// Aggregator-specific configuration. Must conform to the aggregator's configSchema.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Data<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EnableOutput<S: BosStr = DefaultStr> {
-    ///The created authorization details
+    /// The created authorization details
     pub authorization: AuthorizationView<S>,
-    ///CID of the created authorization record
+    /// CID of the created authorization record
     pub cid: Cid<S>,
-    ///AT-URI of the created authorization record
+    /// AT-URI of the created authorization record
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum EnableError {
     /// Caller is not a moderator of this community
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator DID does not exist or has no service declaration
     #[serde(rename = "AggregatorNotFound")]
-    AggregatorNotFound(Option<SmolStr>),
+    AggregatorNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Config does not match aggregator's configSchema
     #[serde(rename = "InvalidConfig")]
-    InvalidConfig(Option<SmolStr>),
+    InvalidConfig(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Aggregator is already enabled for this community
     #[serde(rename = "AlreadyEnabled")]
-    AlreadyEnabled(Option<SmolStr>),
+    AlreadyEnabled(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for EnableError {
@@ -133,9 +133,8 @@ impl jacquard_common::xrpc::XrpcResp for EnableResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Enable<S> {
     const NSID: &'static str = "social.coves.aggregator.enable";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = EnableResponse;
 }
 
@@ -145,16 +144,15 @@ Path: `/xrpc/social.coves.aggregator.enable`. The request payload type is `Enabl
 pub struct EnableRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EnableRequest {
     const PATH: &'static str = "/xrpc/social.coves.aggregator.enable";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Enable<S>;
     type Response = EnableResponse;
 }
 
 pub mod enable_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

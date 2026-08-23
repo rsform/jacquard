@@ -11,13 +11,12 @@ pub mod get_manifest;
 pub mod put_hosting_url;
 pub mod service;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +28,21 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_ocho::plugin;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_ocho::plugin;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
-    ///The background color of the adaptive icon.
+    /// The background color of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<S>,
-    ///The URL to the foreground image of the adaptive icon.
+    /// The URL to the foreground image of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foreground_image: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,14 +56,16 @@ pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Android<S: BosStr = DefaultStr> {
-    ///Configuration for the adaptive icon on Android.
+    /// Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub adaptive_icon: Option<plugin::AdaptiveIcon<S>>,
-    ///Whether edge-to-edge mode is enabled for the app.
+    /// Whether edge-to-edge mode is enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edge_to_edge_enabled: Option<bool>,
     #[serde(
@@ -76,9 +80,12 @@ pub struct Android<S: BosStr = DefaultStr> {
 /// Android status bar configuration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
-    ///The background color of the Android status bar.
+    /// The background color of the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<S>,
     #[serde(
@@ -90,17 +97,19 @@ pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Asset<S: BosStr = DefaultStr> {
-    ///The blob of the asset
+    /// The blob of the asset
     pub blob: BlobRef<S>,
-    ///The hash of the asset
+    /// The hash of the asset
     pub hash: S,
-    ///The type of the asset
+    /// The type of the asset
     pub r#type: S,
-    ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
+    /// The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -112,11 +121,13 @@ pub struct Asset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Db<S: BosStr = DefaultStr> {
-    ///The ID of the database.
+    /// The ID of the database.
     pub id: S,
     #[serde(
         flatten,
@@ -127,11 +138,13 @@ pub struct Db<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Developer<S: BosStr = DefaultStr> {
-    ///The tool used for development, e.g., 'expo-cli'.
+    /// The tool used for development, e.g., 'expo-cli'.
     pub tool: S,
     #[serde(
         flatten,
@@ -142,60 +155,62 @@ pub struct Developer<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExpoClient<S: BosStr = DefaultStr> {
-    ///Android-specific configuration for the app.
+    /// Android-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub android: Option<plugin::Android<S>>,
-    ///Configuration for the Android status bar.
+    /// Configuration for the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub android_status_bar: Option<plugin::AndroidStatusBar<S>>,
-    ///Experimental features enabled for the app.
+    /// Experimental features enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expirements: Option<Data<S>>,
-    ///Additional configuration for the app.
+    /// Additional configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra: Option<Data<S>>,
-    ///The URL to the app icon.
+    /// The URL to the app icon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<S>,
-    ///ios-specific configuration for the app.
+    /// ios-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ios: Option<plugin::Ios<S>>,
-    ///Localization settings for the app.
+    /// Localization settings for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locales: Option<Data<S>>,
-    ///The name of the Expo client application.
+    /// The name of the Expo client application.
     pub name: S,
-    ///Whether the new architecture is enabled for the app.
+    /// Whether the new architecture is enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_arch_enabled: Option<bool>,
-    ///The default orientation of the app.
+    /// The default orientation of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub orientation: Option<ExpoClientOrientation<S>>,
-    ///The platforms supported by the app.
+    /// The platforms supported by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platforms: Option<Vec<ExpoClientPlatforms<S>>>,
-    ///A list of plugins used by the app.
+    /// A list of plugins used by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plugins: Option<Data<S>>,
-    ///The custom URI scheme for deep linking.
+    /// The custom URI scheme for deep linking.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scheme: Option<S>,
-    ///The SDK version of the Expo client.
+    /// The SDK version of the Expo client.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sdk_version: Option<S>,
-    ///A URL-friendly identifier for the app.
+    /// A URL-friendly identifier for the app.
     pub slug: S,
-    ///The default user interface style.
+    /// The default user interface style.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_interface_style: Option<S>,
-    ///The version of the app.
+    /// The version of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<S>,
-    ///Web-specific configuration for the app.
+    /// Web-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub web: Option<plugin::Web<S>>,
     #[serde(
@@ -285,13 +300,10 @@ where
             ExpoClientOrientation::Portrait => ExpoClientOrientation::Portrait,
             ExpoClientOrientation::Landscape => ExpoClientOrientation::Landscape,
             ExpoClientOrientation::Default => ExpoClientOrientation::Default,
-            ExpoClientOrientation::Other(v) => {
-                ExpoClientOrientation::Other(v.into_static())
-            }
+            ExpoClientOrientation::Other(v) => ExpoClientOrientation::Other(v.into_static()),
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ExpoClientPlatforms<S: BosStr = DefaultStr> {
@@ -374,11 +386,13 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExpoGo<S: BosStr = DefaultStr> {
-    ///Developer-specific configuration for the Expo Go app.
+    /// Developer-specific configuration for the Expo Go app.
     pub developer: plugin::Developer<S>,
     #[serde(
         flatten,
@@ -389,11 +403,13 @@ pub struct ExpoGo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Ios<S: BosStr = DefaultStr> {
-    ///Whether the app supports iPad.
+    /// Whether the app supports iPad.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub supports_tablet: Option<bool>,
     #[serde(
@@ -405,15 +421,17 @@ pub struct Ios<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LaunchAsset<S: BosStr = DefaultStr> {
-    ///The MIME type of the asset, e.g., 'image/png'.
+    /// The MIME type of the asset, e.g., 'image/png'.
     pub content_type: S,
-    ///The unique key for this asset, used to reference it in the plugin.
+    /// The unique key for this asset, used to reference it in the plugin.
     pub key: S,
-    ///The URL where the asset can be accessed.
+    /// The URL where the asset can be accessed.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -424,20 +442,22 @@ pub struct LaunchAsset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Manifest<S: BosStr = DefaultStr> {
-    ///The date and time when this plugin manifest was created.
+    /// The date and time when this plugin manifest was created.
     pub created_at: Datetime,
-    ///Additional metadata for the plugin, including Expo client and Go configurations.
+    /// Additional metadata for the plugin, including Expo client and Go configurations.
     pub extra: plugin::ManifestExtra<S>,
-    ///The unique identifier for this plugin manifest.
+    /// The unique identifier for this plugin manifest.
     pub id: S,
-    ///The launch asset for the plugin (the main javascipt bundle).
+    /// The launch asset for the plugin (the main javascipt bundle).
     pub launch_asset: plugin::LaunchAsset<S>,
     pub metadata: Data<S>,
-    ///The version of the Expo runtime this plugin is compatible with.
+    /// The version of the Expo runtime this plugin is compatible with.
     pub runtime_version: S,
     #[serde(
         flatten,
@@ -448,9 +468,11 @@ pub struct Manifest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ManifestExtra<S: BosStr = DefaultStr> {
     pub expo_client: plugin::ExpoClient<S>,
     pub expo_go: plugin::ExpoGo<S>,
@@ -462,7 +484,6 @@ pub struct ManifestExtra<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -480,17 +501,20 @@ pub type PluginConfig<S = DefaultStr> = Data<S>;
 pub type StringId<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Web<S: BosStr = DefaultStr> {
-    ///The bundler used for the web app.
+    /// The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bundler: Option<WebBundler<S>>,
-    ///The URL to the favicon for the web app.
+    /// The URL to the favicon for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon_blob: Option<BlobRef<S>>,
-    ///The output directory for the web app.
+    /// The output directory for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub output: Option<WebOutput<S>>,
     #[serde(
@@ -866,17 +890,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.ocho.plugin.defs"),
@@ -891,28 +914,26 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The background color of the adaptive icon.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The background color of the adaptive icon.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The URL to the foreground image of the adaptive icon.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL to the foreground image of the adaptive icon.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImageBlob"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -946,20 +967,16 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("androidStatusBar"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Android status bar configuration."),
-                    ),
+                    description: Some(CowStr::new_static("Android status bar configuration.")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The background color of the Android status bar.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The background color of the Android status bar.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1029,9 +1046,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The ID of the database."),
-                                ),
+                                description: Some(CowStr::new_static("The ID of the database.")),
                                 ..Default::default()
                             }),
                         );
@@ -1050,11 +1065,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tool"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The tool used for development, e.g., 'expo-cli'.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The tool used for development, e.g., 'expo-cli'.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1066,9 +1079,10 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expoClient"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("slug")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("slug"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1101,9 +1115,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("icon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL to the app icon."),
-                                ),
+                                description: Some(CowStr::new_static("The URL to the app icon.")),
                                 ..Default::default()
                             }),
                         );
@@ -1123,11 +1135,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The name of the Expo client application.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The name of the Expo client application.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1140,18 +1150,18 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("orientation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The default orientation of the app."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The default orientation of the app.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platforms"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("The platforms supported by the app."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The platforms supported by the app.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -1167,47 +1177,43 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scheme"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The custom URI scheme for deep linking.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The custom URI scheme for deep linking.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sdkVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The SDK version of the Expo client."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The SDK version of the Expo client.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("A URL-friendly identifier for the app."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A URL-friendly identifier for the app.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userInterfaceStyle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The default user interface style."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The default user interface style.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("version"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The version of the app."),
-                                ),
+                                description: Some(CowStr::new_static("The version of the app.")),
                                 ..Default::default()
                             }),
                         );
@@ -1391,12 +1397,10 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("manifestExtra"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("expoClient"),
-                            SmolStr::new_static("expoGo")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("expoClient"),
+                        SmolStr::new_static("expoGo"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1425,7 +1429,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                     items: LexArrayItem::Union(LexRefUnion {
                         refs: vec![
                             CowStr::new_static("#stringId"),
-                            CowStr::new_static("#pluginConfig")
+                            CowStr::new_static("#pluginConfig"),
                         ],
                         ..Default::default()
                     }),
@@ -1434,16 +1438,16 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("pluginConfig"),
-                LexUserType::Unknown(LexUnknown { ..Default::default() }),
+                LexUserType::Unknown(LexUnknown {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("stringId"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "A string identifier for a plugin, used to reference it in the app.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A string identifier for a plugin, used to reference it in the app.",
+                    )),
                     ..Default::default()
                 }),
             );
@@ -1456,33 +1460,33 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("bundler"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The bundler used for the web app."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The bundler used for the web app.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("favicon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The URL to the favicon for the web app.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL to the favicon for the web app.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("faviconBlob"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("output"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The output directory for the web app."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The output directory for the web app.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1504,9 +1508,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1517,9 +1520,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1530,15 +1532,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod asset_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1662,10 +1663,7 @@ where
     St::Hash: asset_state::IsUnset,
 {
     /// Set the `hash` field (required)
-    pub fn hash(
-        mut self,
-        value: impl Into<S>,
-    ) -> AssetBuilder<asset_state::SetHash<St>, S> {
+    pub fn hash(mut self, value: impl Into<S>) -> AssetBuilder<asset_state::SetHash<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1681,10 +1679,7 @@ where
     St::Type: asset_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(
-        mut self,
-        value: impl Into<S>,
-    ) -> AssetBuilder<asset_state::SetType<St>, S> {
+    pub fn r#type(mut self, value: impl Into<S>) -> AssetBuilder<asset_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1743,9 +1738,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1756,9 +1750,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1769,9 +1762,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1782,15 +1774,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod expo_go_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1910,9 +1901,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1923,15 +1913,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod launch_asset_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2104,10 +2093,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LaunchAsset<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LaunchAsset<S> {
         LaunchAsset {
             content_type: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -2124,15 +2110,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod manifest_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2336,10 +2321,7 @@ where
     St::Id: manifest_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> ManifestBuilder<manifest_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<S>) -> ManifestBuilder<manifest_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -2449,15 +2431,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod manifest_extra_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2500,10 +2481,7 @@ pub mod manifest_extra_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ManifestExtraBuilder<
-    St: manifest_extra_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ManifestExtraBuilder<St: manifest_extra_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<plugin::ExpoClient<S>>, Option<plugin::ExpoGo<S>>),
     _type: PhantomData<fn() -> S>,
@@ -2598,10 +2576,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ManifestExtra<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ManifestExtra<S> {
         ManifestExtra {
             expo_client: self._fields.0.unwrap(),
             expo_go: self._fields.1.unwrap(),
@@ -2617,8 +2592,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

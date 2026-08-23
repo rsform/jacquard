@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A FitSky-specific user profile with custom banner and bio
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,27 +38,27 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Custom FitSky banner image. Falls back to Bluesky banner if not set.
+    /// Custom FitSky banner image. Falls back to Bluesky banner if not set.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<BlobRef<S>>,
-    ///FitSky-specific bio text
+    /// FitSky-specific bio text
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///User's date of birth (ISO 8601). Used for max HR calculation.
+    /// User's date of birth (ISO 8601). Used for max HR calculation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_of_birth: Option<Datetime>,
-    ///Height in centimeters
+    /// Height in centimeters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height_cm: Option<i64>,
-    ///Whether workout detail pages are publicly viewable without authentication
+    /// Whether workout detail pages are publicly viewable without authentication
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_profile: Option<bool>,
-    ///User's preferred unit system
+    /// User's preferred unit system
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unit_system: Option<ProfileUnitSystem<S>>,
-    ///Weight in grams
+    /// Weight in grams
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weight_grams: Option<i64>,
     #[serde(
@@ -220,25 +220,23 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -306,9 +304,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -320,7 +317,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -469,10 +466,7 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `unitSystem` field (optional)
-    pub fn unit_system(
-        mut self,
-        value: impl Into<Option<ProfileUnitSystem<S>>>,
-    ) -> Self {
+    pub fn unit_system(mut self, value: impl Into<Option<ProfileUnitSystem<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -531,10 +525,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.profile"),

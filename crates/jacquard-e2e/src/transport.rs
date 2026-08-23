@@ -257,8 +257,9 @@ impl jacquard_common::http_client::HttpClientExt for FixtureTransport {
         body: S,
     ) -> Result<HttpResponse<jacquard_common::stream::ByteStream>, Self::Error>
     where
-        S: n0_future::Stream<Item = Result<jacquard::deps::bytes::Bytes, jacquard_common::stream::StreamError>>
-            + Send
+        S: n0_future::Stream<
+                Item = Result<jacquard::deps::bytes::Bytes, jacquard_common::stream::StreamError>,
+            > + Send
             + 'static,
     {
         use jacquard_common::stream::{ByteStream, StreamError};

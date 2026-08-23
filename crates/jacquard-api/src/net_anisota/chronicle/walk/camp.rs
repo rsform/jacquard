@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,22 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::walk::camp;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::walk::camp;
+use serde::{Deserialize, Serialize};
 /// Environmental conditions when camp was made
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CampConditions<S: BosStr = DefaultStr> {
-    ///Time-of-day light condition when camp was made
+    /// Time-of-day light condition when camp was made
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light_level: Option<CampConditionsLightLevel<S>>,
-    ///Weather condition when camp was made
+    /// Weather condition when camp was made
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weather: Option<CampConditionsWeather<S>>,
     #[serde(
@@ -111,8 +114,7 @@ impl<S: BosStr> Serialize for CampConditionsLightLevel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for CampConditionsLightLevel<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CampConditionsLightLevel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -143,9 +145,7 @@ where
             CampConditionsLightLevel::Dusk => CampConditionsLightLevel::Dusk,
             CampConditionsLightLevel::Night => CampConditionsLightLevel::Night,
             CampConditionsLightLevel::Deepnight => CampConditionsLightLevel::Deepnight,
-            CampConditionsLightLevel::Other(v) => {
-                CampConditionsLightLevel::Other(v.into_static())
-            }
+            CampConditionsLightLevel::Other(v) => CampConditionsLightLevel::Other(v.into_static()),
         }
     }
 }
@@ -236,9 +236,7 @@ where
             CampConditionsWeather::Rainy => CampConditionsWeather::Rainy,
             CampConditionsWeather::Stormy => CampConditionsWeather::Stormy,
             CampConditionsWeather::Foggy => CampConditionsWeather::Foggy,
-            CampConditionsWeather::Other(v) => {
-                CampConditionsWeather::Other(v.into_static())
-            }
+            CampConditionsWeather::Other(v) => CampConditionsWeather::Other(v.into_static()),
         }
     }
 }
@@ -246,15 +244,18 @@ where
 /// Light levels at camp start/end
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CampLight<S: BosStr = DefaultStr> {
-    ///Light level when camp was broken (in minutes)
+    /// Light level when camp was broken (in minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_break: Option<i64>,
-    ///Light level when camp was made (in minutes)
+    /// Light level when camp was made (in minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_camp: Option<i64>,
-    ///Light regenerated during camp
+    /// Light regenerated during camp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub regenerated: Option<i64>,
     #[serde(
@@ -269,19 +270,22 @@ pub struct CampLight<S: BosStr = DefaultStr> {
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
-    ///Signing algorithm (ES256)
+    /// Signing algorithm (ES256)
     pub alg: S,
-    ///Key identifier for the signing key
+    /// Key identifier for the signing key
     pub kid: S,
-    ///Unique random nonce to prevent replay
+    /// Unique random nonce to prevent replay
     pub nonce: S,
-    ///Base64-encoded ES256 signature
+    /// Base64-encoded ES256 signature
     pub sig: S,
-    ///When the record was signed
+    /// When the record was signed
     pub signed_at: Datetime,
-    ///Signature schema version
+    /// Signature schema version
     pub version: i64,
     #[serde(
         flatten,
@@ -302,32 +306,32 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Camp<S: BosStr = DefaultStr> {
-    ///When camp was broken (only set when status is 'completed')
+    /// When camp was broken (only set when status is 'completed')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broke_at: Option<Datetime>,
-    ///Sequential camp number within the parent walk (1, 2, 3...)
+    /// Sequential camp number within the parent walk (1, 2, 3...)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub camp_number: Option<i64>,
-    ///When camp was set up
+    /// When camp was set up
     pub camped_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conditions: Option<camp::CampConditions<S>>,
-    ///When the record was created
+    /// When the record was created
     pub created_at: Datetime,
-    ///Total camp duration in minutes (only set when status is 'completed'). Minutes throughout the walk system, unlike the legacy expedition camp lexicon's milliseconds.
+    /// Total camp duration in minutes (only set when status is 'completed'). Minutes throughout the walk system, unlike the legacy expedition camp lexicon's milliseconds.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light: Option<camp::CampLight<S>>,
-    ///Why camp was made
+    /// Why camp was made
     pub reason: CampReason<S>,
     pub signature: camp::ChronicleSignature<S>,
-    ///Whether the camp is currently active or has been broken
+    /// Whether the camp is currently active or has been broken
     pub status: CampStatus<S>,
-    ///When the record was last updated (set on break camp)
+    /// When the record was last updated (set on break camp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///AT URI of the parent walk record (net.anisota.chronicle.walk)
+    /// AT URI of the parent walk record (net.anisota.chronicle.walk)
     pub walk_ref: AtUri<S>,
     #[serde(
         flatten,
@@ -660,17 +664,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_net_anisota_chronicle_walk_camp() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.walk.camp"),
@@ -679,29 +682,27 @@ fn lexicon_doc_net_anisota_chronicle_walk_camp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("campConditions"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Environmental conditions when camp was made"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Environmental conditions when camp was made",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("lightLevel"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Time-of-day light condition when camp was made",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Time-of-day light condition when camp was made",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("weather"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Weather condition when camp was made"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Weather condition when camp was made",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -713,9 +714,7 @@ fn lexicon_doc_net_anisota_chronicle_walk_camp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("campLight"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Light levels at camp start/end"),
-                    ),
+                    description: Some(CowStr::new_static("Light levels at camp start/end")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -748,63 +747,58 @@ fn lexicon_doc_net_anisota_chronicle_walk_camp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "ES256 cryptographic signature proving record authenticity",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
-                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
-                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "ES256 cryptographic signature proving record authenticity",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("sig"),
+                        SmolStr::new_static("alg"),
+                        SmolStr::new_static("kid"),
+                        SmolStr::new_static("signedAt"),
+                        SmolStr::new_static("nonce"),
+                        SmolStr::new_static("version"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Signing algorithm (ES256)"),
-                                ),
+                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Key identifier for the signing key"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Key identifier for the signing key",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Unique random nonce to prevent replay"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique random nonce to prevent replay",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Base64-encoded ES256 signature"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Base64-encoded ES256 signature",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the record was signed"),
-                                ),
+                                description: Some(CowStr::new_static("When the record was signed")),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -972,9 +966,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -985,15 +978,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1104,21 +1096,22 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<
-    St: chronicle_signature_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<
-        chronicle_signature_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -1289,10 +1282,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChronicleSignature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -1312,9 +1302,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1326,7 +1315,7 @@ where
 
 pub mod camp_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1476,18 +1465,7 @@ impl CampBuilder<camp_state::Empty, DefaultStr> {
         CampBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1500,18 +1478,7 @@ impl<S: BosStr> CampBuilder<camp_state::Empty, S> {
         CampBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1565,10 +1532,7 @@ where
 
 impl<St: camp_state::State, S: BosStr> CampBuilder<St, S> {
     /// Set the `conditions` field (optional)
-    pub fn conditions(
-        mut self,
-        value: impl Into<Option<camp::CampConditions<S>>>,
-    ) -> Self {
+    pub fn conditions(mut self, value: impl Into<Option<camp::CampConditions<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }

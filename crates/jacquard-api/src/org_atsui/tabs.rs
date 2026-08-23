@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,25 +20,30 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 use crate::org_atsui::tabs;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Tabs<S: BosStr = DefaultStr> {
-    ///Tabs to display.
+    /// Tabs to display.
     pub items: Vec<tabs::Tab<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TabsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -46,15 +51,17 @@ pub struct TabsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Tab<S: BosStr = DefaultStr> {
-    ///Element to render as tab content.
+    /// Element to render as tab content.
     pub content: Element<S>,
-    ///Stable key that identifies the tab among its siblings.
+    /// Stable key that identifies the tab among its siblings.
     pub key: S,
-    ///Display label for the tab.
+    /// Display label for the tab.
     pub label: S,
     #[serde(
         flatten,
@@ -78,9 +85,8 @@ impl jacquard_common::xrpc::XrpcResp for TabsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Tabs<S> {
     const NSID: &'static str = "org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = TabsResponse;
 }
 
@@ -90,9 +96,8 @@ Path: `/xrpc/org.atsui.Tabs`. The request payload type is `Tabs<S>`; send that r
 pub struct TabsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Tabs<S>;
     type Response = TabsResponse;
 }
@@ -136,7 +141,7 @@ impl<S: BosStr> LexiconSchema for Tab<S> {
 
 pub mod tabs_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -256,15 +261,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod tab_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -404,10 +408,7 @@ where
     St::Label: tab_state::IsUnset,
 {
     /// Set the `label` field (required)
-    pub fn label(
-        mut self,
-        value: impl Into<S>,
-    ) -> TabBuilder<tab_state::SetLabel<St>, S> {
+    pub fn label(mut self, value: impl Into<S>) -> TabBuilder<tab_state::SetLabel<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
@@ -445,10 +446,10 @@ where
 }
 
 fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atsui.Tabs"),
@@ -459,28 +460,26 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("items")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("items"),
-                                        LexObjectProperty::Array(LexArray {
-                                            description: Some(CowStr::new_static("Tabs to display.")),
-                                            items: LexArrayItem::Ref(LexRef {
-                                                r#ref: CowStr::new_static("#tab"),
-                                                ..Default::default()
-                                            }),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("items")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("items"),
+                                    LexObjectProperty::Array(LexArray {
+                                        description: Some(CowStr::new_static("Tabs to display.")),
+                                        items: LexArrayItem::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#tab"),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -489,12 +488,11 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tab"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("key"), SmolStr::new_static("label"),
-                            SmolStr::new_static("content")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("key"),
+                        SmolStr::new_static("label"),
+                        SmolStr::new_static("content"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -508,11 +506,9 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Stable key that identifies the tab among its siblings.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Stable key that identifies the tab among its siblings.",
+                                )),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -520,9 +516,7 @@ fn lexicon_doc_org_atsui_Tabs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("label"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Display label for the tab."),
-                                ),
+                                description: Some(CowStr::new_static("Display label for the tab.")),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),

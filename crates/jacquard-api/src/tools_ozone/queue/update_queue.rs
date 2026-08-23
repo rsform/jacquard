@@ -8,65 +8,65 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::queue::QueueView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::queue::QueueView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateQueue<S: BosStr = DefaultStr> {
-    ///Optional description of the queue
+    /// Optional description of the queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Enable or disable the queue
+    /// Enable or disable the queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///New display name for the queue
+    /// New display name for the queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///ID of the queue to update
+    /// ID of the queue to update
     pub queue_id: i64,
-    ///Policy keys to recommend when actioning reports in this queue
+    /// Policy keys to recommend when actioning reports in this queue
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recommended_policies: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateQueueOutput<S: BosStr = DefaultStr> {
     pub queue: QueueView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateQueueError {
     /// One or more recommended policy keys do not exist in the configured policy list
     #[serde(rename = "InvalidRecommendedPolicies")]
-    InvalidRecommendedPolicies(Option<SmolStr>),
+    InvalidRecommendedPolicies(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateQueueError {
@@ -103,9 +103,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateQueueResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateQueue<S> {
     const NSID: &'static str = "tools.ozone.queue.updateQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateQueueResponse;
 }
 
@@ -115,16 +114,15 @@ Path: `/xrpc/tools.ozone.queue.updateQueue`. The request payload type is `Update
 pub struct UpdateQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateQueueRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.queue.updateQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateQueue<S>;
     type Response = UpdateQueueResponse;
 }
 
 pub mod update_queue_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -157,7 +155,13 @@ pub mod update_queue_state {
 /// Builder for constructing an instance of this type.
 pub struct UpdateQueueBuilder<St: update_queue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<bool>, Option<S>, Option<i64>, Option<Vec<S>>),
+    _fields: (
+        Option<S>,
+        Option<bool>,
+        Option<S>,
+        Option<i64>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -285,10 +289,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateQueue<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateQueue<S> {
         UpdateQueue {
             description: self._fields.0,
             enabled: self._fields.1,

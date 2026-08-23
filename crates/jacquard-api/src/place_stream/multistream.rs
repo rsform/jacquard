@@ -12,13 +12,12 @@ pub mod list_targets;
 pub mod put_target;
 pub mod target;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,13 +28,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_stream::multistream;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::multistream;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Event<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub message: S,
@@ -48,7 +50,6 @@ pub struct Event<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventStatus<S: BosStr = DefaultStr> {
@@ -135,9 +136,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TargetView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -190,15 +193,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -322,10 +324,7 @@ where
     St::Message: event_state::IsUnset,
 {
     /// Set the `message` field (required)
-    pub fn message(
-        mut self,
-        value: impl Into<S>,
-    ) -> EventBuilder<event_state::SetMessage<St>, S> {
+    pub fn message(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -382,10 +381,10 @@ where
 }
 
 fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.multistream.defs"),
@@ -394,13 +393,11 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("event"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("status"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -413,11 +410,15 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -427,12 +428,11 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("targetView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("record")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("record"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -446,9 +446,7 @@ fn lexicon_doc_place_stream_multistream_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latestEvent"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "place.stream.multistream.defs#event",
-                                ),
+                                r#ref: CowStr::new_static("place.stream.multistream.defs#event"),
                                 ..Default::default()
                             }),
                         );
@@ -483,15 +481,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod target_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -616,10 +613,7 @@ where
 
 impl<St: target_view_state::State, S: BosStr> TargetViewBuilder<St, S> {
     /// Set the `latestEvent` field (optional)
-    pub fn latest_event(
-        mut self,
-        value: impl Into<Option<multistream::Event<S>>>,
-    ) -> Self {
+    pub fn latest_event(mut self, value: impl Into<Option<multistream::Event<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -686,10 +680,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TargetView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TargetView<S> {
         TargetView {
             cid: self._fields.0.unwrap(),
             latest_event: self._fields.1,

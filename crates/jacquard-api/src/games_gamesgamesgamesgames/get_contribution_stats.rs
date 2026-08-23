@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::games_gamesgamesgamesgames::get_contribution_stats;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::get_contribution_stats;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Badge<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -42,9 +45,11 @@ pub struct Badge<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContributionStats<S: BosStr = DefaultStr> {
     pub additions: i64,
     pub corrections: i64,
@@ -61,16 +66,20 @@ pub struct ContributionStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetContributionStats<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetContributionStatsOutput<S: BosStr = DefaultStr> {
     pub badges: Vec<get_contribution_stats::Badge<S>>,
     pub stats: get_contribution_stats::ContributionStats<S>,
@@ -143,17 +152,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_getContributionStats() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.getContributionStats"),
@@ -162,23 +170,27 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContributionStats() -> LexiconDoc<'
             map.insert(
                 SmolStr::new_static("badge"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("id"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -188,16 +200,14 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContributionStats() -> LexiconDoc<'
             map.insert(
                 SmolStr::new_static("contributionStats"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("totalContributions"),
-                            SmolStr::new_static("corrections"),
-                            SmolStr::new_static("additions"),
-                            SmolStr::new_static("newGames"),
-                            SmolStr::new_static("uniqueEntities"),
-                            SmolStr::new_static("ownerAccepted")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("totalContributions"),
+                        SmolStr::new_static("corrections"),
+                        SmolStr::new_static("additions"),
+                        SmolStr::new_static("newGames"),
+                        SmolStr::new_static("uniqueEntities"),
+                        SmolStr::new_static("ownerAccepted"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -245,24 +255,22 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContributionStats() -> LexiconDoc<'
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("did")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("did"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("did")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("did"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -279,15 +287,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod contribution_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -398,10 +405,7 @@ pub mod contribution_stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionStatsBuilder<
-    St: contribution_stats_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ContributionStatsBuilder<St: contribution_stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -416,10 +420,7 @@ pub struct ContributionStatsBuilder<
 
 impl ContributionStats<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ContributionStatsBuilder<
-        contribution_stats_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ContributionStatsBuilder<contribution_stats_state::Empty, DefaultStr> {
         ContributionStatsBuilder::new()
     }
 }
@@ -538,10 +539,7 @@ where
     pub fn total_contributions(
         mut self,
         value: impl Into<i64>,
-    ) -> ContributionStatsBuilder<
-        contribution_stats_state::SetTotalContributions<St>,
-        S,
-    > {
+    ) -> ContributionStatsBuilder<contribution_stats_state::SetTotalContributions<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ContributionStatsBuilder {
             _state: PhantomData,
@@ -593,10 +591,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ContributionStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributionStats<S> {
         ContributionStats {
             additions: self._fields.0.unwrap(),
             corrections: self._fields.1.unwrap(),
@@ -611,7 +606,7 @@ where
 
 pub mod get_contribution_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -653,20 +648,14 @@ pub struct GetContributionStatsBuilder<
 
 impl GetContributionStats<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetContributionStatsBuilder<
-        get_contribution_stats_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetContributionStatsBuilder<get_contribution_stats_state::Empty, DefaultStr> {
         GetContributionStatsBuilder::new()
     }
 }
 
 impl<S: BosStr> GetContributionStats<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetContributionStatsBuilder<
-        get_contribution_stats_state::Empty,
-        S,
-    > {
+    pub fn builder() -> GetContributionStatsBuilder<get_contribution_stats_state::Empty, S> {
         GetContributionStatsBuilder::builder()
     }
 }

@@ -1036,6 +1036,7 @@ mod tests {
             Ok(jacquard_identity::resolver::DidDocResponse {
                 buffer: buf,
                 status: StatusCode::OK,
+                headers: http::HeaderMap::new(),
                 requested: None,
             })
         }

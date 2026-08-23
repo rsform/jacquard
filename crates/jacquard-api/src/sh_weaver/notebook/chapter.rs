@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,15 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::Author;
 use crate::sh_weaver::notebook::ContentRating;
 use crate::sh_weaver::notebook::ContentWarnings;
 use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A grouping of entries in a notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,11 +46,11 @@ pub struct Chapter<S: BosStr = DefaultStr> {
     pub authors: Vec<Author<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_warnings: Option<ContentWarnings<S>>,
-    ///Client-declared timestamp when this was originally created.
+    /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub entry_list: Vec<StrongRef<S>>,
-    ///The notebook this chapter belongs to.
+    /// The notebook this chapter belongs to.
     pub notebook: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<ContentRating<S>>,
@@ -175,9 +175,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -189,7 +188,7 @@ where
 
 pub mod chapter_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -318,10 +317,7 @@ where
 
 impl<St: chapter_state::State, S: BosStr> ChapterBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(
-        mut self,
-        value: impl Into<Option<ContentWarnings<S>>>,
-    ) -> Self {
+    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -460,10 +456,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_chapter() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.chapter"),

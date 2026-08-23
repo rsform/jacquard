@@ -12,7 +12,6 @@ pub mod member;
 pub mod request;
 pub mod ring;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -31,15 +30,18 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RingRef<S: BosStr = DefaultStr> {
-    ///Optional CID for strong reference
+    /// Optional CID for strong reference
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
-    ///AT-URI of the Ring
+    /// AT-URI of the Ring
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -93,15 +95,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod ring_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -230,10 +231,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.defs"),
@@ -249,9 +250,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional CID for strong reference"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional CID for strong reference",
+                                )),
                                 format: Some(LexStringFormat::Cid),
                                 max_length: Some(100usize),
                                 ..Default::default()

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// User subscription to an evaluator service. Published by the user (not the evaluator) to declare they want evaluations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,15 +37,15 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Subscription<S: BosStr = DefaultStr> {
-    ///Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
+    /// Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<S>>,
-    ///Timestamp of when this subscription was created.
+    /// Timestamp of when this subscription was created.
     pub created_at: Datetime,
-    ///Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
+    /// Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation_types: Option<Vec<S>>,
-    ///DID of the evaluator service to subscribe to.
+    /// DID of the evaluator service to subscribe to.
     pub evaluator: Did<S>,
     #[serde(
         flatten,
@@ -124,8 +124,7 @@ impl<S: BosStr> LexiconSchema for Subscription<S> {
         if let Some(values) = &self.collections {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 128usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("collections"),
@@ -149,8 +148,7 @@ impl<S: BosStr> LexiconSchema for Subscription<S> {
         if let Some(values) = &self.evaluation_types {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("evaluation_types"),
@@ -172,9 +170,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -186,7 +183,7 @@ where
 
 pub mod subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -231,7 +228,12 @@ pub mod subscription_state {
 /// Builder for constructing an instance of this type.
 pub struct SubscriptionBuilder<St: subscription_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<S>>, Option<Datetime>, Option<Vec<S>>, Option<Did<S>>),
+    _fields: (
+        Option<Vec<S>>,
+        Option<Datetime>,
+        Option<Vec<S>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -352,10 +354,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Subscription<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subscription<S> {
         Subscription {
             collections: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -367,10 +366,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_evaluator_subscription() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.evaluator.subscription"),

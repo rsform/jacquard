@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A fragrance house or brand
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct House<S: BosStr = DefaultStr> {
-    ///Timestamp when house was created
+    /// Timestamp when house was created
     pub created_at: Datetime,
-    ///House/brand name (must be unique per user)
+    /// House/brand name (must be unique per user)
     pub name: S,
-    ///Timestamp of last update (for name corrections)
+    /// Timestamp of last update (for name corrections)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(
@@ -141,9 +141,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -155,7 +154,7 @@ where
 
 pub mod house_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -265,10 +264,7 @@ where
     St::Name: house_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> HouseBuilder<house_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> HouseBuilder<house_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HouseBuilder {
             _state: PhantomData,
@@ -318,10 +314,10 @@ where
 }
 
 fn lexicon_doc_social_drydown_house() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.drydown.house"),
@@ -333,21 +329,19 @@ fn lexicon_doc_social_drydown_house() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A fragrance house or brand")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when house was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when house was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -355,11 +349,9 @@ fn lexicon_doc_social_drydown_house() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "House/brand name (must be unique per user)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "House/brand name (must be unique per user)",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(100usize),
                                     ..Default::default()
@@ -368,11 +360,9 @@ fn lexicon_doc_social_drydown_house() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp of last update (for name corrections)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp of last update (for name corrections)",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

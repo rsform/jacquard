@@ -10,16 +10,19 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SendBoop<S: BosStr = DefaultStr> {
-    ///The character getting booped
+    /// The character getting booped
     #[serde(skip_serializing_if = "Option::is_none")]
     pub character: Option<SendBoopCharacter<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -105,9 +108,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SendBoopOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -127,9 +132,8 @@ impl jacquard_common::xrpc::XrpcResp for SendBoopResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendBoop<S> {
     const NSID: &'static str = "stream.kralsei.score.sendBoop";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = SendBoopResponse;
 }
 
@@ -139,9 +143,8 @@ Path: `/xrpc/stream.kralsei.score.sendBoop`. The request payload type is `SendBo
 pub struct SendBoopRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendBoopRequest {
     const PATH: &'static str = "/xrpc/stream.kralsei.score.sendBoop";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = SendBoop<S>;
     type Response = SendBoopResponse;
 }

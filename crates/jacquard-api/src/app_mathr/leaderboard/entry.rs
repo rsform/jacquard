@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A verified leaderboard entry stored in the mathr.app official repository
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,30 +37,30 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Entry<S: BosStr = DefaultStr> {
-    ///Timestamp when the score was verified and added to the leaderboard
+    /// Timestamp when the score was verified and added to the leaderboard
     pub created_at: Datetime,
-    ///The highest level reached by the player
+    /// The highest level reached by the player
     pub level: i64,
-    ///Success rate as a percentage (0-100)
+    /// Success rate as a percentage (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub percentage: Option<i64>,
-    ///URL to the player's avatar at the time of submission
+    /// URL to the player's avatar at the time of submission
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_avatar: Option<UriValue<S>>,
-    ///The DID of the player who achieved this score
+    /// The DID of the player who achieved this score
     pub player_did: Did<S>,
-    ///The player's display name at the time of submission
+    /// The player's display name at the time of submission
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_display_name: Option<S>,
-    ///The player's handle at the time of submission
+    /// The player's handle at the time of submission
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_handle: Option<S>,
-    ///Optional AT URI to the player's Bluesky post announcing the score
+    /// Optional AT URI to the player's Bluesky post announcing the score
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_uri: Option<AtUri<S>>,
-    ///Total number of challenges attempted
+    /// Total number of challenges attempted
     pub total_challenges: i64,
-    ///Total number of correct answers
+    /// Total number of correct answers
     pub total_successes: i64,
     #[serde(
         flatten,
@@ -185,9 +185,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -199,7 +198,7 @@ where
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -368,10 +367,7 @@ where
     St::Level: entry_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(
-        mut self,
-        value: impl Into<i64>,
-    ) -> EntryBuilder<entry_state::SetLevel<St>, S> {
+    pub fn level(mut self, value: impl Into<i64>) -> EntryBuilder<entry_state::SetLevel<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -547,10 +543,10 @@ where
 }
 
 fn lexicon_doc_app_mathr_leaderboard_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.mathr.leaderboard.entry"),

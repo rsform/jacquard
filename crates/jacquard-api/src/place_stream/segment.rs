@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,16 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
 use crate::place_stream::segment;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Audio<S: BosStr = DefaultStr> {
     pub channels: i64,
     pub codec: AudioCodec<S>,
@@ -46,7 +49,6 @@ pub struct Audio<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AudioCodec<S: BosStr = DefaultStr> {
@@ -125,9 +127,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Framerate<S: BosStr = DefaultStr> {
     pub den: i64,
     pub num: i64,
@@ -159,17 +163,17 @@ pub struct Segment<S: BosStr = DefaultStr> {
     pub creator: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distribution_policy: Option<DistributionPolicy<S>>,
-    ///The duration of the segment in nanoseconds
+    /// The duration of the segment in nanoseconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
-    ///Unique identifier for the segment
+    /// Unique identifier for the segment
     pub id: S,
-    ///The DID of the signing key used for this segment
+    /// The DID of the signing key used for this segment
     pub signing_key: S,
-    ///The size of the segment in bytes
+    /// The size of the segment in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
-    ///When this segment started
+    /// When this segment started
     pub start_time: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub video: Option<Vec<segment::Video<S>>>,
@@ -193,9 +197,11 @@ pub struct SegmentGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Segment<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SegmentView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub record: Data<S>,
@@ -208,9 +214,11 @@ pub struct SegmentView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Video<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bframes: Option<bool>,
@@ -227,7 +235,6 @@ pub struct Video<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VideoCodec<S: BosStr = DefaultStr> {
@@ -417,15 +424,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod audio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -568,10 +574,7 @@ where
     St::Rate: audio_state::IsUnset,
 {
     /// Set the `rate` field (required)
-    pub fn rate(
-        mut self,
-        value: impl Into<i64>,
-    ) -> AudioBuilder<audio_state::SetRate<St>, S> {
+    pub fn rate(mut self, value: impl Into<i64>) -> AudioBuilder<audio_state::SetRate<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AudioBuilder {
             _state: PhantomData,
@@ -609,10 +612,10 @@ where
 }
 
 fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.segment"),
@@ -621,12 +624,11 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("audio"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("codec"), SmolStr::new_static("rate"),
-                            SmolStr::new_static("channels")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("codec"),
+                        SmolStr::new_static("rate"),
+                        SmolStr::new_static("channels"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -638,7 +640,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("codec"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rate"),
@@ -654,9 +658,7 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("framerate"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("num"), SmolStr::new_static("den")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("num"), SmolStr::new_static("den")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -680,21 +682,17 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Media file representing a segment of a livestream",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Media file representing a segment of a livestream",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("id"),
-                                SmolStr::new_static("signingKey"),
-                                SmolStr::new_static("startTime"),
-                                SmolStr::new_static("creator")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("id"),
+                            SmolStr::new_static("signingKey"),
+                            SmolStr::new_static("startTime"),
+                            SmolStr::new_static("creator"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -751,20 +749,18 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("id"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Unique identifier for the segment"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Unique identifier for the segment",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("signingKey"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The DID of the signing key used for this segment",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The DID of the signing key used for this segment",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
@@ -777,9 +773,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startTime"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("When this segment started"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "When this segment started",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -804,9 +800,10 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("segmentView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("cid"), SmolStr::new_static("record")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("record"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -831,12 +828,11 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("video"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("codec"), SmolStr::new_static("width"),
-                            SmolStr::new_static("height")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("codec"),
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -848,7 +844,9 @@ fn lexicon_doc_place_stream_segment() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("codec"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("framerate"),
@@ -887,15 +885,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod framerate_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1033,10 +1030,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Framerate<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Framerate<S> {
         Framerate {
             den: self._fields.0.unwrap(),
             num: self._fields.1.unwrap(),
@@ -1052,9 +1046,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1066,7 +1059,7 @@ where
 
 pub mod segment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1176,7 +1169,9 @@ impl SegmentBuilder<segment_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SegmentBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1187,7 +1182,9 @@ impl<S: BosStr> SegmentBuilder<segment_state::Empty, S> {
     pub fn builder() -> Self {
         SegmentBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1221,10 +1218,7 @@ impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
 
 impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(
-        mut self,
-        value: impl Into<Option<ContentWarnings<S>>>,
-    ) -> Self {
+    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1256,18 +1250,12 @@ where
 
 impl<St: segment_state::State, S: BosStr> SegmentBuilder<St, S> {
     /// Set the `distributionPolicy` field (optional)
-    pub fn distribution_policy(
-        mut self,
-        value: impl Into<Option<DistributionPolicy<S>>>,
-    ) -> Self {
+    pub fn distribution_policy(mut self, value: impl Into<Option<DistributionPolicy<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `distributionPolicy` field to an Option value (optional)
-    pub fn maybe_distribution_policy(
-        mut self,
-        value: Option<DistributionPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_distribution_policy(mut self, value: Option<DistributionPolicy<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1292,10 +1280,7 @@ where
     St::Id: segment_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<S>,
-    ) -> SegmentBuilder<segment_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<S>) -> SegmentBuilder<segment_state::SetId<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SegmentBuilder {
             _state: PhantomData,
@@ -1420,15 +1405,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod segment_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1566,10 +1550,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SegmentView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SegmentView<S> {
         SegmentView {
             cid: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -1585,15 +1566,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod video_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1749,10 +1729,7 @@ where
     St::Height: video_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VideoBuilder<video_state::SetHeight<St>, S> {
+    pub fn height(mut self, value: impl Into<i64>) -> VideoBuilder<video_state::SetHeight<St>, S> {
         self._fields.3 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,
@@ -1768,10 +1745,7 @@ where
     St::Width: video_state::IsUnset,
 {
     /// Set the `width` field (required)
-    pub fn width(
-        mut self,
-        value: impl Into<i64>,
-    ) -> VideoBuilder<video_state::SetWidth<St>, S> {
+    pub fn width(mut self, value: impl Into<i64>) -> VideoBuilder<video_state::SetWidth<St>, S> {
         self._fields.4 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,

@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdatePreferences<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_notifications: Option<bool>,
@@ -68,9 +71,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdatePreferencesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdatePreferences<S> {
     const NSID: &'static str = "org.tangled.temp.notification.updatePreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdatePreferencesResponse;
 }
 
@@ -80,9 +82,8 @@ Path: `/xrpc/org.tangled.temp.notification.updatePreferences`. The request paylo
 pub struct UpdatePreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdatePreferencesRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.notification.updatePreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdatePreferences<S>;
     type Response = UpdatePreferencesResponse;
 }

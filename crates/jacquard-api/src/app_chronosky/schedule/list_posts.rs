@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,9 +21,6 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::external::ExternalRecord;
 use crate::app_bsky::embed::images::Images;
 use crate::app_bsky::embed::record::Record;
@@ -34,14 +31,20 @@ use crate::app_bsky::feed::threadgate::FollowingRule;
 use crate::app_bsky::feed::threadgate::ListRule;
 use crate::app_bsky::feed::threadgate::MentionRule;
 use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::label::SelfLabels;
 use crate::app_chronosky::schedule::list_posts;
+use crate::com_atproto::label::SelfLabels;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Image embed view with CID references. Similar to app.bsky.embed.images#view but includes cid on each image.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageView<S: BosStr = DefaultStr> {
-    ///List of image views with CID references.
+    /// List of image views with CID references.
     pub images: Vec<list_posts::ImageViewImage<S>>,
     #[serde(
         flatten,
@@ -55,16 +58,19 @@ pub struct ImageView<S: BosStr = DefaultStr> {
 /// Image view with CID for referencing in updatePost. Extends app.bsky.embed.images#viewImage with cid field.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageViewImage<S: BosStr = DefaultStr> {
-    ///Alt text for the image.
+    /// Alt text for the image.
     pub alt: S,
-    ///CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
+    /// CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<S>,
-    ///Full-size URL for the image.
+    /// Full-size URL for the image.
     pub fullsize: S,
-    ///Thumbnail URL for the image.
+    /// Thumbnail URL for the image.
     pub thumb: S,
     #[serde(
         flatten,
@@ -166,9 +172,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListPosts<S: BosStr = DefaultStr> {
     /// Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -183,9 +191,11 @@ pub struct ListPosts<S: BosStr = DefaultStr> {
     pub status: Option<ListPostsStatus<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListPostsOutput<S: BosStr = DefaultStr> {
     pub pagination: list_posts::Pagination<S>,
     pub posts: Vec<list_posts::ScheduledPost<S>>,
@@ -196,15 +206,18 @@ pub struct ListPostsOutput<S: BosStr = DefaultStr> {
 /// Pagination information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Pagination<S: BosStr = DefaultStr> {
-    ///Posts per page.
+    /// Posts per page.
     pub limit: i64,
-    ///Current page number.
+    /// Current page number.
     pub page: i64,
-    ///Total number of posts.
+    /// Total number of posts.
     pub total: i64,
-    ///Total number of pages.
+    /// Total number of pages.
     pub total_pages: i64,
     #[serde(
         flatten,
@@ -218,76 +231,79 @@ pub struct Pagination<S: BosStr = DefaultStr> {
 /// Scheduled post object with AT Protocol standard fields.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduledPost<S: BosStr = DefaultStr> {
-    ///AT Protocol record key. Present after successful execution.
+    /// AT Protocol record key. Present after successful execution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_rkey: Option<S>,
-    ///AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.
+    /// AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_uri: Option<S>,
-    ///Child posts in thread. Only present for parent posts with children.
+    /// Child posts in thread. Only present for parent posts with children.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<list_posts::ScheduledPost<S>>>,
-    ///Post creation datetime (ISO 8601).
+    /// Post creation datetime (ISO 8601).
     pub created_at: Datetime,
-    ///Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.
+    /// Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<ScheduledPostEmbed<S>>,
-    ///Error message if execution failed. Present only when status is FAILED.
+    /// Error message if execution failed. Present only when status is FAILED.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_msg: Option<S>,
-    ///Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.
+    /// Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub executed_at: Option<Datetime>,
-    ///Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).
+    /// Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///Post ID.
+    /// Post ID.
     pub id: S,
-    ///Self-applied content labels for content warnings (AT Protocol standard).
+    /// Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.
+    /// Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.
     pub langs: Vec<Language>,
-    ///Parent post ID for thread posts. Null for root posts.
+    /// Parent post ID for thread posts. Null for root posts.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_post_id: Option<S>,
-    ///CID for postgate record. Present after successful execution with postgate settings.
+    /// CID for postgate record. Present after successful execution with postgate settings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub postgate_cid: Option<S>,
-    ///Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate).
+    /// Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub postgate_disable_embedding: Option<bool>,
-    ///AT Protocol URI for postgate record. Present after successful execution with postgate settings.
+    /// AT Protocol URI for postgate record. Present after successful execution with postgate settings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub postgate_uri: Option<S>,
-    ///Number of execution retry attempts.
+    /// Number of execution retry attempts.
     pub retry_count: i64,
-    ///Scheduled publication datetime (ISO 8601).
+    /// Scheduled publication datetime (ISO 8601).
     pub scheduled_at: Datetime,
-    ///Post status.
+    /// Post status.
     pub status: ScheduledPostStatus<S>,
-    ///Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
+    /// Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
     pub text: S,
-    ///Thread depth level (0 for root post, 1 for direct reply, etc.).
+    /// Thread depth level (0 for root post, 1 for direct reply, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_depth: Option<i64>,
-    ///Position in thread (0-indexed). 0 for parent post, 1+ for children.
+    /// Position in thread (0-indexed). 0 for parent post, 1+ for children.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_position: Option<i64>,
-    ///CID for threadgate record. Present after successful execution with threadgate rules.
+    /// CID for threadgate record. Present after successful execution with threadgate rules.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threadgate_cid: Option<S>,
-    ///Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.
+    /// Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threadgate_rules: Option<Vec<ScheduledPostThreadgateRulesItem<S>>>,
-    ///AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.
+    /// AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threadgate_uri: Option<S>,
-    ///Post last update datetime (ISO 8601).
+    /// Post last update datetime (ISO 8601).
     pub updated_at: Datetime,
-    ///User ID who created this post.
+    /// User ID who created this post.
     pub user_id: S,
     #[serde(
         flatten,
@@ -297,7 +313,6 @@ pub struct ScheduledPost<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -407,7 +422,6 @@ where
         }
     }
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -765,15 +779,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -878,10 +891,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageView<S> {
         ImageView {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -890,10 +900,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_schedule_listPosts() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.schedule.listPosts"),
@@ -996,38 +1006,34 @@ fn lexicon_doc_app_chronosky_schedule_listPosts() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("page"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("status"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Filter by post status."),
-                                        ),
-                                        max_length: Some(20usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("limit"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("page"),
+                                LexXrpcParametersProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("status"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Filter by post status.")),
+                                    max_length: Some(20usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -1035,13 +1041,12 @@ fn lexicon_doc_app_chronosky_schedule_listPosts() -> LexiconDoc<'static> {
                 SmolStr::new_static("pagination"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Pagination information.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("page"), SmolStr::new_static("limit"),
-                            SmolStr::new_static("total"),
-                            SmolStr::new_static("totalPages")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("page"),
+                        SmolStr::new_static("limit"),
+                        SmolStr::new_static("total"),
+                        SmolStr::new_static("totalPages"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1424,9 +1429,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1440,7 +1444,7 @@ fn _default_page() -> Option<i64> {
 
 pub mod list_posts_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1560,15 +1564,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod pagination_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1778,10 +1781,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Pagination<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pagination<S> {
         Pagination {
             limit: self._fields.0.unwrap(),
             page: self._fields.1.unwrap(),
@@ -1799,15 +1799,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod scheduled_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1990,10 +1989,7 @@ pub mod scheduled_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScheduledPostBuilder<
-    St: scheduled_post_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ScheduledPostBuilder<St: scheduled_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -2046,32 +2042,8 @@ impl ScheduledPostBuilder<scheduled_post_state::Empty, DefaultStr> {
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2084,32 +2056,8 @@ impl<S: BosStr> ScheduledPostBuilder<scheduled_post_state::Empty, S> {
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2144,18 +2092,12 @@ impl<St: scheduled_post_state::State, S: BosStr> ScheduledPostBuilder<St, S> {
 
 impl<St: scheduled_post_state::State, S: BosStr> ScheduledPostBuilder<St, S> {
     /// Set the `children` field (optional)
-    pub fn children(
-        mut self,
-        value: impl Into<Option<Vec<list_posts::ScheduledPost<S>>>>,
-    ) -> Self {
+    pub fn children(mut self, value: impl Into<Option<Vec<list_posts::ScheduledPost<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(
-        mut self,
-        value: Option<Vec<list_posts::ScheduledPost<S>>>,
-    ) -> Self {
+    pub fn maybe_children(mut self, value: Option<Vec<list_posts::ScheduledPost<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2566,10 +2508,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ScheduledPost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScheduledPost<S> {
         ScheduledPost {
             at_rkey: self._fields.0,
             at_uri: self._fields.1,

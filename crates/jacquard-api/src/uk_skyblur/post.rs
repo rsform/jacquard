@@ -12,13 +12,12 @@ pub mod encrypt;
 pub mod get_post;
 pub mod store;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,7 +34,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record containing a Skyblur post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,18 +45,18 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
-    ///The post additional contents.
+    /// The post additional contents.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
-    ///Created date assigned by client
+    /// Created date assigned by client
     pub created_at: Datetime,
-    ///Encrypted post body. It shoud be decrypted by the client with AES-256.
+    /// Encrypted post body. It shoud be decrypted by the client with AES-256.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub encrypt_body: Option<BlobRef<S>>,
-    ///The post main contents. Blurred text must be enclosed in brackets [].
+    /// The post main contents. Blurred text must be enclosed in brackets [].
     pub text: S,
     pub uri: AtUri<S>,
-    ///For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody. 'followers' restricted to author's followers. 'following' restricted to users author follows. 'mutual' restricted to mutual followers.
+    /// For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody. 'followers' restricted to author's followers. 'following' restricted to users author follows. 'mutual' restricted to mutual followers.
     pub visibility: PostVisibility<S>,
     #[serde(
         flatten,
@@ -299,9 +298,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -313,7 +311,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -486,10 +484,7 @@ where
     St::Text: post_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetText<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -505,10 +500,7 @@ where
     St::Uri: post_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> PostBuilder<post_state::SetUri<St>, S> {
+    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> PostBuilder<post_state::SetUri<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -572,10 +564,10 @@ where
 }
 
 fn lexicon_doc_uk_skyblur_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("uk.skyblur.post"),

@@ -10,26 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
-use jacquard_common::types::string::{Did, Nsid, Tid, Cid, RecordKey, Rkey};
+use jacquard_common::types::string::{Cid, Did, Nsid, RecordKey, Rkey, Tid};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::space::SignedCommit;
 use crate::com_atproto::space::list_repo_ops;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListRepoOps<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -47,14 +50,16 @@ pub struct ListRepoOps<S: BosStr = DefaultStr> {
     pub space: AtSpaceUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListRepoOpsOutput<S: BosStr = DefaultStr> {
-    ///The account's current signed commit. Included when the response reaches the head of the oplog; omitted on backfill responses.
+    /// The account's current signed commit. Included when the response reaches the head of the oplog; omitted on backfill responses.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit: Option<SignedCommit<S>>,
-    ///Pass as `cursor` to fetch the next page. Absent once the response reaches the head of the oplog.
+    /// Pass as `cursor` to fetch the next page. Absent once the response reaches the head of the oplog.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub ops: Vec<list_repo_ops::OpEntry<S>>,
@@ -62,33 +67,28 @@ pub struct ListRepoOpsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ListRepoOpsError {
     #[serde(rename = "SpaceNotFound")]
-    SpaceNotFound(Option<SmolStr>),
+    SpaceNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<SmolStr>),
+    RepoNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<SmolStr>),
+    RepoTakendown(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<SmolStr>),
+    RepoSuspended(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<SmolStr>),
+    RepoDeactivated(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ListRepoOpsError {
@@ -143,7 +143,10 @@ impl core::fmt::Display for ListRepoOpsError {
 /// A single operation in a permissioned repo's oplog. cid is null for deletes; prev is null for creates. Operations sharing the same rev belong to the same batch. value carries the record's current value for creates and updates, unless excludeValues was set or the value is stale (superseded by a later operation).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OpEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -152,7 +155,7 @@ pub struct OpEntry<S: BosStr = DefaultStr> {
     pub prev: Option<Cid<S>>,
     pub rev: Tid,
     pub rkey: RecordKey<Rkey<S>>,
-    ///The record's current value, inlined for create and update operations. Omitted when excludeValues is set, for deletes, or when the value has been superseded by a later operation.
+    /// The record's current value, inlined for create and update operations. Omitted when excludeValues is set, for deletes, or when the value has been superseded by a later operation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<Data<S>>,
     #[serde(
@@ -217,7 +220,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_repo_ops_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -425,15 +428,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod op_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -590,10 +592,7 @@ where
     St::Rev: op_entry_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(
-        mut self,
-        value: impl Into<Tid>,
-    ) -> OpEntryBuilder<op_entry_state::SetRev<St>, S> {
+    pub fn rev(mut self, value: impl Into<Tid>) -> OpEntryBuilder<op_entry_state::SetRev<St>, S> {
         self._fields.3 = Option::Some(value.into());
         OpEntryBuilder {
             _state: PhantomData,
@@ -669,10 +668,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_space_listRepoOps() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.space.listRepoOps"),

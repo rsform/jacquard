@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notebook::FeedEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notebook::FeedEntryView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetEntryFeedAlgorithm<S: BosStr = DefaultStr> {
@@ -90,16 +90,16 @@ where
         match self {
             GetEntryFeedAlgorithm::Chronological => GetEntryFeedAlgorithm::Chronological,
             GetEntryFeedAlgorithm::Popular => GetEntryFeedAlgorithm::Popular,
-            GetEntryFeedAlgorithm::Other(v) => {
-                GetEntryFeedAlgorithm::Other(v.into_static())
-            }
+            GetEntryFeedAlgorithm::Other(v) => GetEntryFeedAlgorithm::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetEntryFeed<S: BosStr = DefaultStr> {
     /// Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
@@ -117,9 +117,11 @@ pub struct GetEntryFeed<S: BosStr = DefaultStr> {
     pub tags: Option<Vec<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetEntryFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -156,10 +158,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
     type Response = GetEntryFeedResponse;
 }
 
-fn _default_algorithm<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetEntryFeedAlgorithm<S>,
-> {
-    Some(<GetEntryFeedAlgorithm<S>>::from_value(S::from_static("chronological")))
+fn _default_algorithm<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetEntryFeedAlgorithm<S>> {
+    Some(<GetEntryFeedAlgorithm<S>>::from_value(S::from_static(
+        "chronological",
+    )))
 }
 
 fn _default_limit() -> Option<i64> {
@@ -168,7 +171,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_entry_feed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,10 +239,7 @@ impl<S: BosStr> GetEntryFeedBuilder<get_entry_feed_state::Empty, S> {
 
 impl<St: get_entry_feed_state::State, S: BosStr> GetEntryFeedBuilder<St, S> {
     /// Set the `algorithm` field (optional)
-    pub fn algorithm(
-        mut self,
-        value: impl Into<Option<GetEntryFeedAlgorithm<S>>>,
-    ) -> Self {
+    pub fn algorithm(mut self, value: impl Into<Option<GetEntryFeedAlgorithm<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }

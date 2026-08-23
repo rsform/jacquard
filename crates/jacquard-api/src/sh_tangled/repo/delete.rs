@@ -10,28 +10,31 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Delete<S: BosStr = DefaultStr> {
-    ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    /// DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
-    ///Admin-only. Delete even though the repository record still exists on the owner's PDS.
+    /// Admin-only. Delete even though the repository record still exists on the owner's PDS.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub force: Option<bool>,
-    ///Name of the repository to delete. A knot without the repo-did-input capability reads this and DID in place of repo.
+    /// Name of the repository to delete. A knot without the repo-did-input capability reads this and DID in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///DID of the repository to delete
+    /// DID of the repository to delete
     pub repo: Did<S>,
-    ///Rkey of the repository record. A knot without the repo-did-input capability checks this against the owner's PDS.
+    /// Rkey of the repository record. A knot without the repo-did-input capability checks this against the owner's PDS.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rkey: Option<RecordKey<Rkey<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,9 +66,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Delete<S> {
     const NSID: &'static str = "sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteResponse;
 }
 
@@ -75,16 +77,15 @@ Path: `/xrpc/sh.tangled.repo.delete`. The request payload type is `Delete<S>`; s
 pub struct DeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Delete<S>;
     type Response = DeleteResponse;
 }
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,10 +209,7 @@ where
     St::Repo: delete_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> DeleteBuilder<delete_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> DeleteBuilder<delete_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,

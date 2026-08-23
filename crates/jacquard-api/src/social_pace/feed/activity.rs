@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_pace::feed::ActivityType;
 use crate::social_pace::feed::Split;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,28 +40,28 @@ use crate::social_pace::feed::Split;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Activity<S: BosStr = DefaultStr> {
-    ///The number of active calories burned during the activity.
+    /// The number of active calories burned during the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
-    ///When the activity was created
+    /// When the activity was created
     pub created_at: Datetime,
-    ///The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.
+    /// The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance: Option<S>,
-    ///The units used for distance measurement.
+    /// The units used for distance measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance_units: Option<ActivityDistanceUnits<S>>,
-    ///When the activity ended.
+    /// When the activity ended.
     pub ended_at: Datetime,
-    ///An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
+    /// An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub route: Option<BlobRef<S>>,
-    ///Array of splits if any.
+    /// Array of splits if any.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub splits: Option<Vec<Split<S>>>,
-    ///When the activity was started.
+    /// When the activity was started.
     pub started_at: Datetime,
-    ///The number of steps taken during the activity.
+    /// The number of steps taken during the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
     pub r#type: ActivityType<S>,
@@ -156,9 +156,7 @@ where
             ActivityDistanceUnits::Miles => ActivityDistanceUnits::Miles,
             ActivityDistanceUnits::Meters => ActivityDistanceUnits::Meters,
             ActivityDistanceUnits::Kilometers => ActivityDistanceUnits::Kilometers,
-            ActivityDistanceUnits::Other(v) => {
-                ActivityDistanceUnits::Other(v.into_static())
-            }
+            ActivityDistanceUnits::Other(v) => ActivityDistanceUnits::Other(v.into_static()),
         }
     }
 }
@@ -231,29 +229,23 @@ impl<S: BosStr> LexiconSchema for Activity<S> {
         if let Some(ref value) = self.route {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "application/vnd.garmin.tcx+xml",
-                    "application/gpx+xml.",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let accepted: &[&str] = &["application/vnd.garmin.tcx+xml", "application/gpx+xml."];
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("route"),
                         accepted: vec![
                             "application/vnd.garmin.tcx+xml".to_string(),
-                            "application/gpx+xml.".to_string()
+                            "application/gpx+xml.".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -282,9 +274,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -296,7 +287,7 @@ where
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -469,18 +460,12 @@ impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
 
 impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
     /// Set the `distanceUnits` field (optional)
-    pub fn distance_units(
-        mut self,
-        value: impl Into<Option<ActivityDistanceUnits<S>>>,
-    ) -> Self {
+    pub fn distance_units(mut self, value: impl Into<Option<ActivityDistanceUnits<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
-    pub fn maybe_distance_units(
-        mut self,
-        value: Option<ActivityDistanceUnits<S>>,
-    ) -> Self {
+    pub fn maybe_distance_units(mut self, value: Option<ActivityDistanceUnits<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -625,10 +610,10 @@ where
 }
 
 fn lexicon_doc_social_pace_feed_activity() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.feed.activity"),

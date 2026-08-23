@@ -10,39 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Merge<S: BosStr = DefaultStr> {
-    ///Author email for the merge commit
+    /// Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author_email: Option<S>,
-    ///Author name for the merge commit
+    /// Author name for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author_name: Option<S>,
-    ///Target branch to merge into
+    /// Target branch to merge into
     pub branch: S,
-    ///Additional commit message body
+    /// Additional commit message body
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit_body: Option<S>,
-    ///Merge commit message
+    /// Merge commit message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit_message: Option<S>,
-    ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    /// DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
-    ///Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo.
+    /// Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Patch content to merge
+    /// Patch content to merge
     pub patch: S,
-    ///DID of the repository
+    /// DID of the repository
     pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -73,9 +76,8 @@ impl jacquard_common::xrpc::XrpcResp for MergeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
     const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = MergeResponse;
 }
 
@@ -85,16 +87,15 @@ Path: `/xrpc/sh.tangled.repo.merge`. The request payload type is `Merge<S>`; sen
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Merge<S>;
     type Response = MergeResponse;
 }
 
 pub mod merge_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -235,10 +236,7 @@ where
     St::Branch: merge_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeBuilder<merge_state::SetBranch<St>, S> {
+    pub fn branch(mut self, value: impl Into<S>) -> MergeBuilder<merge_state::SetBranch<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -306,10 +304,7 @@ where
     St::Patch: merge_state::IsUnset,
 {
     /// Set the `patch` field (required)
-    pub fn patch(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeBuilder<merge_state::SetPatch<St>, S> {
+    pub fn patch(mut self, value: impl Into<S>) -> MergeBuilder<merge_state::SetPatch<St>, S> {
         self._fields.7 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -325,10 +320,7 @@ where
     St::Repo: merge_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> MergeBuilder<merge_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> MergeBuilder<merge_state::SetRepo<St>, S> {
         self._fields.8 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,

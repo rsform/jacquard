@@ -23,17 +23,20 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A named value with a numeric index for sorting.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Indexable<S: BosStr = DefaultStr> {
-    ///The internal ID for the value, limited to the RecordKey character set.
+    /// The internal ID for the value, limited to the RecordKey character set.
     pub id: RecordKey<Rkey<S>>,
-    ///The numeric index used for sorting.
+    /// The numeric index used for sorting.
     pub index: i64,
-    ///The human-readable name of the value for displaying in UIs.
+    /// The human-readable name of the value for displaying in UIs.
     pub name: Data<S>,
     #[serde(
         flatten,
@@ -47,12 +50,15 @@ pub struct Indexable<S: BosStr = DefaultStr> {
 /// A typed record reference that does not require a CID hash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TypedRef<S: BosStr = DefaultStr> {
-    ///The AT URI of the record this object references.
+    /// The AT URI of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<AtUri<S>>,
-    ///The type of the record this object references.
+    /// The type of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<RecordKey<Rkey<S>>>,
     #[serde(
@@ -123,15 +129,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod indexable_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -304,10 +309,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Indexable<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Indexable<S> {
         Indexable {
             id: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -318,10 +320,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.types"),
@@ -379,22 +381,18 @@ fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("typedRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A typed record reference that does not require a CID hash.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A typed record reference that does not require a CID hash.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("ref"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The AT URI of the record this object references.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The AT URI of the record this object references.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -402,11 +400,9 @@ fn lexicon_doc_dev_tsunagite_types() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The type of the record this object references.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The type of the record this object references.",
+                                )),
                                 format: Some(LexStringFormat::RecordKey),
                                 ..Default::default()
                             }),
@@ -429,8 +425,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

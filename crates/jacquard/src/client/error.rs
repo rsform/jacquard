@@ -444,7 +444,11 @@ mod tests {
 
     #[test]
     fn agent_error_source_downcast_client_error() {
-        let err = AgentError::from(ClientError::http(http::StatusCode::CONFLICT, None));
+        let err = AgentError::from(ClientError::http(
+            http::StatusCode::CONFLICT,
+            http::HeaderMap::new(),
+            None,
+        ));
         let typed = err.source_downcast::<ClientError>();
         assert!(typed.is_some());
         assert!(typed.unwrap().is_conflict());
@@ -452,7 +456,11 @@ mod tests {
 
     #[test]
     fn agent_error_client_error() {
-        let err = AgentError::from(ClientError::http(http::StatusCode::NOT_FOUND, None));
+        let err = AgentError::from(ClientError::http(
+            http::StatusCode::NOT_FOUND,
+            http::HeaderMap::new(),
+            None,
+        ));
         assert!(err.client_error().is_some());
         assert!(err.client_error().unwrap().is_not_found());
     }
@@ -471,7 +479,11 @@ mod tests {
 
     #[test]
     fn agent_error_is_not_conflict_for_non_conflict() {
-        let err = AgentError::from(ClientError::http(http::StatusCode::NOT_FOUND, None));
+        let err = AgentError::from(ClientError::http(
+            http::StatusCode::NOT_FOUND,
+            http::HeaderMap::new(),
+            None,
+        ));
         assert!(err.client_error().unwrap().is_conflict() == false);
     }
 

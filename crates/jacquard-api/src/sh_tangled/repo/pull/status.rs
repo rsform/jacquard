@@ -10,13 +10,12 @@ pub mod closed;
 pub mod merged;
 pub mod open;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,7 +31,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -44,7 +43,7 @@ use serde::{Serialize, Deserialize};
 pub struct Status<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub pull: AtUri<S>,
-    ///status of the pull request  Defaults to `"sh.tangled.repo.pull.status.open"`.
+    /// status of the pull request  Defaults to `"sh.tangled.repo.pull.status.open"`.
     #[serde(default = "_default_status_status")]
     pub status: StatusStatus<S>,
     #[serde(
@@ -131,9 +130,7 @@ where
     type Output = StatusStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            StatusStatus::ShTangledRepoPullStatusOpen => {
-                StatusStatus::ShTangledRepoPullStatusOpen
-            }
+            StatusStatus::ShTangledRepoPullStatusOpen => StatusStatus::ShTangledRepoPullStatusOpen,
             StatusStatus::ShTangledRepoPullStatusClosed => {
                 StatusStatus::ShTangledRepoPullStatusClosed
             }
@@ -211,9 +208,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -229,7 +225,7 @@ fn _default_status_status<S: FromStaticStr + BosStr>() -> StatusStatus<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -413,10 +409,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.pull.status"),
@@ -427,12 +423,11 @@ fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("pull"), SmolStr::new_static("status"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("pull"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -453,9 +448,9 @@ fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("status of the pull request"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "status of the pull request",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

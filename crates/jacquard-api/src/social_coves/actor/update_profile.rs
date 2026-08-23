@@ -10,45 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateProfile<S: BosStr = DefaultStr> {
-    ///Base64-encoded avatar image data (png, jpeg, or webp; decoded size limit 1MB)
+    /// Base64-encoded avatar image data (png, jpeg, or webp; decoded size limit 1MB)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_blob: Option<S>,
-    ///MIME type of the avatar image (image/png, image/jpeg, image/webp)
+    /// MIME type of the avatar image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar_mime_type: Option<S>,
-    ///Base64-encoded banner image data (png, jpeg, or webp; decoded size limit 2MB)
+    /// Base64-encoded banner image data (png, jpeg, or webp; decoded size limit 2MB)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_blob: Option<S>,
-    ///MIME type of the banner image (image/png, image/jpeg, image/webp)
+    /// MIME type of the banner image (image/png, image/jpeg, image/webp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_mime_type: Option<S>,
-    ///User bio. Stored as the `description` field of the social.coves.actor.profile record.
+    /// User bio. Stored as the `description` field of the social.coves.actor.profile record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<S>,
-    ///Optional display name
+    /// Optional display name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateProfileOutput<S: BosStr = DefaultStr> {
-    ///CID of the updated profile record
+    /// CID of the updated profile record
     pub cid: Cid<S>,
-    ///AT-URI of the updated profile record
+    /// AT-URI of the updated profile record
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -67,9 +72,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateProfileResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateProfile<S> {
     const NSID: &'static str = "social.coves.actor.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateProfileResponse;
 }
 
@@ -79,9 +83,8 @@ Path: `/xrpc/social.coves.actor.updateProfile`. The request payload type is `Upd
 pub struct UpdateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateProfileRequest {
     const PATH: &'static str = "/xrpc/social.coves.actor.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateProfile<S>;
     type Response = UpdateProfileResponse;
 }

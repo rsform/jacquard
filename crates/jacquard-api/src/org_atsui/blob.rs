@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,14 +21,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 use crate::org_atsui::blob;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -41,19 +44,21 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Blob<S: BosStr = DefaultStr> {
-    ///DID of the blob owner. Used to resolve blob URLs.
+    /// DID of the blob owner. Used to resolve blob URLs.
     pub did: Did<S>,
-    ///When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
+    /// When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fit: Option<BlobFit<S>>,
-    ///Known aspect ratio for CLS prevention. Reserves space before the image loads.
+    /// Known aspect ratio for CLS prevention. Reserves space before the image loads.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ratio: Option<blob::AspectRatio<S>>,
-    ///Blob ref for the image.
+    /// Blob ref for the image.
     pub src: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -138,9 +143,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlobOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -196,9 +203,8 @@ impl jacquard_common::xrpc::XrpcResp for BlobResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Blob<S> {
     const NSID: &'static str = "org.atsui.Blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = BlobResponse;
 }
 
@@ -208,9 +214,8 @@ Path: `/xrpc/org.atsui.Blob`. The request payload type is `Blob<S>`; send that r
 pub struct BlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Blob<S>;
     type Response = BlobResponse;
 }
@@ -222,15 +227,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -368,10 +372,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -381,10 +382,10 @@ where
 }
 
 fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atsui.Blob"),
@@ -393,9 +394,10 @@ fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -486,7 +488,7 @@ fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -582,10 +584,7 @@ where
     St::Did: blob_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> BlobBuilder<blob_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> BlobBuilder<blob_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
@@ -627,10 +626,7 @@ where
     St::Src: blob_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(
-        mut self,
-        value: impl Into<Data<S>>,
-    ) -> BlobBuilder<blob_state::SetSrc<St>, S> {
+    pub fn src(mut self, value: impl Into<Data<S>>) -> BlobBuilder<blob_state::SetSrc<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,

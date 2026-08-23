@@ -2,7 +2,7 @@ use axum::{
     Extension, Router,
     body::Body,
     extract::Request,
-    http::{StatusCode, header},
+    http::{HeaderMap, StatusCode, header},
     middleware,
     routing::get,
 };
@@ -195,6 +195,7 @@ impl IdentityResolver for MockResolver {
             Ok(DidDocResponse {
                 buffer: Bytes::from(json),
                 status: ReqwestStatusCode::OK,
+                headers: HeaderMap::new(),
                 requested: Some(doc.id.clone()),
             })
         }

@@ -11,7 +11,8 @@ use std::collections::BTreeMap;
 use super::CodeGenerator;
 use super::prettify::GeneratedCode;
 use super::utils::{
-    known_value_to_variant_name, make_ident, string_enum_is_nameable, value_to_variant_name,
+    generate_doc_comment, known_value_to_variant_name, make_ident, string_enum_is_nameable,
+    value_to_variant_name,
 };
 
 /// Enum variant kind for IntoStatic generation
@@ -580,10 +581,7 @@ impl<'c> CodeGenerator<'c> {
         };
         let doc = combined_desc
             .as_ref()
-            .map(|d| {
-                let d = d.as_str();
-                quote! { #[doc = #d] }
-            })
+            .map(|d| generate_doc_comment(Some(&CowStr::copy_from_str(d))))
             .unwrap_or_default();
 
         let mut attrs = Vec::new();

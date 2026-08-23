@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::place_stream::media::view_count;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A streamplace node's report of view counts for one place.stream.video over a closed time window. Published in the reporting node's server repo (not the streamer's), so a video served by multiple nodes accumulates multiple records — consumers are expected to sum across trusted reporters. The rkey is conventionally `<windowStart-as-tid>-<video-rkey>` so re-running the aggregator over the same window is idempotent. Counts represent the reporting node's best effort given the data it has; the `tracks` array carries the objective byte / duration totals it observed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,18 +39,18 @@ use crate::place_stream::media::view_count;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ViewCount<S: BosStr = DefaultStr> {
-    ///Number of distinct sessions the reporting node observed as a view over [windowStart, windowEnd).
+    /// Number of distinct sessions the reporting node observed as a view over [windowStart, windowEnd).
     pub count: i64,
-    ///When the reporting node ran this aggregation. Useful for ordering successive reports.
+    /// When the reporting node ran this aggregation. Useful for ordering successive reports.
     pub indexed_at: Datetime,
-    ///Per-track totals of bytes + playback duration the reporting node served over the window. Each entry references the place.stream.media.track record whose bytes were transferred, so user-contributed tracks (transcripts, transcodes published by other accounts) attribute naturally to their own records.
+    /// Per-track totals of bytes + playback duration the reporting node served over the window. Each entry references the place.stream.media.track record whose bytes were transferred, so user-contributed tracks (transcripts, transcodes published by other accounts) attribute naturally to their own records.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<Vec<view_count::TrackUsage<S>>>,
-    ///AT-URI of the place.stream.video this count is for.
+    /// AT-URI of the place.stream.video this count is for.
     pub video: AtUri<S>,
-    ///Exclusive upper bound of the aggregation window.
+    /// Exclusive upper bound of the aggregation window.
     pub window_end: Datetime,
-    ///Inclusive lower bound of the aggregation window.
+    /// Inclusive lower bound of the aggregation window.
     pub window_start: Datetime,
     #[serde(
         flatten,
@@ -75,13 +75,16 @@ pub struct ViewCountGetRecordOutput<S: BosStr = DefaultStr> {
 /// One row of the tracks array: bytes + duration transferred for a single place.stream.media.track record over the window.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TrackUsage<S: BosStr = DefaultStr> {
-    ///Total bytes served from this track over the window. Sum across attributed segment_requests' Range intersections with the track's segment offsets in the metafile.
+    /// Total bytes served from this track over the window. Sum across attributed segment_requests' Range intersections with the track's segment offsets in the metafile.
     pub bytes: i64,
-    ///Total playback duration served from this track, in milliseconds. Per HLS segment in the range: (overlap bytes / segment bytes) * segment duration, so partial-segment fetches credit a proportional share of duration.
+    /// Total playback duration served from this track, in milliseconds. Per HLS segment in the range: (overlap bytes / segment bytes) * segment duration, so partial-segment fetches credit a proportional share of duration.
     pub duration_ms: i64,
-    ///Strong reference to the place.stream.media.track record whose bytes were transferred.
+    /// Strong reference to the place.stream.media.track record whose bytes were transferred.
     pub track: StrongRef<S>,
     #[serde(
         flatten,
@@ -192,9 +195,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -206,7 +208,7 @@ where
 
 pub mod view_count_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,18 +388,12 @@ where
 
 impl<St: view_count_state::State, S: BosStr> ViewCountBuilder<St, S> {
     /// Set the `tracks` field (optional)
-    pub fn tracks(
-        mut self,
-        value: impl Into<Option<Vec<view_count::TrackUsage<S>>>>,
-    ) -> Self {
+    pub fn tracks(mut self, value: impl Into<Option<Vec<view_count::TrackUsage<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `tracks` field to an Option value (optional)
-    pub fn maybe_tracks(
-        mut self,
-        value: Option<Vec<view_count::TrackUsage<S>>>,
-    ) -> Self {
+    pub fn maybe_tracks(mut self, value: Option<Vec<view_count::TrackUsage<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -482,10 +478,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewCount<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewCount<S> {
         ViewCount {
             count: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -499,10 +492,10 @@ where
 }
 
 fn lexicon_doc_place_stream_media_viewCount() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.media.viewCount"),
@@ -662,15 +655,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod track_usage_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -843,10 +835,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TrackUsage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TrackUsage<S> {
         TrackUsage {
             bytes: self._fields.0.unwrap(),
             duration_ms: self._fields.1.unwrap(),

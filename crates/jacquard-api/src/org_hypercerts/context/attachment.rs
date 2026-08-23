@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// An attachment providing commentary, context, evidence, or documentary material related to a hypercert record (e.g. an activity, project, claim, or evaluation).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -42,30 +42,30 @@ use crate::pub_leaflet::pages::linear_document::LinearDocument;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Attachment<S: BosStr = DefaultStr> {
-    ///The files, documents, or external references included in this attachment record.
+    /// The files, documents, or external references included in this attachment record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<Vec<AttachmentContentItem<S>>>,
-    ///The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.
+    /// The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<S>,
-    ///Client-declared timestamp when this record was originally created.
+    /// Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
-    ///Rich-text description, represented as a Leaflet linear document.
+    /// Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<LinearDocument<S>>,
-    ///A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.
+    /// A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<StrongRef<S>>,
-    ///Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
+    /// Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub short_description: Option<S>,
-    ///Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
+    /// Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub short_description_facets: Option<Vec<Facet<S>>>,
-    ///References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.
+    /// References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subjects: Option<Vec<StrongRef<S>>>,
-    ///Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')
+    /// Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')
     pub title: S,
     #[serde(
         flatten,
@@ -75,7 +75,6 @@ pub struct Attachment<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -216,9 +215,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -230,7 +228,7 @@ where
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -327,18 +325,12 @@ impl<S: BosStr> AttachmentBuilder<attachment_state::Empty, S> {
 
 impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `content` field (optional)
-    pub fn content(
-        mut self,
-        value: impl Into<Option<Vec<AttachmentContentItem<S>>>>,
-    ) -> Self {
+    pub fn content(mut self, value: impl Into<Option<Vec<AttachmentContentItem<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(
-        mut self,
-        value: Option<Vec<AttachmentContentItem<S>>>,
-    ) -> Self {
+    pub fn maybe_content(mut self, value: Option<Vec<AttachmentContentItem<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -417,18 +409,12 @@ impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
 
 impl<St: attachment_state::State, S: BosStr> AttachmentBuilder<St, S> {
     /// Set the `shortDescriptionFacets` field (optional)
-    pub fn short_description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn short_description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
-    pub fn maybe_short_description_facets(
-        mut self,
-        value: Option<Vec<Facet<S>>>,
-    ) -> Self {
+    pub fn maybe_short_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -488,10 +474,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Attachment<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attachment<S> {
         Attachment {
             content: self._fields.0,
             content_type: self._fields.1,
@@ -508,10 +491,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_context_attachment() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.context.attachment"),

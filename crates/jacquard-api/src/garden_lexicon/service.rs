@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Nsid, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::garden_lexicon::service;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::garden_lexicon::service;
+use serde::{Deserialize, Serialize};
 /// Declares XRPC methods available on a DID document service. The rkey is the service fragment ID without the # prefix (e.g., 'atproto_pds' for '#atproto_pds').
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,15 +38,15 @@ use crate::garden_lexicon::service;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Service<S: BosStr = DefaultStr> {
-    ///Description of what this service provides.
+    /// Description of what this service provides.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Methods available on this service.
+    /// Methods available on this service.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub methods: Option<Vec<service::Method<S>>>,
-    ///The type of service being declared.
+    /// The type of service being declared.
     pub service_type: S,
-    ///URL templates for constructing web URLs from AT-URIs or record data. Useful for linking to web views of records.
+    /// URL templates for constructing web URLs from AT-URIs or record data. Useful for linking to web views of records.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url_templates: Option<Vec<service::UrlTemplate<S>>>,
     #[serde(
@@ -69,17 +69,19 @@ pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Service<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Method<S: BosStr = DefaultStr> {
-    ///Authentication methods supported by this method.
+    /// Authentication methods supported by this method.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_methods: Option<Vec<MethodAuthMethods<S>>>,
-    ///Whether this method is deprecated and should no longer be used.
+    /// Whether this method is deprecated and should no longer be used.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<bool>,
-    ///AT-URI pointing to a lexicon schema that defines this method.
+    /// AT-URI pointing to a lexicon schema that defines this method.
     pub lexicon: AtUri<S>,
     #[serde(
         flatten,
@@ -89,7 +91,6 @@ pub struct Method<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MethodAuthMethods<S: BosStr = DefaultStr> {
@@ -174,25 +175,25 @@ where
             MethodAuthMethods::AtprotoAdmin => MethodAuthMethods::AtprotoAdmin,
             MethodAuthMethods::AtprotoBearer => MethodAuthMethods::AtprotoBearer,
             MethodAuthMethods::AtprotoOauth => MethodAuthMethods::AtprotoOauth,
-            MethodAuthMethods::AtprotoInterService => {
-                MethodAuthMethods::AtprotoInterService
-            }
+            MethodAuthMethods::AtprotoInterService => MethodAuthMethods::AtprotoInterService,
             MethodAuthMethods::Other(v) => MethodAuthMethods::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UrlTemplate<S: BosStr = DefaultStr> {
-    ///NSIDs of collections this URL template applies to.
+    /// NSIDs of collections this URL template applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<Nsid<S>>>,
-    ///Description of what this URL template is for.
+    /// Description of what this URL template is for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///URI template with placeholders for record data
+    /// URI template with placeholders for record data
     pub url: S,
     #[serde(
         flatten,
@@ -342,9 +343,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -356,7 +356,7 @@ where
 
 pub mod service_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -481,18 +481,12 @@ where
 
 impl<St: service_state::State, S: BosStr> ServiceBuilder<St, S> {
     /// Set the `urlTemplates` field (optional)
-    pub fn url_templates(
-        mut self,
-        value: impl Into<Option<Vec<service::UrlTemplate<S>>>>,
-    ) -> Self {
+    pub fn url_templates(mut self, value: impl Into<Option<Vec<service::UrlTemplate<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `urlTemplates` field to an Option value (optional)
-    pub fn maybe_url_templates(
-        mut self,
-        value: Option<Vec<service::UrlTemplate<S>>>,
-    ) -> Self {
+    pub fn maybe_url_templates(mut self, value: Option<Vec<service::UrlTemplate<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -526,10 +520,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.service"),
@@ -616,11 +610,9 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("authMethods"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Authentication methods supported by this method.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Authentication methods supported by this method.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(50usize),
                                     ..Default::default()
@@ -637,11 +629,9 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lexicon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "AT-URI pointing to a lexicon schema that defines this method.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI pointing to a lexicon schema that defines this method.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -661,11 +651,9 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("collections"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "NSIDs of collections this URL template applies to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "NSIDs of collections this URL template applies to.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Nsid),
                                     ..Default::default()
@@ -676,11 +664,9 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Description of what this URL template is for.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Description of what this URL template is for.",
+                                )),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -688,11 +674,9 @@ fn lexicon_doc_garden_lexicon_service() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URI template with placeholders for record data",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URI template with placeholders for record data",
+                                )),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -715,15 +699,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod method_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -756,7 +739,11 @@ pub mod method_state {
 /// Builder for constructing an instance of this type.
 pub struct MethodBuilder<St: method_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<MethodAuthMethods<S>>>, Option<bool>, Option<AtUri<S>>),
+    _fields: (
+        Option<Vec<MethodAuthMethods<S>>>,
+        Option<bool>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -798,18 +785,12 @@ impl<S: BosStr> MethodBuilder<method_state::Empty, S> {
 
 impl<St: method_state::State, S: BosStr> MethodBuilder<St, S> {
     /// Set the `authMethods` field (optional)
-    pub fn auth_methods(
-        mut self,
-        value: impl Into<Option<Vec<MethodAuthMethods<S>>>>,
-    ) -> Self {
+    pub fn auth_methods(mut self, value: impl Into<Option<Vec<MethodAuthMethods<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `authMethods` field to an Option value (optional)
-    pub fn maybe_auth_methods(
-        mut self,
-        value: Option<Vec<MethodAuthMethods<S>>>,
-    ) -> Self {
+    pub fn maybe_auth_methods(mut self, value: Option<Vec<MethodAuthMethods<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -879,8 +860,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -8,41 +8,43 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Language};
-use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::SelfLabels;
 use crate::social_coves::embed::images::Images;
 use crate::social_coves::embed::post::Post;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{AtUri, Cid, Language};
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Update<S: BosStr = DefaultStr> {
-    ///Updated comment text content
+    /// Updated comment text content
     pub content: S,
-    ///Updated embedded media or quoted posts
+    /// Updated embedded media or quoted posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<UpdateEmbed<S>>,
-    ///Updated annotations for rich text (mentions, links, formatting, block structure)
+    /// Updated annotations for rich text (mentions, links, formatting, block structure)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
-    ///Updated self-applied content labels
+    /// Updated self-applied content labels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Updated languages used in the comment content (ISO 639-1)
+    /// Updated languages used in the comment content (ISO 639-1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
-    ///AT-URI of the comment to update
+    /// AT-URI of the comment to update
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,50 +56,47 @@ pub enum UpdateEmbed<S: BosStr = DefaultStr> {
     Post(Box<Post<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateOutput<S: BosStr = DefaultStr> {
-    ///New CID of the updated comment record
+    /// New CID of the updated comment record
     pub cid: Cid<S>,
-    ///AT-URI of the updated comment (unchanged from input)
+    /// AT-URI of the updated comment (unchanged from input)
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateError {
     /// Comment with the specified URI does not exist
     #[serde(rename = "CommentNotFound")]
-    CommentNotFound(Option<SmolStr>),
+    CommentNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Updated comment content exceeds maximum length constraints
     #[serde(rename = "ContentTooLong")]
-    ContentTooLong(Option<SmolStr>),
+    ContentTooLong(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Updated comment content is empty or contains only whitespace
     #[serde(rename = "ContentEmpty")]
-    ContentEmpty(Option<SmolStr>),
+    ContentEmpty(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User is not authorized to update this comment (not the author)
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Rich text facets are malformed, exceed limits, or reference byte ranges outside the content
     #[serde(rename = "InvalidFacets")]
-    InvalidFacets(Option<SmolStr>),
+    InvalidFacets(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateError {
@@ -162,9 +161,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Update<S> {
     const NSID: &'static str = "social.coves.community.comment.update";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateResponse;
 }
 
@@ -174,16 +172,15 @@ Path: `/xrpc/social.coves.community.comment.update`. The request payload type is
 pub struct UpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.comment.update";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Update<S>;
     type Response = UpdateResponse;
 }
 
 pub mod update_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -352,10 +349,7 @@ where
     St::Uri: update_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> UpdateBuilder<update_state::SetUri<St>, S> {
+    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> UpdateBuilder<update_state::SetUri<St>, S> {
         self._fields.5 = Option::Some(value.into());
         UpdateBuilder {
             _state: PhantomData,

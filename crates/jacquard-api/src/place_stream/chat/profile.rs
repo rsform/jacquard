@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,20 +24,23 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::place_stream::chat::profile;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Selected badges for display in chat, organized by slot.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BadgeSelections<S: BosStr = DefaultStr> {
-    ///Selected globally-issued badge (e.g. event badge).
+    /// Selected globally-issued badge (e.g. event badge).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub global: Option<StrongRef<S>>,
-    ///Selected streamer-issued badges, one per streamer channel.
+    /// Selected streamer-issued badges, one per streamer channel.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streamer: Option<Vec<profile::StreamerBadgeSelection<S>>>,
     #[serde(
@@ -52,7 +55,10 @@ pub struct BadgeSelections<S: BosStr = DefaultStr> {
 /// Customizations for the color of a user's name in chat
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
@@ -76,12 +82,12 @@ pub struct Color<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Badge selections for display in chat.
+    /// Badge selections for display in chat.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub badges: Option<profile::BadgeSelections<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<profile::Color<S>>,
-    ///Self-applied labels for this profile, e.g. 'bot'.
+    /// Self-applied labels for this profile, e.g. 'bot'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub self_labels: Option<Vec<profile::SelfLabel<S>>>,
     #[serde(
@@ -176,11 +182,14 @@ where
 /// A selected badge for a specific streamer's channel.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StreamerBadgeSelection<S: BosStr = DefaultStr> {
-    ///Strong reference to the selected place.stream.badge.issuance record.
+    /// Strong reference to the selected place.stream.badge.issuance record.
     pub badge: StrongRef<S>,
-    ///DID of the streamer whose channel this selection applies to.
+    /// DID of the streamer whose channel this selection applies to.
     pub streamer: Did<S>,
     #[serde(
         flatten,
@@ -371,17 +380,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.chat.profile"),
@@ -390,11 +398,9 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("badgeSelections"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Selected badges for display in chat, organized by slot.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Selected badges for display in chat, organized by slot.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -408,11 +414,9 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("streamer"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Selected streamer-issued badges, one per streamer channel.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Selected streamer-issued badges, one per streamer channel.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#streamerBadgeSelection"),
                                     ..Default::default()
@@ -429,17 +433,14 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("color"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Customizations for the color of a user's name in chat",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("red"), SmolStr::new_static("green"),
-                            SmolStr::new_static("blue")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Customizations for the color of a user's name in chat",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("red"),
+                        SmolStr::new_static("green"),
+                        SmolStr::new_static("blue"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -475,11 +476,9 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Record containing customizations for a user's chat profile.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record containing customizations for a user's chat profile.",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
@@ -502,11 +501,9 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("selfLabels"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Self-applied labels for this profile, e.g. 'bot'.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Self-applied labels for this profile, e.g. 'bot'.",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#selfLabel"),
                                         ..Default::default()
@@ -525,27 +522,22 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("selfLabel"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "Label that a user can apply to their own profile.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Label that a user can apply to their own profile.",
+                    )),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("streamerBadgeSelection"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A selected badge for a specific streamer's channel.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("streamer"), SmolStr::new_static("badge")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A selected badge for a specific streamer's channel.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("streamer"),
+                        SmolStr::new_static("badge"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -559,11 +551,9 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("streamer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the streamer whose channel this selection applies to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the streamer whose channel this selection applies to.",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -586,15 +576,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod color_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -699,10 +688,7 @@ where
     St::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
-    pub fn blue(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetBlue<St>, S> {
+    pub fn blue(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetBlue<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -718,10 +704,7 @@ where
     St::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
-    pub fn green(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetGreen<St>, S> {
+    pub fn green(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetGreen<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -737,10 +720,7 @@ where
     St::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
-    pub fn red(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ColorBuilder<color_state::SetRed<St>, S> {
+    pub fn red(mut self, value: impl Into<i64>) -> ColorBuilder<color_state::SetRed<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
@@ -784,9 +764,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -798,7 +777,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -864,10 +843,7 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `badges` field (optional)
-    pub fn badges(
-        mut self,
-        value: impl Into<Option<profile::BadgeSelections<S>>>,
-    ) -> Self {
+    pub fn badges(mut self, value: impl Into<Option<profile::BadgeSelections<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -893,18 +869,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `selfLabels` field (optional)
-    pub fn self_labels(
-        mut self,
-        value: impl Into<Option<Vec<profile::SelfLabel<S>>>>,
-    ) -> Self {
+    pub fn self_labels(mut self, value: impl Into<Option<Vec<profile::SelfLabel<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `selfLabels` field to an Option value (optional)
-    pub fn maybe_self_labels(
-        mut self,
-        value: Option<Vec<profile::SelfLabel<S>>>,
-    ) -> Self {
+    pub fn maybe_self_labels(mut self, value: Option<Vec<profile::SelfLabel<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -941,15 +911,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod streamer_badge_selection_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1003,20 +972,15 @@ pub struct StreamerBadgeSelectionBuilder<
 
 impl StreamerBadgeSelection<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> StreamerBadgeSelectionBuilder<
-        streamer_badge_selection_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> StreamerBadgeSelectionBuilder<streamer_badge_selection_state::Empty, DefaultStr>
+    {
         StreamerBadgeSelectionBuilder::new()
     }
 }
 
 impl<S: BosStr> StreamerBadgeSelection<S> {
     /// Create a new builder for this type
-    pub fn builder() -> StreamerBadgeSelectionBuilder<
-        streamer_badge_selection_state::Empty,
-        S,
-    > {
+    pub fn builder() -> StreamerBadgeSelectionBuilder<streamer_badge_selection_state::Empty, S> {
         StreamerBadgeSelectionBuilder::builder()
     }
 }
@@ -1071,10 +1035,7 @@ where
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> StreamerBadgeSelectionBuilder<
-        streamer_badge_selection_state::SetStreamer<St>,
-        S,
-    > {
+    ) -> StreamerBadgeSelectionBuilder<streamer_badge_selection_state::SetStreamer<St>, S> {
         self._fields.1 = Option::Some(value.into());
         StreamerBadgeSelectionBuilder {
             _state: PhantomData,

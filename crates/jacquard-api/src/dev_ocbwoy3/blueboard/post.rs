@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,14 +37,14 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Post<S: BosStr = DefaultStr> {
-    ///The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.
+    /// The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment: Option<BlobRef<S>>,
-    ///The date and time when the post was created
+    /// The date and time when the post was created
     pub created_at: Datetime,
-    ///Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.
+    /// Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.
     pub parent: AtUri<S>,
-    ///The post's text
+    /// The post's text
     pub text: S,
     #[serde(
         flatten,
@@ -126,19 +126,16 @@ impl<S: BosStr> LexiconSchema for Post<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*", "video/webm"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("attachment"),
@@ -170,9 +167,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -184,7 +180,7 @@ where
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -243,7 +239,12 @@ pub mod post_state {
 /// Builder for constructing an instance of this type.
 pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<AtUri<S>>, Option<S>),
+    _fields: (
+        Option<BlobRef<S>>,
+        Option<Datetime>,
+        Option<AtUri<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -340,10 +341,7 @@ where
     St::Text: post_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetText<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -383,10 +381,10 @@ where
 }
 
 fn lexicon_doc_dev_ocbwoy3_blueboard_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.ocbwoy3.blueboard.post"),

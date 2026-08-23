@@ -17,21 +17,24 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::hard_break::HardBreak;
 use crate::blog_pckt::block::mention::Mention;
 use crate::blog_pckt::block::text::Text;
 use crate::blog_pckt::richtext::facet::Facet;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Paragraph<S: BosStr = DefaultStr> {
-    ///Array of inline content nodes (text, hard breaks, and mentions)
+    /// Array of inline content nodes (text, hard breaks, and mentions)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<Vec<ParagraphContentItem<S>>>,
-    ///Facets for text formatting and features within this paragraph
+    /// Facets for text formatting and features within this paragraph
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     #[serde(
@@ -42,7 +45,6 @@ pub struct Paragraph<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -78,17 +80,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_blog_pckt_block_paragraph() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.paragraph"),

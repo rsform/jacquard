@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,10 +23,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StandardSitePost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<S>,
@@ -43,7 +46,6 @@ pub struct StandardSitePost<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StandardSitePostSize<S: BosStr = DefaultStr> {
@@ -121,9 +123,7 @@ where
             StandardSitePostSize::Large => StandardSitePostSize::Large,
             StandardSitePostSize::Medium => StandardSitePostSize::Medium,
             StandardSitePostSize::Small => StandardSitePostSize::Small,
-            StandardSitePostSize::Other(v) => {
-                StandardSitePostSize::Other(v.into_static())
-            }
+            StandardSitePostSize::Other(v) => StandardSitePostSize::Other(v.into_static()),
         }
     }
 }
@@ -150,15 +150,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod standard_site_post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,10 +188,7 @@ pub mod standard_site_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct StandardSitePostBuilder<
-    St: standard_site_post_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct StandardSitePostBuilder<St: standard_site_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -205,10 +201,7 @@ pub struct StandardSitePostBuilder<
 
 impl StandardSitePost<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> StandardSitePostBuilder<
-        standard_site_post_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> StandardSitePostBuilder<standard_site_post_state::Empty, DefaultStr> {
         StandardSitePostBuilder::new()
     }
 }
@@ -316,10 +309,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StandardSitePost<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StandardSitePost<S> {
         StandardSitePost {
             cid: self._fields.0,
             show_publication_theme: self._fields.1,
@@ -331,10 +321,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_standardSitePost() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.standardSitePost"),
@@ -349,7 +339,9 @@ fn lexicon_doc_pub_leaflet_blocks_standardSitePost() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("showPublicationTheme"),
@@ -359,7 +351,9 @@ fn lexicon_doc_pub_leaflet_blocks_standardSitePost() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("size"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::at_margin::reply;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::at_margin::reply;
+use serde::{Deserialize, Serialize};
 /// A reply to an annotation (motivation: replying)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,15 +39,15 @@ use crate::at_margin::reply;
 )]
 pub struct Reply<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///MIME type of the text content  Defaults to `"text/plain"`.
+    /// MIME type of the text content  Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reply_format")]
     pub format: Option<S>,
-    ///Reference to the parent annotation or reply
+    /// Reference to the parent annotation or reply
     pub parent: reply::ReplyRef<S>,
-    ///Reference to the root annotation of the thread
+    /// Reference to the root annotation of the thread
     pub root: reply::ReplyRef<S>,
-    ///Reply text content
+    /// Reply text content
     pub text: S,
     #[serde(
         flatten,
@@ -72,7 +72,10 @@ pub struct ReplyGetRecordOutput<S: BosStr = DefaultStr> {
 /// Strong reference to an annotation or reply
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -179,9 +182,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -197,7 +199,7 @@ fn _default_reply_format<S: FromStaticStr>() -> ::core::option::Option<S> {
 
 pub mod reply_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -394,10 +396,7 @@ where
     St::Text: reply_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> ReplyBuilder<reply_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> ReplyBuilder<reply_state::SetText<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ReplyBuilder {
             _state: PhantomData,
@@ -419,7 +418,10 @@ where
     pub fn build(self) -> Reply<S> {
         Reply {
             created_at: self._fields.0.unwrap(),
-            format: self._fields.1.or_else(|| Some(S::from_static("text/plain"))),
+            format: self
+                ._fields
+                .1
+                .or_else(|| Some(S::from_static("text/plain"))),
             parent: self._fields.2.unwrap(),
             root: self._fields.3.unwrap(),
             text: self._fields.4.unwrap(),
@@ -430,7 +432,10 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Reply<S> {
         Reply {
             created_at: self._fields.0.unwrap(),
-            format: self._fields.1.or_else(|| Some(S::from_static("text/plain"))),
+            format: self
+                ._fields
+                .1
+                .or_else(|| Some(S::from_static("text/plain"))),
             parent: self._fields.2.unwrap(),
             root: self._fields.3.unwrap(),
             text: self._fields.4.unwrap(),
@@ -440,10 +445,10 @@ where
 }
 
 fn lexicon_doc_at_margin_reply() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.margin.reply"),
@@ -452,20 +457,17 @@ fn lexicon_doc_at_margin_reply() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A reply to an annotation (motivation: replying)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A reply to an annotation (motivation: replying)",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("parent"), SmolStr::new_static("root"),
-                                SmolStr::new_static("text"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("parent"),
+                            SmolStr::new_static("root"),
+                            SmolStr::new_static("text"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -479,9 +481,9 @@ fn lexicon_doc_at_margin_reply() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("format"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("MIME type of the text content"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "MIME type of the text content",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
@@ -518,12 +520,10 @@ fn lexicon_doc_at_margin_reply() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("replyRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Strong reference to an annotation or reply"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Strong reference to an annotation or reply",
+                    )),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -559,15 +559,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

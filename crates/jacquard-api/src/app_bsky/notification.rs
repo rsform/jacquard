@@ -18,13 +18,12 @@ pub mod register_push;
 pub mod unregister_push;
 pub mod update_seen;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,13 +34,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::notification;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::notification;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivitySubscription<S: BosStr = DefaultStr> {
     pub post: bool,
     pub reply: bool,
@@ -57,7 +59,10 @@ pub struct ActivitySubscription<S: BosStr = DefaultStr> {
 /// Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChatPreference<S: BosStr = DefaultStr> {
     pub include: ChatPreferenceInclude<S>,
     pub push: bool,
@@ -69,7 +74,6 @@ pub struct ChatPreference<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ChatPreferenceInclude<S: BosStr = DefaultStr> {
@@ -143,16 +147,16 @@ where
         match self {
             ChatPreferenceInclude::All => ChatPreferenceInclude::All,
             ChatPreferenceInclude::Accepted => ChatPreferenceInclude::Accepted,
-            ChatPreferenceInclude::Other(v) => {
-                ChatPreferenceInclude::Other(v.into_static())
-            }
+            ChatPreferenceInclude::Other(v) => ChatPreferenceInclude::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FilterablePreference<S: BosStr = DefaultStr> {
     pub include: FilterablePreferenceInclude<S>,
     pub list: bool,
@@ -165,7 +169,6 @@ pub struct FilterablePreference<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FilterablePreferenceInclude<S: BosStr = DefaultStr> {
@@ -213,8 +216,7 @@ impl<S: BosStr> Serialize for FilterablePreferenceInclude<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for FilterablePreferenceInclude<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for FilterablePreferenceInclude<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -247,9 +249,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Preference<S: BosStr = DefaultStr> {
     pub list: bool,
     pub push: bool,
@@ -262,11 +266,13 @@ pub struct Preference<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Preferences<S: BosStr = DefaultStr> {
-    ///Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.
+    /// Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.
     pub chat: notification::ChatPreference<S>,
     pub follow: notification::FilterablePreference<S>,
     pub like: notification::FilterablePreference<S>,
@@ -289,9 +295,11 @@ pub struct Preferences<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordDeleted<S: BosStr = DefaultStr> {
     #[serde(
         flatten,
@@ -305,7 +313,10 @@ pub struct RecordDeleted<S: BosStr = DefaultStr> {
 /// Object used to store activity subscription data in stash.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubjectActivitySubscription<S: BosStr = DefaultStr> {
     pub activity_subscription: notification::ActivitySubscription<S>,
     pub subject: Did<S>,
@@ -430,15 +441,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod activity_subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -492,20 +502,14 @@ pub struct ActivitySubscriptionBuilder<
 
 impl ActivitySubscription<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ActivitySubscriptionBuilder<
-        activity_subscription_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ActivitySubscriptionBuilder<activity_subscription_state::Empty, DefaultStr> {
         ActivitySubscriptionBuilder::new()
     }
 }
 
 impl<S: BosStr> ActivitySubscription<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ActivitySubscriptionBuilder<
-        activity_subscription_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ActivitySubscriptionBuilder<activity_subscription_state::Empty, S> {
         ActivitySubscriptionBuilder::builder()
     }
 }
@@ -598,10 +602,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.notification.defs"),
@@ -610,9 +614,10 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activitySubscription"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("post"), SmolStr::new_static("reply")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("post"),
+                        SmolStr::new_static("reply"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -665,18 +670,19 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("filterablePreference"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("include"), SmolStr::new_static("list"),
-                            SmolStr::new_static("push")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("include"),
+                        SmolStr::new_static("list"),
+                        SmolStr::new_static("push"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("include"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("list"),
@@ -698,9 +704,10 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("preference"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("list"), SmolStr::new_static("push")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("list"),
+                        SmolStr::new_static("push"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -724,20 +731,21 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("preferences"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("chat"), SmolStr::new_static("follow"),
-                            SmolStr::new_static("like"),
-                            SmolStr::new_static("likeViaRepost"),
-                            SmolStr::new_static("mention"), SmolStr::new_static("quote"),
-                            SmolStr::new_static("reply"), SmolStr::new_static("repost"),
-                            SmolStr::new_static("repostViaRepost"),
-                            SmolStr::new_static("starterpackJoined"),
-                            SmolStr::new_static("subscribedPost"),
-                            SmolStr::new_static("unverified"),
-                            SmolStr::new_static("verified")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("chat"),
+                        SmolStr::new_static("follow"),
+                        SmolStr::new_static("like"),
+                        SmolStr::new_static("likeViaRepost"),
+                        SmolStr::new_static("mention"),
+                        SmolStr::new_static("quote"),
+                        SmolStr::new_static("reply"),
+                        SmolStr::new_static("repost"),
+                        SmolStr::new_static("repostViaRepost"),
+                        SmolStr::new_static("starterpackJoined"),
+                        SmolStr::new_static("subscribedPost"),
+                        SmolStr::new_static("unverified"),
+                        SmolStr::new_static("verified"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -851,17 +859,13 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("subjectActivitySubscription"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Object used to store activity subscription data in stash.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("activitySubscription")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Object used to store activity subscription data in stash.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("activitySubscription"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -897,15 +901,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chat_preference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -948,10 +951,7 @@ pub mod chat_preference_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChatPreferenceBuilder<
-    St: chat_preference_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChatPreferenceBuilder<St: chat_preference_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<ChatPreferenceInclude<S>>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -1046,10 +1046,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChatPreference<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChatPreference<S> {
         ChatPreference {
             include: self._fields.0.unwrap(),
             push: self._fields.1.unwrap(),
@@ -1065,15 +1062,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod filterable_preference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1135,26 +1131,24 @@ pub struct FilterablePreferenceBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<FilterablePreferenceInclude<S>>, Option<bool>, Option<bool>),
+    _fields: (
+        Option<FilterablePreferenceInclude<S>>,
+        Option<bool>,
+        Option<bool>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl FilterablePreference<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FilterablePreferenceBuilder<
-        filterable_preference_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> FilterablePreferenceBuilder<filterable_preference_state::Empty, DefaultStr> {
         FilterablePreferenceBuilder::new()
     }
 }
 
 impl<S: BosStr> FilterablePreference<S> {
     /// Create a new builder for this type
-    pub fn builder() -> FilterablePreferenceBuilder<
-        filterable_preference_state::Empty,
-        S,
-    > {
+    pub fn builder() -> FilterablePreferenceBuilder<filterable_preference_state::Empty, S> {
         FilterablePreferenceBuilder::builder()
     }
 }
@@ -1275,15 +1269,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod preference_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1421,10 +1414,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Preference<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preference<S> {
         Preference {
             list: self._fields.0.unwrap(),
             push: self._fields.1.unwrap(),
@@ -1440,15 +1430,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1795,19 +1784,7 @@ impl PreferencesBuilder<preferences_state::Empty, DefaultStr> {
         PreferencesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1820,19 +1797,7 @@ impl<S: BosStr> PreferencesBuilder<preferences_state::Empty, S> {
         PreferencesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2123,10 +2088,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Preferences<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preferences<S> {
         Preferences {
             chat: self._fields.0.unwrap(),
             follow: self._fields.1.unwrap(),
@@ -2153,9 +2115,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -2166,15 +2127,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod subject_activity_subscription_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2222,34 +2182,31 @@ pub struct SubjectActivitySubscriptionBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<notification::ActivitySubscription<S>>, Option<Did<S>>),
+    _fields: (
+        Option<notification::ActivitySubscription<S>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl SubjectActivitySubscription<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubjectActivitySubscriptionBuilder<
-        subject_activity_subscription_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::Empty, DefaultStr>
+    {
         SubjectActivitySubscriptionBuilder::new()
     }
 }
 
 impl<S: BosStr> SubjectActivitySubscription<S> {
     /// Create a new builder for this type
-    pub fn builder() -> SubjectActivitySubscriptionBuilder<
-        subject_activity_subscription_state::Empty,
-        S,
-    > {
+    pub fn builder()
+    -> SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::Empty, S> {
         SubjectActivitySubscriptionBuilder::builder()
     }
 }
 
-impl SubjectActivitySubscriptionBuilder<
-    subject_activity_subscription_state::Empty,
-    DefaultStr,
-> {
+impl SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SubjectActivitySubscriptionBuilder {
@@ -2260,9 +2217,7 @@ impl SubjectActivitySubscriptionBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::Empty, S> {
+impl<S: BosStr> SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SubjectActivitySubscriptionBuilder {
@@ -2304,10 +2259,8 @@ where
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SubjectActivitySubscriptionBuilder<
-        subject_activity_subscription_state::SetSubject<St>,
-        S,
-    > {
+    ) -> SubjectActivitySubscriptionBuilder<subject_activity_subscription_state::SetSubject<St>, S>
+    {
         self._fields.1 = Option::Some(value.into());
         SubjectActivitySubscriptionBuilder {
             _state: PhantomData,

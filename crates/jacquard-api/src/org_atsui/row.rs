@@ -8,38 +8,41 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::at_inlay::Response;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Row<S: BosStr = DefaultStr> {
-    ///Cross-axis (vertical) alignment of children.  Defaults to `"center"`.
+    /// Cross-axis (vertical) alignment of children.  Defaults to `"center"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_row_align")]
     pub align: Option<RowAlign<S>>,
     pub children: Data<S>,
-    ///Space between children.  Defaults to `"medium"`.
+    /// Space between children.  Defaults to `"medium"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_row_gap")]
     pub gap: Option<RowGap<S>>,
-    ///Whether this container has inset padding. The theme controls the amount.
+    /// Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
-    ///Main-axis distribution of children.  Defaults to `"start"`.
+    /// Main-axis distribution of children.  Defaults to `"start"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_row_justify")]
     pub justify: Option<RowJustify<S>>,
-    ///Whether the container has an opaque background.
+    /// Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opaque: Option<bool>,
-    ///Whether the container sticks to the top of the scroll area.
+    /// Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -307,9 +310,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RowOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -330,9 +335,8 @@ impl jacquard_common::xrpc::XrpcResp for RowResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Row<S> {
     const NSID: &'static str = "org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RowResponse;
 }
 
@@ -342,16 +346,13 @@ Path: `/xrpc/org.atsui.Row`. The request payload type is `Row<S>`; send that req
 pub struct RowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Row";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Row<S>;
     type Response = RowResponse;
 }
 
-fn _default_row_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    RowAlign<S>,
-> {
+fn _default_row_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<RowAlign<S>> {
     Some(<RowAlign<S>>::from_value(S::from_static("center")))
 }
 
@@ -359,15 +360,13 @@ fn _default_row_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<RowGa
     Some(<RowGap<S>>::from_value(S::from_static("medium")))
 }
 
-fn _default_row_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    RowJustify<S>,
-> {
+fn _default_row_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<RowJustify<S>> {
     Some(<RowJustify<S>>::from_value(S::from_static("start")))
 }
 
 pub mod row_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

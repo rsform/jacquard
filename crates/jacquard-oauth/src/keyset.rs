@@ -52,7 +52,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 ///
 /// EdDSA and ES256K are preferred for their security properties, followed by
 /// the NIST curves. This order matches common AT Protocol server expectations.
-const PREFERRED_SIGNING_ALGORITHMS: [Signing; 4] = [
+pub const PREFERRED_SIGNING_ALGORITHMS: [Signing; 4] = [
     Signing::EdDsa,
     Signing::Es256K,
     Signing::Es256,

@@ -69,6 +69,7 @@ impl IdentityResolver for MockResolver {
         Ok(DidDocResponse {
             buffer: Bytes::from(serde_json::to_vec(&doc).unwrap()),
             status: StatusCode::OK,
+            headers: http::HeaderMap::new(),
             requested: None,
         })
     }

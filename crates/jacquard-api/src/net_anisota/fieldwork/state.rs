@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Quest system state for cross-device sync (dismissals, nudge timing, visited routes). Singleton record (rkey: self), overwritten via putRecord. Client-written (no backend signing). Distinct from net.anisota.chronicle.fieldwork (immutable, backend-signed completion records).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,33 +37,33 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct State<S: BosStr = DefaultStr> {
-    ///Reserved for future quest progress counters. Object mapping counter ids to values.
+    /// Reserved for future quest progress counters. Object mapping counter ids to values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub counters: Option<Data<S>>,
-    ///Object mapping dismissed quest ids to the ISO datetime they were dismissed. Dismissed quests are excluded from recommendations and nudges until undismissed.
+    /// Object mapping dismissed quest ids to the ISO datetime they were dismissed. Dismissed quests are excluded from recommendations and nudges until undismissed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dismissed: Option<Data<S>>,
-    ///When a quest nudge was last shown (nudges are spaced at least a day apart)
+    /// When a quest nudge was last shown (nudges are spaced at least a day apart)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_nudge_at: Option<Datetime>,
-    ///Which quest the most recent nudge was about
+    /// Which quest the most recent nudge was about
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_nudge_quest_id: Option<S>,
-    ///Quest the player has pinned to keep in view
+    /// Quest the player has pinned to keep in view
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pinned_quest_id: Option<S>,
-    ///When the retroactive completion sweep last ran (throttles the sweep to once per day)
+    /// When the retroactive completion sweep last ran (throttles the sweep to once per day)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retro_sweep_at: Option<Datetime>,
-    ///Version of the retroactive sweep that armed retroSweepAt. When it doesn't match the client's current sweep version the throttle is treated as stale and the sweep runs once more, so a throttle armed by an earlier (buggy) sweep can't lock out backfill.
+    /// Version of the retroactive sweep that armed retroSweepAt. When it doesn't match the client's current sweep version the throttle is treated as stale and the sweep runs once more, so a throttle armed by an earlier (buggy) sweep can't lock out backfill.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retro_sweep_version: Option<i64>,
-    ///Suppress quest nudges until this time
+    /// Suppress quest nudges until this time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub snoozed_until: Option<Datetime>,
-    ///When this state snapshot was taken
+    /// When this state snapshot was taken
     pub updated_at: Datetime,
-    ///Object mapping visited app routes (e.g. '/chronicle') to the ISO datetime of the first tracked visit. Drives route-based quest detection.
+    /// Object mapping visited app routes (e.g. '/chronicle') to the ISO datetime of the first tracked visit. Drives route-based quest detection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visited_routes: Option<Data<S>>,
     #[serde(
@@ -141,9 +141,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -155,7 +154,7 @@ where
 
 pub mod state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -415,10 +414,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_fieldwork_state() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.fieldwork.state"),

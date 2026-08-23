@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::AgeRating;
 use crate::games_gamesgamesgamesgames::AlternativeName;
 use crate::games_gamesgamesgamesgames::ApplicationType;
@@ -45,6 +42,9 @@ use crate::games_gamesgamesgamesgames::Theme;
 use crate::games_gamesgamesgamesgames::TimeToBeat;
 use crate::games_gamesgamesgamesgames::Website;
 use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A video game.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -61,10 +61,10 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub alternative_names: Option<Vec<AlternativeName<S>>>,
     pub application_type: ApplicationType<S>,
     pub created_at: Datetime,
-    ///Detailed game description in plain text, with formatting expressed via descriptionFacets.
+    /// Detailed game description in plain text, with formatting expressed via descriptionFacets.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Rich text facets for the description field.
+    /// Rich text facets for the description field.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,7 +77,7 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub keywords: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language_supports: Option<Vec<LanguageSupport<S>>>,
-    ///Images associated with the game.
+    /// Images associated with the game.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media: Option<Vec<MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,12 +87,12 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<AtUri<S>>,
-    ///Platform-specific feature support.
+    /// Platform-specific feature support.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform_features: Option<Vec<PlatformFeatures<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_perspectives: Option<Vec<PlayerPerspective<S>>>,
-    ///When this record was marked ready for public viewing.
+    /// When this record was marked ready for public viewing.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,7 +101,7 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub storyline: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<S>,
-    ///System requirements per platform.
+    /// System requirements per platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub system_requirements: Option<Vec<SystemRequirements<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,9 +187,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -201,7 +200,7 @@ where
 
 pub mod game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -312,33 +311,8 @@ impl GameBuilder<game_state::Empty, DefaultStr> {
         GameBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -351,33 +325,8 @@ impl<S: BosStr> GameBuilder<game_state::Empty, S> {
         GameBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -399,18 +348,12 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `alternativeNames` field (optional)
-    pub fn alternative_names(
-        mut self,
-        value: impl Into<Option<Vec<AlternativeName<S>>>>,
-    ) -> Self {
+    pub fn alternative_names(mut self, value: impl Into<Option<Vec<AlternativeName<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeNames` field to an Option value (optional)
-    pub fn maybe_alternative_names(
-        mut self,
-        value: Option<Vec<AlternativeName<S>>>,
-    ) -> Self {
+    pub fn maybe_alternative_names(mut self, value: Option<Vec<AlternativeName<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -469,10 +412,7 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -537,18 +477,12 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `languageSupports` field (optional)
-    pub fn language_supports(
-        mut self,
-        value: impl Into<Option<Vec<LanguageSupport<S>>>>,
-    ) -> Self {
+    pub fn language_supports(mut self, value: impl Into<Option<Vec<LanguageSupport<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `languageSupports` field to an Option value (optional)
-    pub fn maybe_language_supports(
-        mut self,
-        value: Option<Vec<LanguageSupport<S>>>,
-    ) -> Self {
+    pub fn maybe_language_supports(mut self, value: Option<Vec<LanguageSupport<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -582,18 +516,12 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `multiplayerModes` field (optional)
-    pub fn multiplayer_modes(
-        mut self,
-        value: impl Into<Option<Vec<MultiplayerMode<S>>>>,
-    ) -> Self {
+    pub fn multiplayer_modes(mut self, value: impl Into<Option<Vec<MultiplayerMode<S>>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `multiplayerModes` field to an Option value (optional)
-    pub fn maybe_multiplayer_modes(
-        mut self,
-        value: Option<Vec<MultiplayerMode<S>>>,
-    ) -> Self {
+    pub fn maybe_multiplayer_modes(mut self, value: Option<Vec<MultiplayerMode<S>>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -605,10 +533,7 @@ where
     St::Name: game_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> GameBuilder<game_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> GameBuilder<game_state::SetName<St>, S> {
         self._fields.14 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -633,18 +558,12 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `platformFeatures` field (optional)
-    pub fn platform_features(
-        mut self,
-        value: impl Into<Option<Vec<PlatformFeatures<S>>>>,
-    ) -> Self {
+    pub fn platform_features(mut self, value: impl Into<Option<Vec<PlatformFeatures<S>>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `platformFeatures` field to an Option value (optional)
-    pub fn maybe_platform_features(
-        mut self,
-        value: Option<Vec<PlatformFeatures<S>>>,
-    ) -> Self {
+    pub fn maybe_platform_features(mut self, value: Option<Vec<PlatformFeatures<S>>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -660,10 +579,7 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
-    pub fn maybe_player_perspectives(
-        mut self,
-        value: Option<Vec<PlayerPerspective<S>>>,
-    ) -> Self {
+    pub fn maybe_player_perspectives(mut self, value: Option<Vec<PlayerPerspective<S>>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -731,10 +647,7 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
         self
     }
     /// Set the `systemRequirements` field to an Option value (optional)
-    pub fn maybe_system_requirements(
-        mut self,
-        value: Option<Vec<SystemRequirements<S>>>,
-    ) -> Self {
+    pub fn maybe_system_requirements(mut self, value: Option<Vec<SystemRequirements<S>>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -868,10 +781,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_game() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.game"),

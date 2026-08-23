@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -35,10 +32,16 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A musical group, such as a band, an orchestra, or a choir. Can also be a solo musician.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -239,7 +242,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -293,7 +295,6 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -318,7 +319,6 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -348,7 +348,6 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -377,7 +376,6 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -396,7 +394,6 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -404,7 +401,6 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -419,7 +415,6 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -427,7 +422,6 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -444,7 +438,6 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -452,7 +445,6 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -473,7 +465,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -548,7 +539,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -597,7 +587,6 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -616,7 +605,6 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -630,7 +618,6 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -641,7 +628,6 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -649,7 +635,6 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -661,7 +646,6 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -669,7 +653,6 @@ pub enum EmbeddedMusicGroupMember<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -704,7 +687,6 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -712,7 +694,6 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -769,7 +750,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -778,7 +758,6 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -786,7 +765,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1030,7 +1008,6 @@ pub struct MusicGroup<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1084,7 +1061,6 @@ pub enum MusicGroupAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1109,7 +1085,6 @@ pub enum MusicGroupBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1139,7 +1114,6 @@ pub enum MusicGroupDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1168,7 +1142,6 @@ pub enum MusicGroupDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1187,7 +1160,6 @@ pub enum MusicGroupEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1195,7 +1167,6 @@ pub enum MusicGroupEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1210,7 +1181,6 @@ pub enum MusicGroupEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1218,7 +1188,6 @@ pub enum MusicGroupEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1235,7 +1204,6 @@ pub enum MusicGroupFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1243,7 +1211,6 @@ pub enum MusicGroupFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1264,7 +1231,6 @@ pub enum MusicGroupFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1339,7 +1305,6 @@ pub enum MusicGroupImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1388,7 +1353,6 @@ pub enum MusicGroupLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1407,7 +1371,6 @@ pub enum MusicGroupLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1421,7 +1384,6 @@ pub enum MusicGroupMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1432,7 +1394,6 @@ pub enum MusicGroupMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1440,7 +1401,6 @@ pub enum MusicGroupMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1452,7 +1412,6 @@ pub enum MusicGroupMembers<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1460,7 +1419,6 @@ pub enum MusicGroupMusicGroupMember<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1495,7 +1453,6 @@ pub enum MusicGroupOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1503,7 +1460,6 @@ pub enum MusicGroupParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1560,7 +1516,6 @@ pub enum MusicGroupSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1569,7 +1524,6 @@ pub enum MusicGroupSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1577,7 +1531,6 @@ pub enum MusicGroupSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1694,17 +1647,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_MusicGroup() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup"),
@@ -3741,9 +3693,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -3755,7 +3706,7 @@ where
 
 pub mod music_group_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3895,101 +3846,13 @@ impl MusicGroupBuilder<music_group_state::Empty, DefaultStr> {
         MusicGroupBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4002,101 +3865,13 @@ impl<S: BosStr> MusicGroupBuilder<music_group_state::Empty, S> {
         MusicGroupBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4151,10 +3926,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<MusicGroupAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<MusicGroupAdditionalType<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -4202,10 +3974,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(
-        mut self,
-        value: Option<MusicGroupAggregateRating<S>>,
-    ) -> Self {
+    pub fn maybe_aggregate_rating(mut self, value: Option<MusicGroupAggregateRating<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -4239,18 +4008,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(
-        mut self,
-        value: impl Into<Option<MusicGroupAlternateName<S>>>,
-    ) -> Self {
+    pub fn alternate_name(mut self, value: impl Into<Option<MusicGroupAlternateName<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<MusicGroupAlternateName<S>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<MusicGroupAlternateName<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -4271,10 +4034,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(
-        mut self,
-        value: impl Into<Option<MusicGroupAreaServed<S>>>,
-    ) -> Self {
+    pub fn area_served(mut self, value: impl Into<Option<MusicGroupAreaServed<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -4345,18 +4105,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(
-        mut self,
-        value: impl Into<Option<MusicGroupContactPoint<S>>>,
-    ) -> Self {
+    pub fn contact_point(mut self, value: impl Into<Option<MusicGroupContactPoint<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(
-        mut self,
-        value: Option<MusicGroupContactPoint<S>>,
-    ) -> Self {
+    pub fn maybe_contact_point(mut self, value: Option<MusicGroupContactPoint<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -4364,18 +4118,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(
-        mut self,
-        value: impl Into<Option<MusicGroupContactPoints<S>>>,
-    ) -> Self {
+    pub fn contact_points(mut self, value: impl Into<Option<MusicGroupContactPoints<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(
-        mut self,
-        value: Option<MusicGroupContactPoints<S>>,
-    ) -> Self {
+    pub fn maybe_contact_points(mut self, value: Option<MusicGroupContactPoints<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -4402,10 +4150,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `department` field (optional)
-    pub fn department(
-        mut self,
-        value: impl Into<Option<MusicGroupDepartment<S>>>,
-    ) -> Self {
+    pub fn department(mut self, value: impl Into<Option<MusicGroupDepartment<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -4418,10 +4163,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<MusicGroupDescription<S>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<MusicGroupDescription<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -4461,10 +4203,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(
-        mut self,
-        value: Option<MusicGroupDissolutionDate<S>>,
-    ) -> Self {
+    pub fn maybe_dissolution_date(mut self, value: Option<MusicGroupDissolutionDate<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -4480,10 +4219,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(
-        mut self,
-        value: Option<MusicGroupDiversityPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_diversity_policy(mut self, value: Option<MusicGroupDiversityPolicy<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -4549,10 +4285,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `employees` field (optional)
-    pub fn employees(
-        mut self,
-        value: impl Into<Option<MusicGroupEmployees<S>>>,
-    ) -> Self {
+    pub fn employees(mut self, value: impl Into<Option<MusicGroupEmployees<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
@@ -4565,18 +4298,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(
-        mut self,
-        value: impl Into<Option<MusicGroupEthicsPolicy<S>>>,
-    ) -> Self {
+    pub fn ethics_policy(mut self, value: impl Into<Option<MusicGroupEthicsPolicy<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(
-        mut self,
-        value: Option<MusicGroupEthicsPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_ethics_policy(mut self, value: Option<MusicGroupEthicsPolicy<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -4610,10 +4337,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(
-        mut self,
-        value: impl Into<Option<MusicGroupFaxNumber<S>>>,
-    ) -> Self {
+    pub fn fax_number(mut self, value: impl Into<Option<MusicGroupFaxNumber<S>>>) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -4652,18 +4376,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(
-        mut self,
-        value: impl Into<Option<MusicGroupFoundingDate<S>>>,
-    ) -> Self {
+    pub fn founding_date(mut self, value: impl Into<Option<MusicGroupFoundingDate<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(
-        mut self,
-        value: Option<MusicGroupFoundingDate<S>>,
-    ) -> Self {
+    pub fn maybe_founding_date(mut self, value: Option<MusicGroupFoundingDate<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -4679,10 +4397,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
-    pub fn maybe_founding_location(
-        mut self,
-        value: Option<MusicGroupFoundingLocation<S>>,
-    ) -> Self {
+    pub fn maybe_founding_location(mut self, value: Option<MusicGroupFoundingLocation<S>>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -4756,10 +4471,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(
-        mut self,
-        value: Option<MusicGroupHasCertification<S>>,
-    ) -> Self {
+    pub fn maybe_has_certification(mut self, value: Option<MusicGroupHasCertification<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -4767,18 +4479,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(
-        mut self,
-        value: impl Into<Option<MusicGroupHasCredential<S>>>,
-    ) -> Self {
+    pub fn has_credential(mut self, value: impl Into<Option<MusicGroupHasCredential<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(
-        mut self,
-        value: Option<MusicGroupHasCredential<S>>,
-    ) -> Self {
+    pub fn maybe_has_credential(mut self, value: Option<MusicGroupHasCredential<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -4851,10 +4557,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(
-        mut self,
-        value: Option<MusicGroupHasOfferCatalog<S>>,
-    ) -> Self {
+    pub fn maybe_has_offer_catalog(mut self, value: Option<MusicGroupHasOfferCatalog<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -4913,10 +4616,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<MusicGroupIdentifier<S>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<MusicGroupIdentifier<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -4974,18 +4674,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(
-        mut self,
-        value: impl Into<Option<MusicGroupIso6523Code<S>>>,
-    ) -> Self {
+    pub fn iso6523_code(mut self, value: impl Into<Option<MusicGroupIso6523Code<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(
-        mut self,
-        value: Option<MusicGroupIso6523Code<S>>,
-    ) -> Self {
+    pub fn maybe_iso6523_code(mut self, value: Option<MusicGroupIso6523Code<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -5006,10 +4700,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(
-        mut self,
-        value: impl Into<Option<MusicGroupKnowsAbout<S>>>,
-    ) -> Self {
+    pub fn knows_about(mut self, value: impl Into<Option<MusicGroupKnowsAbout<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
@@ -5022,18 +4713,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(
-        mut self,
-        value: impl Into<Option<MusicGroupKnowsLanguage<S>>>,
-    ) -> Self {
+    pub fn knows_language(mut self, value: impl Into<Option<MusicGroupKnowsLanguage<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(
-        mut self,
-        value: Option<MusicGroupKnowsLanguage<S>>,
-    ) -> Self {
+    pub fn maybe_knows_language(mut self, value: Option<MusicGroupKnowsLanguage<S>>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -5041,18 +4726,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(
-        mut self,
-        value: impl Into<Option<MusicGroupLegalAddress<S>>>,
-    ) -> Self {
+    pub fn legal_address(mut self, value: impl Into<Option<MusicGroupLegalAddress<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(
-        mut self,
-        value: Option<MusicGroupLegalAddress<S>>,
-    ) -> Self {
+    pub fn maybe_legal_address(mut self, value: Option<MusicGroupLegalAddress<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -5060,10 +4739,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(
-        mut self,
-        value: impl Into<Option<MusicGroupLegalName<S>>>,
-    ) -> Self {
+    pub fn legal_name(mut self, value: impl Into<Option<MusicGroupLegalName<S>>>) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -5153,10 +4829,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(
-        mut self,
-        value: impl Into<Option<MusicGroupMakesOffer<S>>>,
-    ) -> Self {
+    pub fn makes_offer(mut self, value: impl Into<Option<MusicGroupMakesOffer<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
@@ -5261,10 +4934,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(
-        mut self,
-        value: Option<MusicGroupNonprofitStatus<S>>,
-    ) -> Self {
+    pub fn maybe_nonprofit_status(mut self, value: Option<MusicGroupNonprofitStatus<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -5350,10 +5020,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(
-        mut self,
-        value: Option<MusicGroupPotentialAction<S>>,
-    ) -> Self {
+    pub fn maybe_potential_action(mut self, value: Option<MusicGroupPotentialAction<S>>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -5432,18 +5099,12 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(
-        mut self,
-        value: impl Into<Option<MusicGroupServiceArea<S>>>,
-    ) -> Self {
+    pub fn service_area(mut self, value: impl Into<Option<MusicGroupServiceArea<S>>>) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(
-        mut self,
-        value: Option<MusicGroupServiceArea<S>>,
-    ) -> Self {
+    pub fn maybe_service_area(mut self, value: Option<MusicGroupServiceArea<S>>) -> Self {
         self._fields.82 = value;
         self
     }
@@ -5498,10 +5159,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(
-        mut self,
-        value: Option<MusicGroupSubOrganization<S>>,
-    ) -> Self {
+    pub fn maybe_sub_organization(mut self, value: Option<MusicGroupSubOrganization<S>>) -> Self {
         self._fields.86 = value;
         self
     }
@@ -5509,10 +5167,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(
-        mut self,
-        value: impl Into<Option<MusicGroupSubjectOf<S>>>,
-    ) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<MusicGroupSubjectOf<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
@@ -5538,10 +5193,7 @@ impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
 
 impl<St: music_group_state::State, S: BosStr> MusicGroupBuilder<St, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(
-        mut self,
-        value: impl Into<Option<MusicGroupTelephone<S>>>,
-    ) -> Self {
+    pub fn telephone(mut self, value: impl Into<Option<MusicGroupTelephone<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
@@ -5729,10 +5381,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MusicGroup<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MusicGroup<S> {
         MusicGroup {
             accepted_payment_method: self._fields.0,
             actionable_feedback_policy: self._fields.1,

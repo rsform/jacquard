@@ -10,19 +10,21 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBlob<S: BosStr = DefaultStr> {
     pub cid: S,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -30,29 +32,24 @@ pub struct GetBlobOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetBlobError {
     /// The requested blob was not found.
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(Option<SmolStr>),
+    BlobNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Invalid CID format or missing parameters.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<SmolStr>),
+    InvalidRequest(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetBlobError {
@@ -132,7 +129,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
 
 pub mod get_blob_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -211,10 +208,7 @@ where
     St::Cid: get_blob_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(
-        mut self,
-        value: impl Into<S>,
-    ) -> GetBlobBuilder<get_blob_state::SetCid<St>, S> {
+    pub fn cid(mut self, value: impl Into<S>) -> GetBlobBuilder<get_blob_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetBlobBuilder {
             _state: PhantomData,

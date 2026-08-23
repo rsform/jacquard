@@ -392,8 +392,11 @@ impl<C: HttpClient + Sync> LexiconAuthorityResolver for crate::JacquardResolver<
                 }
             }
             Err(_) => {
-                self.invalidate_authority_chain(nsid.domain_authority())
-                    .await;
+                if let Some(caches) = &self.caches {
+                    let authority =
+                        jacquard_common::deps::smol_str::SmolStr::from(nsid.domain_authority());
+                    crate::cache_impl::invalidate(&caches.authority_to_did, &authority);
+                }
             }
         }
 

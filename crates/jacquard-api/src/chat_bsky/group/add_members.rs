@@ -8,19 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::actor::ProfileViewBasic;
+use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::actor::ProfileViewBasic;
-use crate::chat_bsky::convo::ConvoView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddMembers<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub members: Vec<Did<S>>,
@@ -28,9 +31,11 @@ pub struct AddMembers<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddMembersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_members: Option<Vec<ProfileViewBasic<S>>>,
@@ -39,43 +44,38 @@ pub struct AddMembersOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum AddMembersError {
     #[serde(rename = "AccountSuspended")]
-    AccountSuspended(Option<SmolStr>),
+    AccountSuspended(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "BlockedActor")]
-    BlockedActor(Option<SmolStr>),
+    BlockedActor(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "BlockedSubject")]
-    BlockedSubject(Option<SmolStr>),
+    BlockedSubject(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "ConvoLocked")]
-    ConvoLocked(Option<SmolStr>),
+    ConvoLocked(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InsufficientRole")]
-    InsufficientRole(Option<SmolStr>),
+    InsufficientRole(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidConvo")]
-    InvalidConvo(Option<SmolStr>),
+    InvalidConvo(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "MemberLimitReached")]
-    MemberLimitReached(Option<SmolStr>),
+    MemberLimitReached(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "NotFollowedBySender")]
-    NotFollowedBySender(Option<SmolStr>),
+    NotFollowedBySender(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "RecipientNotFound")]
-    RecipientNotFound(Option<SmolStr>),
+    RecipientNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "UserForbidsGroups")]
-    UserForbidsGroups(Option<SmolStr>),
+    UserForbidsGroups(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for AddMembersError {
@@ -175,9 +175,8 @@ impl jacquard_common::xrpc::XrpcResp for AddMembersResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddMembers<S> {
     const NSID: &'static str = "chat.bsky.group.addMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddMembersResponse;
 }
 
@@ -187,16 +186,15 @@ Path: `/xrpc/chat.bsky.group.addMembers`. The request payload type is `AddMember
 pub struct AddMembersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddMembersRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.addMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AddMembers<S>;
     type Response = AddMembersResponse;
 }
 
 pub mod add_members_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -334,10 +332,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AddMembers<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddMembers<S> {
         AddMembers {
             convo_id: self._fields.0.unwrap(),
             members: self._fields.1.unwrap(),

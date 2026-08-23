@@ -188,9 +188,6 @@
 
 pub mod client;
 
-#[cfg(feature = "streaming")]
-/// Streaming endpoints
-pub mod streaming;
 /// Jetstream v2: `.jss` archive decoding and replay orchestration.
 ///
 /// Requires `streaming` (the generated `subscribeRepos`/`subscribeEvents`
@@ -199,6 +196,9 @@ pub mod streaming;
 /// upstream.
 #[cfg(feature = "streaming")]
 pub mod jetstream;
+#[cfg(feature = "streaming")]
+/// Streaming endpoints
+pub mod streaming;
 
 #[cfg(feature = "api_bluesky")]
 pub mod richtext;

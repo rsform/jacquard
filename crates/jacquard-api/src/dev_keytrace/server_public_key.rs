@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A signing key for claim attestations. It effectively hosts a JWK on a user's ATProto repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,14 +37,14 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ServerPublicKey<S: BosStr = DefaultStr> {
-    ///Optional comment or description.
+    /// Optional comment or description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///JWK public key as a JSON string (RFC 7517 format)
+    /// JWK public key as a JSON string (RFC 7517 format)
     pub public_jwk: S,
-    ///Datetime from which this key is valid (ISO 8601).
+    /// Datetime from which this key is valid (ISO 8601).
     pub valid_from: Datetime,
-    ///Datetime until which this key is valid (ISO 8601).
+    /// Datetime until which this key is valid (ISO 8601).
     pub valid_until: Datetime,
     #[serde(
         flatten,
@@ -144,9 +144,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -158,7 +157,7 @@ where
 
 pub mod server_public_key_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,10 +214,7 @@ pub mod server_public_key_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ServerPublicKeyBuilder<
-    St: server_public_key_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ServerPublicKeyBuilder<St: server_public_key_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
@@ -348,10 +344,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ServerPublicKey<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ServerPublicKey<S> {
         ServerPublicKey {
             comment: self._fields.0,
             public_jwk: self._fields.1.unwrap(),
@@ -363,10 +356,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_serverPublicKey() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.serverPublicKey"),

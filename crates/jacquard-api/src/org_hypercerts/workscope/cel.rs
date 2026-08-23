@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,22 +21,25 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Cel<S: BosStr = DefaultStr> {
-    ///Client-declared timestamp when this expression was originally created.
+    /// Client-declared timestamp when this expression was originally created.
     pub created_at: Datetime,
-    ///A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
+    /// A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
     pub expression: S,
-    ///Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.
+    /// Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.
     pub used_tags: Vec<StrongRef<S>>,
-    ///CEL context schema version.
+    /// CEL context schema version.
     pub version: CelVersion<S>,
     #[serde(
         flatten,
@@ -190,15 +193,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod cel_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -425,10 +427,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_workscope_cel() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.workscope.cel"),

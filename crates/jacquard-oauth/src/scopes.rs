@@ -13,8 +13,8 @@
 //! [transitional scopes](https://atproto.com/specs/oauth#transitional-scopes).
 //! The AT Protocol docs also provide an interactive
 //! [scope builder](https://atproto.com/guides/scope-builder) for choosing
-//! appropriate scopes before translating them into [`Scope`] constructors or a
-//! [`ScopesBuilder`] chain.
+//! appropriate scopes before translating them into [`Scope`](crate::scopes::Scope)
+//! constructors or a [`ScopesBuilder`](crate::scopes::ScopesBuilder) chain.
 //!
 //! Scopes in AT Protocol follow a prefix-based format with optional query parameters:
 //! - `account`: Access to account information (email, repo, status)
@@ -31,8 +31,10 @@
 //! - `profile`: Access to user profile information
 //! - `email`: Access to user email address
 //!
-//! Programmatic construction is available through [`Scope`] constructors,
-//! [`Scopes::from_scopes`], and [`ScopesBuilder`]:
+//! Programmatic construction is available through
+//! [`Scope`](crate::scopes::Scope) constructors,
+//! [`Scopes::from_scopes`](crate::scopes::Scopes::from_scopes), and
+//! [`ScopesBuilder`](crate::scopes::ScopesBuilder):
 //!
 //! ```rust
 //! use jacquard_oauth::scopes::{Scope, Scopes};
@@ -634,8 +636,7 @@ fn space_scope_grants<T: BosStr, U: BosStr>(a: &SpaceScope<T>, b: &SpaceScope<U>
     for action in &b.actions {
         let granted = match action {
             SpaceAction::ReadSelf => {
-                a.actions.contains(&SpaceAction::Read)
-                    || a.actions.contains(&SpaceAction::ReadSelf)
+                a.actions.contains(&SpaceAction::Read) || a.actions.contains(&SpaceAction::ReadSelf)
             }
             SpaceAction::Read => a.actions.contains(&SpaceAction::Read),
             SpaceAction::Create | SpaceAction::Update | SpaceAction::Delete => {
@@ -657,8 +658,7 @@ fn space_scope_grants<T: BosStr, U: BosStr>(a: &SpaceScope<T>, b: &SpaceScope<U>
     });
     if b_has_writes {
         let a_allows_all = a.collections.is_empty()
-            || a
-                .collections
+            || a.collections
                 .iter()
                 .any(|c| matches!(c, SpaceCollection::All));
         let within = if b.collections.is_empty() {
@@ -862,9 +862,7 @@ pub enum SpaceAuthority<S: BosStr = DefaultStr> {
 
 impl<S: BosStr> SpaceAuthority<S> {
     /// Convert to a `SpaceAuthority` with a different backing type.
-    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(
-        self,
-    ) -> SpaceAuthority<B> {
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> SpaceAuthority<B> {
         match self {
             SpaceAuthority::All => SpaceAuthority::All,
             SpaceAuthority::Self_ => SpaceAuthority::Self_,
@@ -932,9 +930,7 @@ pub enum SpaceCollection<S: BosStr = DefaultStr> {
 
 impl<S: BosStr> SpaceCollection<S> {
     /// Convert to a `SpaceCollection` with a different backing type.
-    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(
-        self,
-    ) -> SpaceCollection<B> {
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> SpaceCollection<B> {
         match self {
             SpaceCollection::All => SpaceCollection::All,
             SpaceCollection::Nsid(nsid) => SpaceCollection::Nsid(nsid.convert()),
@@ -2432,11 +2428,9 @@ unsafe fn reconstruct_scope<'a>(buffer: &'a str, indices: &ScopeIndices) -> Scop
         } => {
             let space_type = match space_type {
                 None => SpaceType::All,
-                Some((start, end)) => {
-                    SpaceType::Nsid(unsafe {
-                        Nsid::unchecked(&buffer[*start as usize..*end as usize])
-                    })
-                }
+                Some((start, end)) => SpaceType::Nsid(unsafe {
+                    Nsid::unchecked(&buffer[*start as usize..*end as usize])
+                }),
             };
 
             // Empty authority signals the `self` default; `*` any.
@@ -2644,9 +2638,9 @@ impl<S: BosStr + Ord> Scope<S> {
                     authority = match *value {
                         "*" => SpaceAuthority::All,
                         "self" => SpaceAuthority::Self_,
-                        did => SpaceAuthority::Did(
-                            jacquard_common::types::did::Did::from_str(did)?,
-                        ),
+                        did => {
+                            SpaceAuthority::Did(jacquard_common::types::did::Did::from_str(did)?)
+                        }
                     };
                 }
             }
@@ -2658,9 +2652,10 @@ impl<S: BosStr + Ord> Scope<S> {
                     }
                     skey = match *value {
                         "*" => SpaceSkey::All,
-                        key => SpaceSkey::Key(S::from_str(key).map_err(|_| {
-                            ParseError::InvalidResource(key.to_smolstr())
-                        })?),
+                        key => SpaceSkey::Key(
+                            S::from_str(key)
+                                .map_err(|_| ParseError::InvalidResource(key.to_smolstr()))?,
+                        ),
                     };
                 }
             }
@@ -2670,8 +2665,7 @@ impl<S: BosStr + Ord> Scope<S> {
                     if *value == "*" {
                         collections.insert(SpaceCollection::All);
                     } else {
-                        collections
-                            .insert(SpaceCollection::Nsid(Nsid::from_str(*value)?));
+                        collections.insert(SpaceCollection::Nsid(Nsid::from_str(*value)?));
                     }
                 }
             }
@@ -2684,9 +2678,7 @@ impl<S: BosStr + Ord> Scope<S> {
                         "create" => SpaceAction::Create,
                         "update" => SpaceAction::Update,
                         "delete" => SpaceAction::Delete,
-                        other => {
-                            return Err(ParseError::InvalidAction(other.to_smolstr()))
-                        }
+                        other => return Err(ParseError::InvalidAction(other.to_smolstr())),
                     };
                     actions.insert(action);
                 }
@@ -2698,9 +2690,7 @@ impl<S: BosStr + Ord> Scope<S> {
                         "create" => SpaceManageOp::Create,
                         "update" => SpaceManageOp::Update,
                         "delete" => SpaceManageOp::Delete,
-                        other => {
-                            return Err(ParseError::InvalidAction(other.to_smolstr()))
-                        }
+                        other => return Err(ParseError::InvalidAction(other.to_smolstr())),
                     };
                     manage.insert(op);
                 }
@@ -3096,9 +3086,7 @@ impl<S: BosStr + Ord> Scope<S> {
                 match &scope.authority {
                     SpaceAuthority::All => params.push("authority=*".to_smolstr()),
                     SpaceAuthority::Self_ => {}
-                    SpaceAuthority::Did(did) => {
-                        params.push(format_smolstr!("authority={}", did))
-                    }
+                    SpaceAuthority::Did(did) => params.push(format_smolstr!("authority={}", did)),
                 }
                 if let SpaceSkey::Key(key) = &scope.skey {
                     params.push(format_smolstr!("skey={}", key.as_ref()));
@@ -3903,10 +3891,7 @@ mod tests {
                             .unwrap()
                     )
                 );
-                assert_eq!(
-                    s.skey,
-                    SpaceSkey::Key(SmolStr::new("main"))
-                );
+                assert_eq!(s.skey, SpaceSkey::Key(SmolStr::new("main")));
                 assert!(s.collections.contains(&SpaceCollection::Nsid(
                     Nsid::new_owned("com.example.post").unwrap()
                 )));
@@ -3918,8 +3903,7 @@ mod tests {
 
         // Default authority and skey are omitted from the normalized form.
         let scope: Scope =
-            Scope::parse("space:dev.jacquard.e2e.space?authority=self&skey=*&action=read")
-                .unwrap();
+            Scope::parse("space:dev.jacquard.e2e.space?authority=self&skey=*&action=read").unwrap();
         assert_eq!(
             scope.to_string_normalized(),
             "space:dev.jacquard.e2e.space?action=read"
@@ -3927,7 +3911,9 @@ mod tests {
 
         // Invalid action and invalid authority DID are rejected.
         assert!(Scope::<SmolStr>::parse("space:dev.jacquard.e2e.space?action=manage").is_err());
-        assert!(Scope::<SmolStr>::parse("space:dev.jacquard.e2e.space?authority=not-a-did").is_err());
+        assert!(
+            Scope::<SmolStr>::parse("space:dev.jacquard.e2e.space?authority=not-a-did").is_err()
+        );
         assert!(Scope::<SmolStr>::parse("space:not an nsid").is_err());
         assert!(Scope::<SmolStr>::parse("space").is_err());
     }
@@ -3944,9 +3930,7 @@ mod tests {
 
         // Wildcard type and authority cover concrete values.
         let wildcard = parse("space:*?authority=*&action=read");
-        let concrete = parse(
-            "space:dev.t.example?authority=did:web:example.test&action=read",
-        );
+        let concrete = parse("space:dev.t.example?authority=did:web:example.test&action=read");
         assert!(wildcard.grants(&concrete));
         assert!(!concrete.grants(&wildcard));
 
@@ -3965,9 +3949,8 @@ mod tests {
         assert!(!skey.grants(&any_skey));
 
         // Collection constraints bind write actions.
-        let write_post = parse(
-            "space:dev.t.example?authority=*&action=create&collection=com.example.post",
-        );
+        let write_post =
+            parse("space:dev.t.example?authority=*&action=create&collection=com.example.post");
         let write_any = parse("space:dev.t.example?authority=*&action=create");
         assert!(write_any.grants(&write_post));
         assert!(!write_post.grants(&write_any));

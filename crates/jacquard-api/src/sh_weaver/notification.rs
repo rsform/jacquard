@@ -11,13 +11,12 @@ pub mod get_unread_count;
 pub mod list_notifications;
 pub mod update_seen;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,24 +27,27 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 use crate::sh_weaver::notification;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A notification for a user.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Notification<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
     pub indexed_at: Datetime,
     pub is_read: bool,
     pub reason: notification::NotificationReason<S>,
-    ///The subject of the notification (entry, notebook, etc).
+    /// The subject of the notification (entry, notebook, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason_subject: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,9 +65,12 @@ pub struct Notification<S: BosStr = DefaultStr> {
 /// Grouped notifications (e.g., '5 people liked your entry').
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotificationGroup<S: BosStr = DefaultStr> {
-    ///Most recent actors (up to 5).
+    /// Most recent actors (up to 5).
     pub actors: Vec<ProfileViewBasic<S>>,
     pub count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,7 +86,6 @@ pub struct NotificationGroup<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -198,12 +202,8 @@ where
             NotificationReason::FollowAccept => NotificationReason::FollowAccept,
             NotificationReason::Subscribe => NotificationReason::Subscribe,
             NotificationReason::SubscribeAccept => NotificationReason::SubscribeAccept,
-            NotificationReason::CollaborationInvite => {
-                NotificationReason::CollaborationInvite
-            }
-            NotificationReason::CollaborationAccept => {
-                NotificationReason::CollaborationAccept
-            }
+            NotificationReason::CollaborationInvite => NotificationReason::CollaborationInvite,
+            NotificationReason::CollaborationAccept => NotificationReason::CollaborationAccept,
             NotificationReason::NewEntry => NotificationReason::NewEntry,
             NotificationReason::EntryUpdate => NotificationReason::EntryUpdate,
             NotificationReason::Mention => NotificationReason::Mention,
@@ -217,13 +217,16 @@ where
 /// New content from a notebook subscription.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubscriptionUpdateView<S: BosStr = DefaultStr> {
-    ///New entries since last check.
+    /// New entries since last check.
     pub new_entries: Vec<EntryView<S>>,
     pub notebook: NotebookView<S>,
     pub updated_at: Datetime,
-    ///Entries that were updated.
+    /// Entries that were updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_entries: Option<Vec<EntryView<S>>>,
     #[serde(
@@ -298,15 +301,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -633,10 +635,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Notification<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
         Notification {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -652,10 +651,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notification.defs"),
@@ -665,23 +664,21 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("notification"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A notification for a user.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("reason"),
-                            SmolStr::new_static("isRead"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("reason"),
+                        SmolStr::new_static("isRead"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -715,11 +712,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("reasonSubject"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The subject of the notification (entry, notebook, etc).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The subject of the notification (entry, notebook, etc).",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -745,28 +740,25 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notificationGroup"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Grouped notifications (e.g., '5 people liked your entry').",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("reason"),
-                            SmolStr::new_static("subject"), SmolStr::new_static("count"),
-                            SmolStr::new_static("actors"),
-                            SmolStr::new_static("mostRecentAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Grouped notifications (e.g., '5 people liked your entry').",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("reason"),
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("count"),
+                        SmolStr::new_static("actors"),
+                        SmolStr::new_static("mostRecentAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("actors"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Most recent actors (up to 5)."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Most recent actors (up to 5).",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "sh.weaver.actor.defs#profileViewBasic",
@@ -808,7 +800,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
-                                    CowStr::new_static("sh.weaver.notebook.defs#entryView")
+                                    CowStr::new_static("sh.weaver.notebook.defs#entryView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -821,38 +813,32 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("notificationReason"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("Why this notification was generated."),
-                    ),
+                    description: Some(CowStr::new_static("Why this notification was generated.")),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("subscriptionUpdateView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("New content from a notebook subscription."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("notebook"),
-                            SmolStr::new_static("newEntries"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "New content from a notebook subscription.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("notebook"),
+                        SmolStr::new_static("newEntries"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("newEntries"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("New entries since last check."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "New entries since last check.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "sh.weaver.notebook.defs#entryView",
-                                    ),
+                                    r#ref: CowStr::new_static("sh.weaver.notebook.defs#entryView"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -861,9 +847,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("notebook"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.notebook.defs#notebookView",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
                                 ..Default::default()
                             }),
                         );
@@ -877,13 +861,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("updatedEntries"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Entries that were updated."),
-                                ),
+                                description: Some(CowStr::new_static("Entries that were updated.")),
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "sh.weaver.notebook.defs#entryView",
-                                    ),
+                                    r#ref: CowStr::new_static("sh.weaver.notebook.defs#entryView"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -907,15 +887,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod notification_group_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1006,10 +985,7 @@ pub mod notification_group_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotificationGroupBuilder<
-    St: notification_group_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct NotificationGroupBuilder<St: notification_group_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<ProfileViewBasic<S>>>,
@@ -1024,10 +1000,7 @@ pub struct NotificationGroupBuilder<
 
 impl NotificationGroup<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> NotificationGroupBuilder<
-        notification_group_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> NotificationGroupBuilder<notification_group_state::Empty, DefaultStr> {
         NotificationGroupBuilder::new()
     }
 }
@@ -1191,10 +1164,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> NotificationGroup<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotificationGroup<S> {
         NotificationGroup {
             actors: self._fields.0.unwrap(),
             count: self._fields.1.unwrap(),
@@ -1214,15 +1184,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod subscription_update_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1295,20 +1264,15 @@ pub struct SubscriptionUpdateViewBuilder<
 
 impl SubscriptionUpdateView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubscriptionUpdateViewBuilder<
-        subscription_update_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> SubscriptionUpdateViewBuilder<subscription_update_view_state::Empty, DefaultStr>
+    {
         SubscriptionUpdateViewBuilder::new()
     }
 }
 
 impl<S: BosStr> SubscriptionUpdateView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> SubscriptionUpdateViewBuilder<
-        subscription_update_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> SubscriptionUpdateViewBuilder<subscription_update_view_state::Empty, S> {
         SubscriptionUpdateViewBuilder::builder()
     }
 }
@@ -1344,10 +1308,7 @@ where
     pub fn new_entries(
         mut self,
         value: impl Into<Vec<EntryView<S>>>,
-    ) -> SubscriptionUpdateViewBuilder<
-        subscription_update_view_state::SetNewEntries<St>,
-        S,
-    > {
+    ) -> SubscriptionUpdateViewBuilder<subscription_update_view_state::SetNewEntries<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _state: PhantomData,
@@ -1366,10 +1327,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<NotebookView<S>>,
-    ) -> SubscriptionUpdateViewBuilder<
-        subscription_update_view_state::SetNotebook<St>,
-        S,
-    > {
+    ) -> SubscriptionUpdateViewBuilder<subscription_update_view_state::SetNotebook<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _state: PhantomData,
@@ -1388,10 +1346,7 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SubscriptionUpdateViewBuilder<
-        subscription_update_view_state::SetUpdatedAt<St>,
-        S,
-    > {
+    ) -> SubscriptionUpdateViewBuilder<subscription_update_view_state::SetUpdatedAt<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _state: PhantomData,
@@ -1401,15 +1356,9 @@ where
     }
 }
 
-impl<
-    St: subscription_update_view_state::State,
-    S: BosStr,
-> SubscriptionUpdateViewBuilder<St, S> {
+impl<St: subscription_update_view_state::State, S: BosStr> SubscriptionUpdateViewBuilder<St, S> {
     /// Set the `updatedEntries` field (optional)
-    pub fn updated_entries(
-        mut self,
-        value: impl Into<Option<Vec<EntryView<S>>>>,
-    ) -> Self {
+    pub fn updated_entries(mut self, value: impl Into<Option<Vec<EntryView<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }

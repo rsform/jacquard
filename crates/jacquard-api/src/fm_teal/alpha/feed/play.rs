@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fm_teal::alpha::feed::Artist;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::feed::Artist;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -37,52 +37,52 @@ use crate::fm_teal::alpha::feed::Artist;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Play<S: BosStr = DefaultStr> {
-    ///DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.
+    /// DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_mb_ids: Option<Vec<S>>,
-    ///DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.
+    /// DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_names: Option<Vec<S>>,
-    ///Array of artists in order of original appearance.
+    /// Array of artists in order of original appearance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artists: Option<Vec<Artist<S>>>,
-    ///The length of the track in seconds
+    /// The length of the track in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
-    ///The ISRC code associated with the recording
+    /// The ISRC code associated with the recording
     #[serde(skip_serializing_if = "Option::is_none")]
     pub isrc: Option<S>,
-    ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
+    /// The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub music_service_base_domain: Option<S>,
-    ///The URL associated with this track
+    /// The URL associated with this track
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin_url: Option<S>,
-    ///The unix timestamp of when the track was played
+    /// The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
-    ///The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>
+    /// The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recording_mb_id: Option<UriValue<S>>,
-    ///Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
+    /// Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_discriminant: Option<S>,
-    ///The MusicBrainz release ID URI, formatted as mbid:<uuid>
+    /// The MusicBrainz release ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_mb_id: Option<UriValue<S>>,
-    ///The name of the release/album
+    /// The name of the release/album
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_name: Option<S>,
-    ///A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
+    /// A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submission_client_agent: Option<S>,
-    ///Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
+    /// Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_discriminant: Option<S>,
-    ///The MusicBrainz ID URI of the track, formatted as mbid:<uuid>
+    /// The MusicBrainz ID URI of the track, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_mb_id: Option<UriValue<S>>,
-    ///The name of the track
+    /// The name of the track
     pub track_name: S,
     #[serde(
         flatten,
@@ -175,8 +175,7 @@ impl<S: BosStr> LexiconSchema for Play<S> {
         if let Some(values) = &self.artist_names {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                     if count > 2560usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("artist_names"),
@@ -321,9 +320,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -335,7 +333,7 @@ where
 
 pub mod play_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -409,22 +407,8 @@ impl PlayBuilder<play_state::Empty, DefaultStr> {
         PlayBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -437,22 +421,8 @@ impl<S: BosStr> PlayBuilder<play_state::Empty, S> {
         PlayBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -725,10 +695,10 @@ where
 }
 
 fn lexicon_doc_fm_teal_alpha_feed_play() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.feed.play"),

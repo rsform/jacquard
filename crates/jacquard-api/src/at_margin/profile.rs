@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A profile for a user on the Margin network.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,20 +38,20 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///User avatar image.
+    /// User avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
-    ///User biography or description.
+    /// User biography or description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<S>,
     pub created_at: Datetime,
-    ///Display name for the user.
+    /// Display name for the user.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///List of other relevant links (e.g. GitHub, Bluesky, etc).
+    /// List of other relevant links (e.g. GitHub, Bluesky, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Vec<S>>,
-    ///User website URL.
+    /// User website URL.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<S>,
     #[serde(
@@ -134,25 +134,20 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -221,9 +216,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -235,7 +229,7 @@ where
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -431,10 +425,10 @@ where
 }
 
 fn lexicon_doc_at_margin_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.margin.profile"),
@@ -443,9 +437,9 @@ fn lexicon_doc_at_margin_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A profile for a user on the Margin network."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A profile for a user on the Margin network.",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("createdAt")]),
@@ -454,14 +448,16 @@ fn lexicon_doc_at_margin_profile() -> LexiconDoc<'static> {
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("User biography or description."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "User biography or description.",
+                                    )),
                                     max_length: Some(5000usize),
                                     ..Default::default()
                                 }),
@@ -476,9 +472,9 @@ fn lexicon_doc_at_margin_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("displayName"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Display name for the user."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name for the user.",
+                                    )),
                                     max_length: Some(640usize),
                                     ..Default::default()
                                 }),
@@ -486,11 +482,9 @@ fn lexicon_doc_at_margin_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("links"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "List of other relevant links (e.g. GitHub, Bluesky, etc).",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "List of other relevant links (e.g. GitHub, Bluesky, etc).",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(1000usize),
                                         ..Default::default()

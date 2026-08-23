@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fm_teal::alpha::feed::PlayView;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::feed::PlayView;
+use serde::{Deserialize, Serialize};
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the status of the actor. Only one can be shown at a time. If there are multiple, the latest record should be picked and earlier records should be deleted or tombstoned.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,11 +38,11 @@ use crate::fm_teal::alpha::feed::PlayView;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Status<S: BosStr = DefaultStr> {
-    ///The RFC 3339 formatted time of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
+    /// The RFC 3339 formatted time of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
     pub item: PlayView<S>,
-    ///The RFC 3339 formatted time of when the item was recorded
+    /// The RFC 3339 formatted time of when the item was recorded
     pub time: Datetime,
     #[serde(
         flatten,
@@ -119,9 +119,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -133,7 +132,7 @@ where
 
 pub mod status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -296,10 +295,10 @@ where
 }
 
 fn lexicon_doc_fm_teal_alpha_actor_status() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.actor.status"),

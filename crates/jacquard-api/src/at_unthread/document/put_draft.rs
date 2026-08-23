@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,10 +23,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DraftView<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
@@ -41,22 +44,26 @@ pub struct DraftView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutDraft<S: BosStr = DefaultStr> {
-    ///Markdown content of the draft.
+    /// Markdown content of the draft.
     pub content: S,
-    ///TID of an existing draft to update. Omit to create a new draft.
+    /// TID of an existing draft to update. Omit to create a new draft.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tid: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutDraftOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -64,25 +71,20 @@ pub struct PutDraftOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum PutDraftError {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(Option<SmolStr>),
+    DraftNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for PutDraftError {
@@ -134,9 +136,8 @@ impl jacquard_common::xrpc::XrpcResp for PutDraftResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutDraft<S> {
     const NSID: &'static str = "at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutDraftResponse;
 }
 
@@ -146,9 +147,8 @@ Path: `/xrpc/at.unthread.document.putDraft`. The request payload type is `PutDra
 pub struct PutDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutDraftRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PutDraft<S>;
     type Response = PutDraftResponse;
 }
@@ -160,15 +160,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod draft_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -327,10 +326,7 @@ where
     St::Tid: draft_view_state::IsUnset,
 {
     /// Set the `tid` field (required)
-    pub fn tid(
-        mut self,
-        value: impl Into<S>,
-    ) -> DraftViewBuilder<draft_view_state::SetTid<St>, S> {
+    pub fn tid(mut self, value: impl Into<S>) -> DraftViewBuilder<draft_view_state::SetTid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -378,10 +374,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DraftView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DraftView<S> {
         DraftView {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -393,10 +386,10 @@ where
 }
 
 fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.unthread.document.putDraft"),
@@ -405,19 +398,20 @@ fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("draftView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("tid"), SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("tid"),
+                        SmolStr::new_static("content"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -428,7 +422,9 @@ fn lexicon_doc_at_unthread_document_putDraft() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("tid"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),

@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /** Request marker for the `com.atproto.identity.requestPlcOperationSignature` procedure.
 
 This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
@@ -46,14 +46,10 @@ impl jacquard_common::xrpc::XrpcResp for RequestPlcOperationSignatureResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestPlcOperationSignature {
     const NSID: &'static str = "com.atproto.identity.requestPlcOperationSignature";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RequestPlcOperationSignatureResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -64,9 +60,8 @@ Path: `/xrpc/com.atproto.identity.requestPlcOperationSignature`. The request pay
 pub struct RequestPlcOperationSignatureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPlcOperationSignatureRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.requestPlcOperationSignature";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RequestPlcOperationSignature;
     type Response = RequestPlcOperationSignatureResponse;
 }

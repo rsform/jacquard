@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Named label pointing to a dataset entry. Multiple labels with the same name but different versions can coexist, enabling versioned references to immutable dataset entries.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,16 +37,16 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Label<S: BosStr = DefaultStr> {
-    ///Timestamp when this label was created
+    /// Timestamp when this label was created
     pub created_at: Datetime,
-    ///AT-URI pointing to the dataset entry this label refers to
+    /// AT-URI pointing to the dataset entry this label refers to
     pub dataset_uri: AtUri<S>,
-    ///Optional description of this labeled version
+    /// Optional description of this labeled version
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///User-facing label name, e.g. 'mnist'
+    /// User-facing label name, e.g. 'mnist'
     pub name: S,
-    ///Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.
+    /// Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<S>,
     #[serde(
@@ -166,9 +166,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -180,7 +179,7 @@ where
 
 pub mod label_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -239,7 +238,13 @@ pub mod label_state {
 /// Builder for constructing an instance of this type.
 pub struct LabelBuilder<St: label_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<S>, Option<S>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -336,10 +341,7 @@ where
     St::Name: label_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> LabelBuilder<label_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> LabelBuilder<label_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LabelBuilder {
             _state: PhantomData,
@@ -394,10 +396,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_label() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.label"),

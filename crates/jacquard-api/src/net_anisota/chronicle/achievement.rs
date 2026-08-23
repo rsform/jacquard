@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,28 +24,31 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::chronicle::achievement;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::chronicle::achievement;
+use serde::{Deserialize, Serialize};
 /// Contextual data at the time of achievement unlock
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AchievementContext<S: BosStr = DefaultStr> {
-    ///Follower count when achievement was unlocked
+    /// Follower count when achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follower_count: Option<i64>,
-    ///Player level when achievement was unlocked
+    /// Player level when achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub level: Option<i64>,
-    ///Post count when achievement was unlocked
+    /// Post count when achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_count: Option<i64>,
-    ///Specimen count when achievement was unlocked
+    /// Specimen count when achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimen_count: Option<i64>,
-    ///Total XP when achievement was unlocked
+    /// Total XP when achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_xp: Option<i64>,
     #[serde(
@@ -60,19 +63,22 @@ pub struct AchievementContext<S: BosStr = DefaultStr> {
 /// ES256 cryptographic signature proving record authenticity. The signature itself proves legitimacy - no separate verification lexicons needed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
-    ///Signing algorithm (ES256)
+    /// Signing algorithm (ES256)
     pub alg: S,
-    ///Key identifier for the signing key
+    /// Key identifier for the signing key
     pub kid: S,
-    ///Unique random nonce to prevent replay
+    /// Unique random nonce to prevent replay
     pub nonce: S,
-    ///Base64-encoded ES256 signature
+    /// Base64-encoded ES256 signature
     pub sig: S,
-    ///When the record was signed
+    /// When the record was signed
     pub signed_at: Datetime,
-    ///Signature schema version
+    /// Signature schema version
     pub version: i64,
     #[serde(
         flatten,
@@ -93,33 +99,33 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Achievement<S: BosStr = DefaultStr> {
-    ///Unique identifier for the achievement (e.g. 'followers2500', 'level50')
+    /// Unique identifier for the achievement (e.g. 'followers2500', 'level50')
     pub achievement_id: S,
-    ///Category of the achievement
+    /// Category of the achievement
     pub category: AchievementCategory<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<achievement::AchievementContext<S>>,
-    ///When the achievement record was created
+    /// When the achievement record was created
     pub created_at: Datetime,
-    ///AT URI of the daily record when the achievement was unlocked
+    /// AT URI of the daily record when the achievement was unlocked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_record_ref: Option<S>,
-    ///Description of what was accomplished
+    /// Description of what was accomplished
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Display name of the achievement
+    /// Display name of the achievement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Rarity tier of the achievement
+    /// Rarity tier of the achievement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<AchievementRarity<S>>,
     pub signature: achievement::ChronicleSignature<S>,
-    ///Tier or milestone value (e.g. 2500 for followers2500)
+    /// Tier or milestone value (e.g. 2500 for followers2500)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tier: Option<i64>,
-    ///When the achievement was unlocked
+    /// When the achievement was unlocked
     pub unlocked_at: Datetime,
-    ///XP awarded for this achievement
+    /// XP awarded for this achievement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_reward: Option<i64>,
     #[serde(
@@ -511,17 +517,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_net_anisota_chronicle_achievement() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.achievement"),
@@ -530,11 +535,9 @@ fn lexicon_doc_net_anisota_chronicle_achievement() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("achievementContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Contextual data at the time of achievement unlock",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Contextual data at the time of achievement unlock",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -806,15 +809,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -925,21 +927,22 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<
-    St: chronicle_signature_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<
-        chronicle_signature_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -1110,10 +1113,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ChronicleSignature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -1133,9 +1133,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -1147,7 +1146,7 @@ where
 
 pub mod achievement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1277,18 +1276,7 @@ impl AchievementBuilder<achievement_state::Empty, DefaultStr> {
         AchievementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1301,18 +1289,7 @@ impl<S: BosStr> AchievementBuilder<achievement_state::Empty, S> {
         AchievementBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1359,18 +1336,12 @@ where
 
 impl<St: achievement_state::State, S: BosStr> AchievementBuilder<St, S> {
     /// Set the `context` field (optional)
-    pub fn context(
-        mut self,
-        value: impl Into<Option<achievement::AchievementContext<S>>>,
-    ) -> Self {
+    pub fn context(mut self, value: impl Into<Option<achievement::AchievementContext<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `context` field to an Option value (optional)
-    pub fn maybe_context(
-        mut self,
-        value: Option<achievement::AchievementContext<S>>,
-    ) -> Self {
+    pub fn maybe_context(mut self, value: Option<achievement::AchievementContext<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1539,10 +1510,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Achievement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Achievement<S> {
         Achievement {
             achievement_id: self._fields.0.unwrap(),
             category: self._fields.1.unwrap(),

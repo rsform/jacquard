@@ -1743,14 +1743,14 @@ mod tests {
             assert!(result.is_err(), "Key '{}' should be invalid", key);
         }
 
-        // Rejects keys over 256 chars
-        let long_key: String = "a".repeat(253);
+        // Rejects keys over 830 bytes
+        let long_key: String = "a".repeat(827);
         let key = format!("coll/{}", long_key);
         let result = mst.add(&key, cid1).await;
         assert!(result.is_err());
 
-        // Allows long key under 256 chars
-        let long_key: String = "a".repeat(250);
+        // Allows keys at the 830-byte limit
+        let long_key: String = "a".repeat(825);
         let key = format!("coll/{}", long_key);
         let result = mst.add(&key, cid1).await;
         assert!(result.is_ok());

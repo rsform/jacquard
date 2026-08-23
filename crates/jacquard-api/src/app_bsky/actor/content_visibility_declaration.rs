@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of an account's preferences for appearing in content discovery surfaces.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,7 +37,7 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ContentVisibilityDeclaration<S: BosStr = DefaultStr> {
-    ///Whether the account requests that its posts be hidden from algorithmic recommendations. Consumers must treat a missing record as false.
+    /// Whether the account requests that its posts be hidden from algorithmic recommendations. Consumers must treat a missing record as false.
     pub hide_from_algorithmic_recommendations: bool,
     #[serde(
         flatten,
@@ -60,9 +60,7 @@ pub struct ContentVisibilityDeclarationGetRecordOutput<S: BosStr = DefaultStr> {
 }
 
 impl<S: BosStr> ContentVisibilityDeclaration<S> {
-    pub fn uri(
-        uri: S,
-    ) -> Result<RecordUri<S, ContentVisibilityDeclarationRecord>, UriError> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ContentVisibilityDeclarationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
@@ -79,7 +77,8 @@ impl XrpcResp for ContentVisibilityDeclarationRecord {
 }
 
 impl<S: BosStr> From<ContentVisibilityDeclarationGetRecordOutput<S>>
-for ContentVisibilityDeclaration<S> {
+    for ContentVisibilityDeclaration<S>
+{
     fn from(output: ContentVisibilityDeclarationGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -117,9 +116,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -131,7 +129,7 @@ where
 
 pub mod content_visibility_declaration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -148,14 +146,11 @@ pub mod content_visibility_declaration_state {
         type HideFromAlgorithmicRecommendations = Unset;
     }
     ///State transition - sets the `hide_from_algorithmic_recommendations` field to Set
-    pub struct SetHideFromAlgorithmicRecommendations<St: State = Empty>(
-        PhantomData<fn() -> St>,
-    );
+    pub struct SetHideFromAlgorithmicRecommendations<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHideFromAlgorithmicRecommendations<St> {}
     impl<St: State> State for SetHideFromAlgorithmicRecommendations<St> {
-        type HideFromAlgorithmicRecommendations = Set<
-            members::hide_from_algorithmic_recommendations,
-        >;
+        type HideFromAlgorithmicRecommendations =
+            Set<members::hide_from_algorithmic_recommendations>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -177,28 +172,22 @@ pub struct ContentVisibilityDeclarationBuilder<
 
 impl ContentVisibilityDeclaration<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ContentVisibilityDeclarationBuilder<
-        content_visibility_declaration_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> ContentVisibilityDeclarationBuilder<content_visibility_declaration_state::Empty, DefaultStr>
+    {
         ContentVisibilityDeclarationBuilder::new()
     }
 }
 
 impl<S: BosStr> ContentVisibilityDeclaration<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ContentVisibilityDeclarationBuilder<
-        content_visibility_declaration_state::Empty,
-        S,
-    > {
+    pub fn builder()
+    -> ContentVisibilityDeclarationBuilder<content_visibility_declaration_state::Empty, S> {
         ContentVisibilityDeclarationBuilder::builder()
     }
 }
 
-impl ContentVisibilityDeclarationBuilder<
-    content_visibility_declaration_state::Empty,
-    DefaultStr,
-> {
+impl ContentVisibilityDeclarationBuilder<content_visibility_declaration_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContentVisibilityDeclarationBuilder {
@@ -209,9 +198,9 @@ impl ContentVisibilityDeclarationBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> ContentVisibilityDeclarationBuilder<content_visibility_declaration_state::Empty, S> {
+impl<S: BosStr>
+    ContentVisibilityDeclarationBuilder<content_visibility_declaration_state::Empty, S>
+{
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ContentVisibilityDeclarationBuilder {
@@ -269,10 +258,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_actor_contentVisibilityDeclaration() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.actor.contentVisibilityDeclaration"),

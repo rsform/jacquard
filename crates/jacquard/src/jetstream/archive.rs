@@ -11,15 +11,15 @@ use jacquard_api::network_bsky::jetstream::get_zstd_dictionary::GetZstdDictionar
 use jacquard_api::network_bsky::jetstream::plan_snapshot::{PlanSnapshot, PlanSnapshotOutput};
 use jacquard_common::AuthorizationToken;
 use jacquard_common::deps::fluent_uri::Uri;
-use jacquard_common::error::XrpcResult;
+use jacquard_common::error::{ClientError, ClientErrorKind, HttpError, XrpcResult};
 use jacquard_common::http_client::{HttpClient, HttpClientExt};
 use jacquard_common::stream::{ByteStream, StreamError};
 use jacquard_common::xrpc::streaming::{
     XrpcProcedureSend, XrpcProcedureStream, XrpcResponseStream, XrpcStreamResp,
 };
 use jacquard_common::xrpc::{
-    CallOptions, GenericXrpcError, StreamingResponse, XrpcClient, XrpcExt, XrpcRequest,
-    XrpcResponse, XrpcStreamingClient, build_http_request, normalize_base_uri,
+    CallOptions, GenericXrpcError, Response, StreamingResponse, XrpcClient, XrpcExt, XrpcRequest,
+    XrpcResponse, XrpcStreamingClient, normalize_base_uri,
 };
 use smol_str::{SmolStr, format_smolstr};
 
@@ -36,7 +36,113 @@ fn parse_retry_after(value: &str) -> Option<u64> {
     Some(at.duration_since(now).map(|d| d.as_secs()).unwrap_or(0))
 }
 
-/// Errors surfaced by the jetstream v2 http transport.
+fn map_client_error<E>(error: ClientError) -> JetstreamError<E>
+where
+    E: core::error::Error + Send + Sync + 'static,
+{
+    let message = error.to_string();
+    let status = error.status();
+    let headers = error.headers().cloned();
+    let body = error
+        .source_err()
+        .and_then(|source| source.downcast_ref::<HttpError>())
+        .and_then(|http_error| http_error.body.clone());
+
+    if matches!(error.kind(), ClientErrorKind::Auth(_))
+        || status == Some(http::StatusCode::UNAUTHORIZED)
+    {
+        return JetstreamError::InvalidBearerCredential;
+    }
+
+    match status {
+        Some(http::StatusCode::TOO_MANY_REQUESTS) => {
+            let retry_after = headers
+                .as_ref()
+                .and_then(|headers| headers.get(http::header::RETRY_AFTER))
+                .and_then(|value| value.to_str().ok())
+                .and_then(parse_retry_after);
+            JetstreamError::ByteLimitExceeded { retry_after }
+        }
+        Some(http::StatusCode::NOT_FOUND) => {
+            let error_body = body
+                .as_deref()
+                .and_then(|body| serde_json::from_slice::<GenericXrpcError>(body).ok());
+            JetstreamError::NotFound {
+                error: error_body
+                    .map(|body| body.error)
+                    .unwrap_or_else(|| SmolStr::new_static("NotFound")),
+            }
+        }
+        Some(status) => JetstreamError::UnexpectedStatus {
+            status,
+            body: body
+                .as_deref()
+                .and_then(|body| serde_json::from_slice::<GenericXrpcError>(body).ok())
+                .map(|body| match body.message {
+                    Some(message) => format!("{}: {message}", body.error),
+                    None => body.error.to_string(),
+                })
+                .unwrap_or_else(|| {
+                    body.as_ref()
+                        .map(|body| format!("{} bytes", body.len()))
+                        .unwrap_or_else(|| "empty response".to_owned())
+                })
+                .into(),
+        },
+        None => {
+            let source = error
+                .into_source()
+                .and_then(|source| source.downcast::<E>().ok())
+                .map(|source| *source);
+            match source {
+                Some(source) => JetstreamError::Transport(source),
+                None => JetstreamError::Decode(message.into()),
+            }
+        }
+    }
+}
+
+fn map_response_error<E, R>(response: Response<R>) -> JetstreamError<E>
+where
+    E: core::error::Error + Send + Sync + 'static,
+    R: jacquard_common::xrpc::XrpcResp,
+{
+    let status = response.status();
+    let headers = response.headers();
+    let body = response.buffer();
+
+    match status {
+        http::StatusCode::UNAUTHORIZED => JetstreamError::InvalidBearerCredential,
+        http::StatusCode::TOO_MANY_REQUESTS => {
+            let retry_after = headers
+                .get(http::header::RETRY_AFTER)
+                .and_then(|value| value.to_str().ok())
+                .and_then(parse_retry_after);
+            JetstreamError::ByteLimitExceeded { retry_after }
+        }
+        http::StatusCode::NOT_FOUND => {
+            let error_body = serde_json::from_slice::<GenericXrpcError>(body).ok();
+            JetstreamError::NotFound {
+                error: error_body
+                    .map(|body| body.error)
+                    .unwrap_or_else(|| SmolStr::new_static("NotFound")),
+            }
+        }
+        status => JetstreamError::UnexpectedStatus {
+            status,
+            body: serde_json::from_slice::<GenericXrpcError>(body)
+                .ok()
+                .map(|body| match body.message {
+                    Some(message) => format!("{}: {message}", body.error),
+                    None => body.error.to_string(),
+                })
+                .unwrap_or_else(|| format!("{} bytes", body.len()))
+                .into(),
+        },
+    }
+}
+
+/// Errors surfaced by the Jetstream v2 HTTP transport.
 #[derive(Debug)]
 pub enum JetstreamError<E> {
     /// Underlying HTTP transport failure.
@@ -112,70 +218,32 @@ impl<C: HttpClient> JetstreamClient<C> {
         self.options.read().await.clone()
     }
 
-    /// Send one typed jetstream v2 (mostly backfill-oriented) request and process the raw response,
-    /// preserving headers the standard XRPC path would drop.
+    /// Send one typed Jetstream v2 request through the shared XRPC response path.
     async fn send_jetstream<R>(
         &self,
         request: &R,
         extra_headers: &[(http::HeaderName, http::HeaderValue)],
-    ) -> Result<http::Response<Vec<u8>>, JetstreamError<C::Error>>
+    ) -> Result<XrpcResponse<R>, JetstreamError<C::Error>>
     where
         R: XrpcRequest + serde::Serialize,
+        R::Response: Send + Sync,
     {
         let mut opts = self.call_options().await;
         opts.extra_headers.extend_from_slice(extra_headers);
-        let base_guard = self.base.read().await;
-        let base = base_guard.borrow();
-        let http_request = build_http_request(&base, request, &opts)
-            .map_err(|e| JetstreamError::Decode(format_smolstr!("failed to build request: {e}")))?;
-
-        let response = self
-            .http
-            .send_http(http_request)
+        let base = self.base.read().await;
+        self.http
+            .xrpc(base.borrow())
+            .with_options(opts)
+            .send(request)
             .await
-            .map_err(JetstreamError::Transport)?;
-
-        let status = response.status();
-        if status.is_success() {
-            return Ok(response);
-        }
-
-        let (parts, body) = response.into_parts();
-        let error_body = serde_json::from_slice::<GenericXrpcError>(&body)
-            .ok()
-            .map(|mut e| {
-                e.nsid = R::NSID;
-                e.method = R::METHOD.as_str();
-                e.http_status = status;
-                e
-            });
-
-        match status.as_u16() {
-            401 => Err(JetstreamError::InvalidBearerCredential),
-            404 => Err(JetstreamError::NotFound {
-                error: error_body
-                    .map(|b| b.error)
-                    .unwrap_or_else(|| SmolStr::new_static("NotFound")),
-            }),
-            429 => {
-                let retry_after = parts
-                    .headers
-                    .get(http::header::RETRY_AFTER)
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(parse_retry_after);
-                Err(JetstreamError::ByteLimitExceeded { retry_after })
-            }
-            _ => Err(JetstreamError::UnexpectedStatus {
-                status,
-                body: error_body
-                    .map(|b| match b.message {
-                        Some(message) => format!("{}: {message}", b.error),
-                        None => b.error.to_string(),
-                    })
-                    .unwrap_or_else(|| format!("{} bytes", body.len()))
-                    .into(),
-            }),
-        }
+            .map_err(map_client_error)
+            .and_then(|response| {
+                if response.status().is_success() {
+                    Ok(response)
+                } else {
+                    Err(map_response_error(response))
+                }
+            })
     }
 
     /// `POST network.bsky.jetstream.planSnapshot`.
@@ -187,7 +255,7 @@ impl<C: HttpClient> JetstreamClient<C> {
     ) -> Result<PlanSnapshotPage, JetstreamError<C::Error>> {
         let response = self.send_jetstream(params, &[]).await?;
         Ok(PlanSnapshotPage {
-            body: response.into_body().into(),
+            body: response.buffer().clone(),
         })
     }
 
@@ -195,7 +263,7 @@ impl<C: HttpClient> JetstreamClient<C> {
     /// bytes for one segment.
     pub async fn get_segment(&self, name: &str) -> Result<Bytes, JetstreamError<C::Error>> {
         let params = GetSegment::<DefaultStr> { name: name.into() };
-        Ok(self.send_jetstream(&params, &[]).await?.into_body().into())
+        Ok(self.send_jetstream(&params, &[]).await?.buffer().clone())
     }
 
     /// `GET network.bsky.jetstream.getBlock`: one block's bare zstd frame
@@ -209,7 +277,7 @@ impl<C: HttpClient> JetstreamClient<C> {
             segment: segment.into(),
             block_index,
         };
-        Ok(self.send_jetstream(&params, &[]).await?.into_body().into())
+        Ok(self.send_jetstream(&params, &[]).await?.buffer().clone())
     }
 
     /// `GET network.bsky.jetstream.getZstdDictionary`: the raw zstd
@@ -219,7 +287,7 @@ impl<C: HttpClient> JetstreamClient<C> {
         id: Option<i64>,
     ) -> Result<Bytes, JetstreamError<C::Error>> {
         let params = GetZstdDictionary { id };
-        Ok(self.send_jetstream(&params, &[]).await?.into_body().into())
+        Ok(self.send_jetstream(&params, &[]).await?.buffer().clone())
     }
 
     /// `GET network.bsky.jetstream.getSegment` with a byte offset via HTTP
@@ -228,7 +296,7 @@ impl<C: HttpClient> JetstreamClient<C> {
         &self,
         name: &str,
         offset: u64,
-    ) -> Result<http::Response<Vec<u8>>, JetstreamError<C::Error>> {
+    ) -> Result<XrpcResponse<GetSegment<DefaultStr>>, JetstreamError<C::Error>> {
         let params = GetSegment::<DefaultStr> { name: name.into() };
         let range = http::HeaderValue::from_str(&format!("bytes={offset}-"))
             .map_err(|e| JetstreamError::Decode(format_smolstr!("invalid range offset: {e}")))?;
@@ -529,6 +597,33 @@ mod tests {
             Err(JetstreamError::InvalidBearerCredential) => {}
             other => panic!("expected InvalidBearerCredential, got {other:?}"),
         }
+    }
+
+    #[tokio::test]
+    async fn archive_preserves_range_response_metadata() {
+        let server = MockServer::start().await;
+        server
+            .register(
+                Mock::given(method("GET"))
+                    .and(path("/xrpc/network.bsky.jetstream.getSegment"))
+                    .and(header("range", "bytes=7-"))
+                    .respond_with(
+                        ResponseTemplate::new(206)
+                            .insert_header("content-range", "bytes 7-9/10")
+                            .set_body_bytes(vec![7, 8, 9]),
+                    ),
+            )
+            .await;
+        let client = client_for(&server, None);
+
+        let response = client.get_segment_range("segment.jss", 7).await.unwrap();
+        assert_eq!(response.status(), http::StatusCode::PARTIAL_CONTENT);
+        assert_eq!(
+            response.headers().get("content-range").unwrap(),
+            "bytes 7-9/10"
+        );
+        assert_eq!(response.buffer().as_ref(), &[7, 8, 9]);
+        server.verify().await;
     }
 
     #[tokio::test]

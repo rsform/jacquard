@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::community_lexicon::location::hthree::Hthree;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A job listing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,25 +40,25 @@ use crate::community_lexicon::location::hthree::Hthree;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Listing<S: BosStr = DefaultStr> {
-    ///URL where applicants can apply for the job.
+    /// URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apply_link: Option<UriValue<S>>,
-    ///Larger horizontal image to display behind job listing view.
+    /// Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<BlobRef<S>>,
-    ///The description of the job listing.
+    /// The description of the job listing.
     pub description: S,
-    ///Annotations of text (mentions, URLs, hashtags, etc).
+    /// Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///Locations that are relevant to the job listing.
+    /// Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locations: Option<Vec<Hthree<S>>>,
-    ///Client-declared timestamp when the job listing expires.
+    /// Client-declared timestamp when the job listing expires.
     pub not_after: Datetime,
-    ///Client-declared timestamp when the job listing becomes visible.
+    /// Client-declared timestamp when the job listing becomes visible.
     pub not_before: Datetime,
-    ///The title of the job listing.
+    /// The title of the job listing.
     pub title: S,
     #[serde(
         flatten,
@@ -140,25 +140,20 @@ impl<S: BosStr> LexiconSchema for Listing<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -210,9 +205,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -224,7 +218,7 @@ where
 
 pub mod listing_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -463,10 +457,7 @@ where
     St::Title: listing_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListingBuilder<listing_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> ListingBuilder<listing_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -515,10 +506,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_listing() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.listing"),

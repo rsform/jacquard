@@ -14,37 +14,39 @@ pub mod identity;
 pub mod repo;
 pub mod sync;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::zone_stratos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::zone_stratos;
+use serde::{Deserialize, Serialize};
 /// Indicates this record requires hydration from an external service. The stub record on the PDS contains minimal data; full content is fetched from the service endpoint.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
-    ///DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
+    /// DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
     pub service: Did<S>,
-    ///Reference to the full record at the hydration service.
+    /// Reference to the full record at the hydration service.
     pub subject: zone_stratos::SubjectRef<S>,
-    ///Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
+    /// Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
     pub vary: SourceVary<S>,
     #[serde(
         flatten,
@@ -137,11 +139,14 @@ where
 /// A strong reference to a record, including its content hash for verification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
-    ///CID of the full record content for integrity verification.
+    /// CID of the full record content for integrity verification.
     pub cid: Cid<S>,
-    ///AT-URI of the record at the hydration service.
+    /// AT-URI of the record at the hydration service.
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -200,15 +205,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod source_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -396,10 +400,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.defs"),
@@ -514,15 +518,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -660,10 +663,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SubjectRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

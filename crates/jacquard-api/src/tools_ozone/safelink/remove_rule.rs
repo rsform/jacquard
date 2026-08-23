@@ -8,36 +8,41 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::safelink::Event;
+use crate::tools_ozone::safelink::PatternType;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::safelink::Event;
-use crate::tools_ozone::safelink::PatternType;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveRule<S: BosStr = DefaultStr> {
-    ///Optional comment about why the rule is being removed
+    /// Optional comment about why the rule is being removed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
-    ///Optional DID of the user. Only respected when using admin auth.
+    /// Optional DID of the user. Only respected when using admin auth.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<Did<S>>,
     pub pattern: PatternType<S>,
-    ///The URL or domain to remove the rule for
+    /// The URL or domain to remove the rule for
     pub url: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveRuleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Event<S>,
@@ -45,26 +50,21 @@ pub struct RemoveRuleOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RemoveRuleError {
     /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
-    RuleNotFound(Option<SmolStr>),
+    RuleNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RemoveRuleError {
@@ -101,9 +101,8 @@ impl jacquard_common::xrpc::XrpcResp for RemoveRuleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveRule<S> {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveRuleResponse;
 }
 
@@ -113,16 +112,15 @@ Path: `/xrpc/tools.ozone.safelink.removeRule`. The request payload type is `Remo
 pub struct RemoveRuleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveRuleRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.removeRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RemoveRule<S>;
     type Response = RemoveRuleResponse;
 }
 
 pub mod remove_rule_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -288,10 +286,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RemoveRule<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RemoveRule<S> {
         RemoveRule {
             comment: self._fields.0,
             created_by: self._fields.1,

@@ -78,7 +78,9 @@ This is a Cargo workspace with several crates:
 - **Always** use periods at the end of code comments.
 - **Never** use title case in headings and titles. Always use sentence case.
 
-### Running tests
+### Formatting and running tests
+
+Use `just pre-commit-all` as the authoritative formatting and validation command. It runs the repository's configured hooks across the complete source tree, including generated fixtures. Do not substitute an ad-hoc workspace `cargo fmt --check`; it can report formatting differences in generated files that are handled by the repository hooks.
 
 **CRITICAL**: Always use `cargo nextest run` to run unit and integration tests. Never use `cargo test` for these!
 

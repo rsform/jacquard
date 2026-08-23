@@ -8,63 +8,63 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::contact::MatchAndContactIndex;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::contact::MatchAndContactIndex;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImportContacts<S: BosStr = DefaultStr> {
-    ///List of phone numbers in global E.164 format (e.g., '+12125550123'). Phone numbers that cannot be normalized into a valid phone number will be discarded. Should not repeat the 'phone' input used in `app.bsky.contact.verifyPhone`.
+    /// List of phone numbers in global E.164 format (e.g., '+12125550123'). Phone numbers that cannot be normalized into a valid phone number will be discarded. Should not repeat the 'phone' input used in `app.bsky.contact.verifyPhone`.
     pub contacts: Vec<S>,
-    ///JWT to authenticate the call. Use the JWT received as a response to the call to `app.bsky.contact.verifyPhone`.
+    /// JWT to authenticate the call. Use the JWT received as a response to the call to `app.bsky.contact.verifyPhone`.
     pub token: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImportContactsOutput<S: BosStr = DefaultStr> {
-    ///The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.
+    /// The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.
     pub matches_and_contact_indexes: Vec<MatchAndContactIndex<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ImportContactsError {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(Option<SmolStr>),
+    InvalidDid(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidContacts")]
-    InvalidContacts(Option<SmolStr>),
+    InvalidContacts(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "TooManyContacts")]
-    TooManyContacts(Option<SmolStr>),
+    TooManyContacts(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(Option<SmolStr>),
+    InvalidToken(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InternalError")]
-    InternalError(Option<SmolStr>),
+    InternalError(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ImportContactsError {
@@ -129,9 +129,8 @@ impl jacquard_common::xrpc::XrpcResp for ImportContactsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ImportContacts<S> {
     const NSID: &'static str = "app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ImportContactsResponse;
 }
 
@@ -141,16 +140,15 @@ Path: `/xrpc/app.bsky.contact.importContacts`. The request payload type is `Impo
 pub struct ImportContactsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportContactsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.importContacts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ImportContacts<S>;
     type Response = ImportContactsResponse;
 }
 
 pub mod import_contacts_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,10 +191,7 @@ pub mod import_contacts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ImportContactsBuilder<
-    St: import_contacts_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ImportContactsBuilder<St: import_contacts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -291,10 +286,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImportContacts<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImportContacts<S> {
         ImportContacts {
             contacts: self._fields.0.unwrap(),
             token: self._fields.1.unwrap(),

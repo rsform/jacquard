@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,28 +21,31 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_stream::branding::get_branding;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::branding::get_branding;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BrandingAsset<S: BosStr = DefaultStr> {
-    ///Inline data for text assets
+    /// Inline data for text assets
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<S>,
-    ///Image height in pixels (optional, for images only)
+    /// Image height in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    ///Asset key identifier
+    /// Asset key identifier
     pub key: S,
-    ///MIME type of the asset
+    /// MIME type of the asset
     pub mime_type: S,
-    ///URL to fetch the asset blob (for images)
+    /// URL to fetch the asset blob (for images)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<S>,
-    ///Image width in pixels (optional, for images only)
+    /// Image width in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
     #[serde(
@@ -54,41 +57,40 @@ pub struct BrandingAsset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBranding<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBrandingOutput<S: BosStr = DefaultStr> {
-    ///List of available branding assets
+    /// List of available branding assets
     pub assets: Vec<get_branding::BrandingAsset<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetBrandingError {
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetBrandingError {
@@ -155,17 +157,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_place_stream_branding_getBranding() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.branding.getBranding"),
@@ -174,18 +175,19 @@ fn lexicon_doc_place_stream_branding_getBranding() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("brandingAsset"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("key"), SmolStr::new_static("mimeType")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("key"),
+                        SmolStr::new_static("mimeType"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("data"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Inline data for text assets"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Inline data for text assets",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -198,29 +200,23 @@ fn lexicon_doc_place_stream_branding_getBranding() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Asset key identifier"),
-                                ),
+                                description: Some(CowStr::new_static("Asset key identifier")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("MIME type of the asset"),
-                                ),
+                                description: Some(CowStr::new_static("MIME type of the asset")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URL to fetch the asset blob (for images)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URL to fetch the asset blob (for images)",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -272,7 +268,7 @@ fn lexicon_doc_place_stream_branding_getBranding() -> LexiconDoc<'static> {
 
 pub mod get_branding_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

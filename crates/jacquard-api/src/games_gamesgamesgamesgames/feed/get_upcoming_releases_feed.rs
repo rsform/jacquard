@@ -8,17 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::GameFeedViewItem;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUpcomingReleasesFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -38,9 +41,11 @@ pub struct GetUpcomingReleasesFeed<S: BosStr = DefaultStr> {
     pub to: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUpcomingReleasesFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -89,7 +94,7 @@ fn _default_shuffle() -> Option<bool> {
 
 pub mod get_upcoming_releases_feed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,34 +117,33 @@ pub struct GetUpcomingReleasesFeedBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<i64>, Option<S>, Option<bool>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<i64>,
+        Option<S>,
+        Option<bool>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl GetUpcomingReleasesFeed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetUpcomingReleasesFeedBuilder<
-        get_upcoming_releases_feed_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, DefaultStr> {
         GetUpcomingReleasesFeedBuilder::new()
     }
 }
 
 impl<S: BosStr> GetUpcomingReleasesFeed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetUpcomingReleasesFeedBuilder<
-        get_upcoming_releases_feed_state::Empty,
-        S,
-    > {
+    pub fn builder() -> GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, S> {
         GetUpcomingReleasesFeedBuilder::builder()
     }
 }
 
-impl GetUpcomingReleasesFeedBuilder<
-    get_upcoming_releases_feed_state::Empty,
-    DefaultStr,
-> {
+impl GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetUpcomingReleasesFeedBuilder {
@@ -150,9 +154,7 @@ impl GetUpcomingReleasesFeedBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, S> {
+impl<S: BosStr> GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetUpcomingReleasesFeedBuilder {
@@ -163,10 +165,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -179,10 +178,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -195,10 +191,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -211,10 +204,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `now` field (optional)
     pub fn now(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -227,10 +217,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `shuffle` field (optional)
     pub fn shuffle(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -243,10 +230,7 @@ impl<
     }
 }
 
-impl<
-    St: get_upcoming_releases_feed_state::State,
-    S: BosStr,
-> GetUpcomingReleasesFeedBuilder<St, S> {
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `to` field (optional)
     pub fn to(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();

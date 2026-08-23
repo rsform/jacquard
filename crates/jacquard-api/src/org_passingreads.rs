@@ -9,13 +9,12 @@
 pub mod actor;
 pub mod book;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,11 +27,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Basic actor information for embedding in responses
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Actor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,7 +53,10 @@ pub struct Actor<S: BosStr = DefaultStr> {
 /// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any unit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -67,7 +72,10 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// Book ID entry for SSG
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BookIdEntry<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(
@@ -82,7 +90,10 @@ pub struct BookIdEntry<S: BosStr = DefaultStr> {
 /// Location entry with book count for SSG
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LocationEntry<S: BosStr = DefaultStr> {
     pub book_count: i64,
     pub h3: S,
@@ -192,15 +203,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod actor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -279,10 +289,7 @@ where
     St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> ActorBuilder<actor_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> ActorBuilder<actor_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
@@ -344,10 +351,10 @@ where
 }
 
 fn lexicon_doc_org_passingreads_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.passingreads.defs"),
@@ -356,11 +363,9 @@ fn lexicon_doc_org_passingreads_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("actor"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Basic actor information for embedding in responses",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Basic actor information for embedding in responses",
+                    )),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -434,7 +439,9 @@ fn lexicon_doc_org_passingreads_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -444,12 +451,11 @@ fn lexicon_doc_org_passingreads_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("locationEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Location entry with book count for SSG"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("h3"), SmolStr::new_static("bookCount")],
-                    ),
+                    description: Some(CowStr::new_static("Location entry with book count for SSG")),
+                    required: Some(vec![
+                        SmolStr::new_static("h3"),
+                        SmolStr::new_static("bookCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -461,7 +467,9 @@ fn lexicon_doc_org_passingreads_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("h3"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -481,15 +489,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -627,10 +634,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -646,9 +650,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -659,15 +662,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod location_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -710,10 +712,7 @@ pub mod location_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LocationEntryBuilder<
-    St: location_entry_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct LocationEntryBuilder<St: location_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -808,10 +807,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LocationEntry<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LocationEntry<S> {
         LocationEntry {
             book_count: self._fields.0.unwrap(),
             h3: self._fields.1.unwrap(),

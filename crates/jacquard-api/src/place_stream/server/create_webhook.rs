@@ -8,50 +8,52 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::server::RewriteRule;
+use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::server::RewriteRule;
-use crate::place_stream::server::Webhook;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateWebhook<S: BosStr = DefaultStr> {
-    ///Whether this webhook should be active upon creation.  Defaults to `false`.
+    /// Whether this webhook should be active upon creation.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_create_webhook_active")]
     pub active: Option<bool>,
-    ///A description of what this webhook is used for.
+    /// A description of what this webhook is used for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The types of events this webhook should receive.
+    /// The types of events this webhook should receive.
     pub events: Vec<CreateWebhookEvents<S>>,
-    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mute_words: Option<Vec<S>>,
-    ///A user-friendly name for this webhook.
+    /// A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Text to prepend to webhook messages.
+    /// Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prefix: Option<S>,
-    ///Text replacement rules for webhook messages.
+    /// Text replacement rules for webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rewrite: Option<Vec<RewriteRule<S>>>,
-    ///Text to append to webhook messages.
+    /// Text to append to webhook messages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub suffix: Option<S>,
-    ///The webhook URL where events will be sent.
+    /// The webhook URL where events will be sent.
     pub url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateWebhookEvents<S: BosStr = DefaultStr> {
@@ -142,41 +144,38 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateWebhookOutput<S: BosStr = DefaultStr> {
     pub webhook: Webhook<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateWebhookError {
     /// The provided webhook URL is invalid or unreachable.
     #[serde(rename = "InvalidUrl")]
-    InvalidUrl(Option<SmolStr>),
+    InvalidUrl(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// A webhook with this URL already exists for this user.
     #[serde(rename = "DuplicateWebhook")]
-    DuplicateWebhook(Option<SmolStr>),
+    DuplicateWebhook(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The user has reached their maximum number of webhooks.
     #[serde(rename = "TooManyWebhooks")]
-    TooManyWebhooks(Option<SmolStr>),
+    TooManyWebhooks(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateWebhookError {
@@ -227,9 +226,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateWebhook<S> {
     const NSID: &'static str = "place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateWebhookResponse;
 }
 
@@ -239,9 +237,8 @@ Path: `/xrpc/place.stream.server.createWebhook`. The request payload type is `Cr
 pub struct CreateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateWebhook<S>;
     type Response = CreateWebhookResponse;
 }
@@ -252,7 +249,7 @@ fn _default_create_webhook_active() -> Option<bool> {
 
 pub mod create_webhook_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -295,10 +292,7 @@ pub mod create_webhook_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateWebhookBuilder<
-    St: create_webhook_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateWebhookBuilder<St: create_webhook_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -501,10 +495,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateWebhook<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateWebhook<S> {
         CreateWebhook {
             active: self._fields.0.or_else(|| Some(false)),
             description: self._fields.1,

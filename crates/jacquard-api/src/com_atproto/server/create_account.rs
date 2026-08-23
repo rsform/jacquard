@@ -10,32 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateAccount<S: BosStr = DefaultStr> {
-    ///Pre-existing atproto DID, being imported to a new account.
+    /// Pre-existing atproto DID, being imported to a new account.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<S>,
-    ///Requested handle for the account.
+    /// Requested handle for the account.
     pub handle: Handle<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invite_code: Option<S>,
-    ///Initial account password. May need to meet instance-specific password strength requirements.
+    /// Initial account password. May need to meet instance-specific password strength requirements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<S>,
-    ///A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
+    /// A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plc_op: Option<Data<S>>,
-    ///DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
+    /// DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recovery_key: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,14 +49,16 @@ pub struct CreateAccount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateAccountOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
-    ///The DID of the new account.
+    /// The DID of the new account.
     pub did: Did<S>,
-    ///Complete DID document.
+    /// Complete DID document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did_doc: Option<Data<S>>,
     pub handle: Handle<S>,
@@ -62,37 +67,32 @@ pub struct CreateAccountOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateAccountError {
     #[serde(rename = "InvalidHandle")]
-    InvalidHandle(Option<SmolStr>),
+    InvalidHandle(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidPassword")]
-    InvalidPassword(Option<SmolStr>),
+    InvalidPassword(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "InvalidInviteCode")]
-    InvalidInviteCode(Option<SmolStr>),
+    InvalidInviteCode(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "HandleNotAvailable")]
-    HandleNotAvailable(Option<SmolStr>),
+    HandleNotAvailable(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "UnsupportedDomain")]
-    UnsupportedDomain(Option<SmolStr>),
+    UnsupportedDomain(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "UnresolvableDid")]
-    UnresolvableDid(Option<SmolStr>),
+    UnresolvableDid(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "IncompatibleDidDoc")]
-    IncompatibleDidDoc(Option<SmolStr>),
+    IncompatibleDidDoc(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateAccountError {
@@ -171,9 +171,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateAccount<S> {
     const NSID: &'static str = "com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateAccountResponse;
 }
 
@@ -183,16 +182,15 @@ Path: `/xrpc/com.atproto.server.createAccount`. The request payload type is `Cre
 pub struct CreateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateAccount<S>;
     type Response = CreateAccountResponse;
 }
 
 pub mod create_account_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -223,10 +221,7 @@ pub mod create_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateAccountBuilder<
-    St: create_account_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateAccountBuilder<St: create_account_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -422,10 +417,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateAccount<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateAccount<S> {
         CreateAccount {
             did: self._fields.0,
             email: self._fields.1,

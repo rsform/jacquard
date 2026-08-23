@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::beta::game::progress;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::beta::game::progress;
+use serde::{Deserialize, Serialize};
 /// Record representing a player's level progression and game statistics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,43 +38,43 @@ use crate::net_anisota::beta::game::progress;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Progress<S: BosStr = DefaultStr> {
-    ///URI of the card that was advanced when triggerSource is card_advance
+    /// URI of the card that was advanced when triggerSource is card_advance
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_uri: Option<S>,
-    ///When the progress record was created
+    /// When the progress record was created
     pub created_at: Datetime,
-    ///Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
+    /// Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_stamina: Option<S>,
-    ///Current player level
+    /// Current player level
     pub level: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<progress::Metadata<S>>,
-    ///Previous level before this update (for tracking level progression)
+    /// Previous level before this update (for tracking level progression)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub previous_level: Option<i64>,
-    ///Progress percentage to the next level (decimal string, e.g. '75.5')
+    /// Progress percentage to the next level (decimal string, e.g. '75.5')
     pub progress_percentage: S,
-    ///URIs of related game log records that contributed to this progress
+    /// URIs of related game log records that contributed to this progress
     #[serde(skip_serializing_if = "Option::is_none")]
     pub related_log_uris: Option<Vec<S>>,
-    ///Session ID when this progress was recorded (for linking with log records)
+    /// Session ID when this progress was recorded (for linking with log records)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_id: Option<S>,
-    ///URI of the session record when this progress was recorded
+    /// URI of the session record when this progress was recorded
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_uri: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stats: Option<progress::Stats<S>>,
-    ///Total experience points accumulated
+    /// Total experience points accumulated
     pub total_xp: i64,
-    ///What action triggered this progress save
+    /// What action triggered this progress save
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_source: Option<ProgressTriggerSource<S>>,
-    ///Experience points gained since the last progress save
+    /// Experience points gained since the last progress save
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_since_last_save: Option<i64>,
-    ///Experience points needed to reach the next level
+    /// Experience points needed to reach the next level
     pub xp_to_next_level: i64,
     #[serde(
         flatten,
@@ -181,21 +181,15 @@ where
             ProgressTriggerSource::CardAdvance => ProgressTriggerSource::CardAdvance,
             ProgressTriggerSource::Post => ProgressTriggerSource::Post,
             ProgressTriggerSource::PostToList => ProgressTriggerSource::PostToList,
-            ProgressTriggerSource::SpecimenDiscover => {
-                ProgressTriggerSource::SpecimenDiscover
-            }
-            ProgressTriggerSource::SpecimenCatchNew => {
-                ProgressTriggerSource::SpecimenCatchNew
-            }
+            ProgressTriggerSource::SpecimenDiscover => ProgressTriggerSource::SpecimenDiscover,
+            ProgressTriggerSource::SpecimenCatchNew => ProgressTriggerSource::SpecimenCatchNew,
             ProgressTriggerSource::SpecimenCatchRepeat => {
                 ProgressTriggerSource::SpecimenCatchRepeat
             }
             ProgressTriggerSource::LevelUp => ProgressTriggerSource::LevelUp,
             ProgressTriggerSource::ManualSave => ProgressTriggerSource::ManualSave,
             ProgressTriggerSource::SessionEnd => ProgressTriggerSource::SessionEnd,
-            ProgressTriggerSource::Other(v) => {
-                ProgressTriggerSource::Other(v.into_static())
-            }
+            ProgressTriggerSource::Other(v) => ProgressTriggerSource::Other(v.into_static()),
         }
     }
 }
@@ -214,12 +208,15 @@ pub struct ProgressGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional metadata about this progress update
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Metadata<S: BosStr = DefaultStr> {
-    ///Version of the client when this progress was recorded
+    /// Version of the client when this progress was recorded
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_version: Option<S>,
-    ///Platform where the level up occurred (web, mobile, etc.)
+    /// Platform where the level up occurred (web, mobile, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<S>,
     #[serde(
@@ -234,30 +231,33 @@ pub struct Metadata<S: BosStr = DefaultStr> {
 /// Game-specific statistics and metrics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Stats<S: BosStr = DefaultStr> {
-    ///Total daily rewards claimed
+    /// Total daily rewards claimed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
-    ///Total items collected
+    /// Total items collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_collected: Option<i64>,
-    ///Date when posts read today was last updated (for daily reset tracking)
+    /// Date when posts read today was last updated (for daily reset tracking)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_post_read_date: Option<Datetime>,
-    ///Posts read today (resets daily)
+    /// Posts read today (resets daily)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_read_today: Option<i64>,
-    ///Total posts read (all time, cumulative)
+    /// Total posts read (all time, cumulative)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_read_total: Option<i64>,
-    ///Total posts viewed
+    /// Total posts viewed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub posts_viewed: Option<i64>,
-    ///Total shuffles performed
+    /// Total shuffles performed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shuffles_performed: Option<i64>,
-    ///Total specimens collected
+    /// Total specimens collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_collected: Option<i64>,
     #[serde(
@@ -465,9 +465,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -479,7 +478,7 @@ where
 
 pub mod progress_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -612,20 +611,7 @@ impl ProgressBuilder<progress_state::Empty, DefaultStr> {
         ProgressBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -639,20 +625,7 @@ impl<S: BosStr> ProgressBuilder<progress_state::Empty, S> {
         ProgressBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -842,18 +815,12 @@ where
 
 impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `triggerSource` field (optional)
-    pub fn trigger_source(
-        mut self,
-        value: impl Into<Option<ProgressTriggerSource<S>>>,
-    ) -> Self {
+    pub fn trigger_source(mut self, value: impl Into<Option<ProgressTriggerSource<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `triggerSource` field to an Option value (optional)
-    pub fn maybe_trigger_source(
-        mut self,
-        value: Option<ProgressTriggerSource<S>>,
-    ) -> Self {
+    pub fn maybe_trigger_source(mut self, value: Option<ProgressTriggerSource<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -945,10 +912,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_progress() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.progress"),
@@ -1125,33 +1092,27 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("metadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Additional metadata about this progress update",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Additional metadata about this progress update",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("clientVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Version of the client when this progress was recorded",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Version of the client when this progress was recorded",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Platform where the level up occurred (web, mobile, etc.)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Platform where the level up occurred (web, mobile, etc.)",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1248,9 +1209,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -1261,8 +1221,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

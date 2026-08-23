@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A community's profile information (V2: stored in community's own repository)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -42,32 +42,32 @@ pub struct Profile<S: BosStr = DefaultStr> {
     pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banner: Option<BlobRef<S>>,
-    ///Required content warnings for this community
+    /// Required content warnings for this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_warnings: Option<Vec<ProfileContentWarnings<S>>>,
     pub created_at: Datetime,
-    ///DID of the user who created this community
+    /// DID of the user who created this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<Did<S>>,
-    ///Community description with rich text support
+    /// Community description with rich text support
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Rich text annotations for description
+    /// Rich text annotations for description
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_facets: Option<Vec<Data<S>>>,
-    ///Display name for the community
+    /// Display name for the community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
-    ///DID of the instance hosting this community
+    /// DID of the instance hosting this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hosted_by: Option<Did<S>>,
-    ///Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)  Defaults to `"moderator"`.
+    /// Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)  Defaults to `"moderator"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_moderation_type")]
     pub moderation_type: Option<ProfileModerationType<S>>,
-    ///Short community name (local part of handle). Must be a valid DNS label: ASCII letters, digits, and hyphens only.
+    /// Short community name (local part of handle). Must be a valid DNS label: ASCII letters, digits, and hyphens only.
     pub name: S,
-    ///Community visibility level  Defaults to `"public"`.
+    /// Community visibility level  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_visibility")]
     pub visibility: Option<ProfileVisibility<S>>,
@@ -79,7 +79,6 @@ pub struct Profile<S: BosStr = DefaultStr> {
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileContentWarnings<S: BosStr = DefaultStr> {
@@ -157,9 +156,7 @@ where
             ProfileContentWarnings::Nsfw => ProfileContentWarnings::Nsfw,
             ProfileContentWarnings::Violence => ProfileContentWarnings::Violence,
             ProfileContentWarnings::Spoilers => ProfileContentWarnings::Spoilers,
-            ProfileContentWarnings::Other(v) => {
-                ProfileContentWarnings::Other(v.into_static())
-            }
+            ProfileContentWarnings::Other(v) => ProfileContentWarnings::Other(v.into_static()),
         }
     }
 }
@@ -238,9 +235,7 @@ where
         match self {
             ProfileModerationType::Moderator => ProfileModerationType::Moderator,
             ProfileModerationType::Sortition => ProfileModerationType::Sortition,
-            ProfileModerationType::Other(v) => {
-                ProfileModerationType::Other(v.into_static())
-            }
+            ProfileModerationType::Other(v) => ProfileModerationType::Other(v.into_static()),
         }
     }
 }
@@ -399,25 +394,23 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -440,25 +433,23 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -563,9 +554,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -575,21 +565,21 @@ where
     Ok(data)
 }
 
-fn _default_profile_moderation_type<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    ProfileModerationType<S>,
-> {
-    Some(<ProfileModerationType<S>>::from_value(S::from_static("moderator")))
+fn _default_profile_moderation_type<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<ProfileModerationType<S>> {
+    Some(<ProfileModerationType<S>>::from_value(S::from_static(
+        "moderator",
+    )))
 }
 
-fn _default_profile_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
-    ProfileVisibility<S>,
-> {
+fn _default_profile_visibility<S: FromStaticStr + BosStr>()
+-> ::core::option::Option<ProfileVisibility<S>> {
     Some(<ProfileVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -671,18 +661,7 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -695,18 +674,7 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -749,10 +717,7 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(
-        mut self,
-        value: Option<Vec<ProfileContentWarnings<S>>>,
-    ) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<Vec<ProfileContentWarnings<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -844,18 +809,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `moderationType` field (optional)
-    pub fn moderation_type(
-        mut self,
-        value: impl Into<Option<ProfileModerationType<S>>>,
-    ) -> Self {
+    pub fn moderation_type(mut self, value: impl Into<Option<ProfileModerationType<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `moderationType` field to an Option value (optional)
-    pub fn maybe_moderation_type(
-        mut self,
-        value: Option<ProfileModerationType<S>>,
-    ) -> Self {
+    pub fn maybe_moderation_type(mut self, value: Option<ProfileModerationType<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -867,10 +826,7 @@ where
     St::Name: profile_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProfileBuilder<profile_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ProfileBuilder<profile_state::SetName<St>, S> {
         self._fields.10 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -938,10 +894,10 @@ where
 }
 
 fn lexicon_doc_social_coves_community_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.community.profile"),

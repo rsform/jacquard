@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,45 +22,48 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::social_coves::embed::external;
+use crate::social_coves::embed::images::Image;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::social_coves::embed::images::Image;
-use crate::social_coves::embed::external;
+use serde::{Deserialize, Serialize};
 /// Primary external link metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct External<S: BosStr = DefaultStr> {
-    ///Description or excerpt of the linked content
+    /// Description or excerpt of the linked content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Domain of the linked content (e.g., nytimes.com)
+    /// Domain of the linked content (e.g., nytimes.com)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub domain: Option<S>,
-    ///Type hint for content rendering and filtering
+    /// Type hint for content rendering and filtering
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_type: Option<ExternalEmbedType<S>>,
-    ///Preview images for image gallery providers
+    /// Preview images for image gallery providers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<Image<S>>>,
-    ///Service provider name (e.g., imgur, streamable)
+    /// Service provider name (e.g., imgur, streamable)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub provider: Option<S>,
-    ///Aggregated source links for megathreads. Each source references an original article and optionally the Coves post that shared it
+    /// Aggregated source links for megathreads. Each source references an original article and optionally the Coves post that shared it
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sources: Option<Vec<external::Source<S>>>,
-    ///Thumbnail image for the post (applies to primary link)
+    /// Thumbnail image for the post (applies to primary link)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<BlobRef<S>>,
-    ///Title of the linked content
+    /// Title of the linked content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///Total number of items if more than displayed (for galleries)
+    /// Total number of items if more than displayed (for galleries)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_count: Option<i64>,
-    ///URI of the primary external content
+    /// URI of the primary external content
     pub uri: UriValue<S>,
     #[serde(
         flatten,
@@ -161,7 +164,10 @@ where
 /// External link embed with optional aggregated sources for megathreads
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ExternalRecord<S: BosStr = DefaultStr> {
     pub external: external::External<S>,
     #[serde(
@@ -176,18 +182,21 @@ pub struct ExternalRecord<S: BosStr = DefaultStr> {
 /// A source link aggregated into a megathread
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Source<S: BosStr = DefaultStr> {
-    ///Domain of the source (e.g., nytimes.com)
+    /// Domain of the source (e.g., nytimes.com)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub domain: Option<S>,
-    ///Reference to the Coves post that originally shared this link. Used for feed deprioritization of rolled-up posts
+    /// Reference to the Coves post that originally shared this link. Used for feed deprioritization of rolled-up posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_post: Option<StrongRef<S>>,
-    ///Title of the source article
+    /// Title of the source article
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///URI of the source article
+    /// URI of the source article
     pub uri: UriValue<S>,
     #[serde(
         flatten,
@@ -201,7 +210,10 @@ pub struct Source<S: BosStr = DefaultStr> {
 /// View of an external link embed as served by the AppView
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
     pub external: external::ViewExternal<S>,
     #[serde(
@@ -216,36 +228,39 @@ pub struct View<S: BosStr = DefaultStr> {
 /// External link metadata as served by the AppView; thumb is a fetchable URL instead of a blob reference
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewExternal<S: BosStr = DefaultStr> {
-    ///Description or excerpt of the linked content
+    /// Description or excerpt of the linked content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Domain of the linked content (e.g., nytimes.com)
+    /// Domain of the linked content (e.g., nytimes.com)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub domain: Option<S>,
-    ///Type hint for content rendering and filtering
+    /// Type hint for content rendering and filtering
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_type: Option<ViewExternalEmbedType<S>>,
-    ///Preview images for image gallery providers
+    /// Preview images for image gallery providers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<Image<S>>>,
-    ///Service provider name (e.g., imgur, streamable)
+    /// Service provider name (e.g., imgur, streamable)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub provider: Option<S>,
-    ///Aggregated source links for megathreads. Each source references an original article and optionally the Coves post that shared it
+    /// Aggregated source links for megathreads. Each source references an original article and optionally the Coves post that shared it
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sources: Option<Vec<external::Source<S>>>,
-    ///URL of the thumbnail image, served via the hosting PDS blob endpoint
+    /// URL of the thumbnail image, served via the hosting PDS blob endpoint
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<UriValue<S>>,
-    ///Title of the linked content
+    /// Title of the linked content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    ///Total number of items if more than displayed (for galleries)
+    /// Total number of items if more than displayed (for galleries)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_count: Option<i64>,
-    ///URI of the primary external content
+    /// URI of the primary external content
     pub uri: UriValue<S>,
     #[serde(
         flatten,
@@ -338,9 +353,7 @@ where
             ViewExternalEmbedType::Image => ViewExternalEmbedType::Image,
             ViewExternalEmbedType::Video => ViewExternalEmbedType::Video,
             ViewExternalEmbedType::Website => ViewExternalEmbedType::Website,
-            ViewExternalEmbedType::Other(v) => {
-                ViewExternalEmbedType::Other(v.into_static())
-            }
+            ViewExternalEmbedType::Other(v) => ViewExternalEmbedType::Other(v.into_static()),
         }
     }
 }
@@ -444,25 +457,23 @@ impl<S: BosStr> LexiconSchema for External<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -706,15 +717,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -865,10 +875,7 @@ impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
 
 impl<St: external_state::State, S: BosStr> ExternalBuilder<St, S> {
     /// Set the `sources` field (optional)
-    pub fn sources(
-        mut self,
-        value: impl Into<Option<Vec<external::Source<S>>>>,
-    ) -> Self {
+    pub fn sources(mut self, value: impl Into<Option<Vec<external::Source<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -977,10 +984,10 @@ where
 }
 
 fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.coves.embed.external"),
@@ -1119,11 +1126,9 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "External link embed with optional aggregated sources for megathreads",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "External link embed with optional aggregated sources for megathreads",
+                    )),
                     required: Some(vec![SmolStr::new_static("external")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1143,9 +1148,9 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("source"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A source link aggregated into a megathread"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A source link aggregated into a megathread",
+                    )),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1153,11 +1158,9 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("domain"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Domain of the source (e.g., nytimes.com)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Domain of the source (e.g., nytimes.com)",
+                                )),
                                 max_length: Some(253usize),
                                 ..Default::default()
                             }),
@@ -1172,9 +1175,9 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Title of the source article"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Title of the source article",
+                                )),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(500usize),
                                 ..Default::default()
@@ -1183,9 +1186,7 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URI of the source article"),
-                                ),
+                                description: Some(CowStr::new_static("URI of the source article")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1198,11 +1199,9 @@ fn lexicon_doc_social_coves_embed_external() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("view"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "View of an external link embed as served by the AppView",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "View of an external link embed as served by the AppView",
+                    )),
                     required: Some(vec![SmolStr::new_static("external")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1372,15 +1371,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod external_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1411,10 +1409,7 @@ pub mod external_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ExternalRecordBuilder<
-    St: external_record_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ExternalRecordBuilder<St: external_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<external::External<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -1488,10 +1483,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ExternalRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ExternalRecord<S> {
         ExternalRecord {
             external: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1506,15 +1498,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod source_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1547,7 +1538,12 @@ pub mod source_state {
 /// Builder for constructing an instance of this type.
 pub struct SourceBuilder<St: source_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<StrongRef<S>>, Option<S>, Option<UriValue<S>>),
+    _fields: (
+        Option<S>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1679,15 +1675,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1807,15 +1802,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod view_external_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1927,10 +1921,7 @@ impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
 
 impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
     /// Set the `embedType` field (optional)
-    pub fn embed_type(
-        mut self,
-        value: impl Into<Option<ViewExternalEmbedType<S>>>,
-    ) -> Self {
+    pub fn embed_type(mut self, value: impl Into<Option<ViewExternalEmbedType<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1969,10 +1960,7 @@ impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
 
 impl<St: view_external_state::State, S: BosStr> ViewExternalBuilder<St, S> {
     /// Set the `sources` field (optional)
-    pub fn sources(
-        mut self,
-        value: impl Into<Option<Vec<external::Source<S>>>>,
-    ) -> Self {
+    pub fn sources(mut self, value: impl Into<Option<Vec<external::Source<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -2063,10 +2051,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewExternal<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewExternal<S> {
         ViewExternal {
             description: self._fields.0,
             domain: self._fields.1,

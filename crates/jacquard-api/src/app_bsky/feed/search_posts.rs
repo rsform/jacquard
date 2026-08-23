@@ -8,16 +8,16 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::feed::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Language, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::feed::PostView;
+use serde::{Deserialize, Serialize};
 /// Specifies the ranking order of results.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -97,9 +97,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchPosts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
@@ -130,13 +132,15 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub url: Option<UriValue<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    /// Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hits_total: Option<i64>,
     pub posts: Vec<PostView<S>>,
@@ -144,25 +148,20 @@ pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum SearchPostsError {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(Option<SmolStr>),
+    BadQueryString(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for SearchPostsError {
@@ -218,15 +217,14 @@ fn _default_limit() -> Option<i64> {
     Some(25i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    SearchPostsSort<S>,
-> {
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<SearchPostsSort<S>> {
     Some(<SearchPostsSort<S>>::from_value(S::from_static("latest")))
 }
 
 pub mod search_posts_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -296,18 +294,7 @@ impl SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -320,18 +307,7 @@ impl<S: BosStr> SearchPostsBuilder<search_posts_state::Empty, S> {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -422,10 +398,7 @@ where
     St::Q: search_posts_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(
-        mut self,
-        value: impl Into<S>,
-    ) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
+    pub fn q(mut self, value: impl Into<S>) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SearchPostsBuilder {
             _state: PhantomData,

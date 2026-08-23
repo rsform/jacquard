@@ -75,7 +75,7 @@ use crate::resolver::{
     MiniDoc, PlcSource, ResolverOptions,
 };
 use bytes::Bytes;
-use http::StatusCode;
+use http::{HeaderMap, StatusCode};
 use jacquard_common::BosStr;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
@@ -470,15 +470,17 @@ impl<C: HttpClient> JacquardResolver<C> {
         self.did_web_url(&did).unwrap().to_string()
     }
 
-    async fn get_json_bytes(&self, uri: Uri<&str>) -> resolver::Result<(Bytes, StatusCode)> {
+    async fn get_json_bytes(
+        &self,
+        uri: Uri<&str>,
+    ) -> resolver::Result<(Bytes, StatusCode, HeaderMap)> {
         let resp = self
             .http
             .send_http(http::Request::get(uri.as_str()).body(Vec::new()).unwrap())
             .await
             .map_err(|e| IdentityError::transport(SmolStr::from(uri.as_str()), e))?;
-        let status = resp.status();
-        let buf = resp.into_body();
-        Ok((Bytes::from_owner(buf), status))
+        let (parts, body) = resp.into_parts();
+        Ok((Bytes::from_owner(body), parts.status, parts.headers))
     }
 
     async fn get_text(&self, uri: Uri<&str>) -> resolver::Result<String> {
@@ -546,10 +548,11 @@ impl<C: HttpClient> JacquardResolver<C> {
 
         let status = response.status();
         if !status.is_success() {
-            return Err(IdentityError::http_status(status).with_context(format!(
-                "DNS-over-HTTPS query for {} ({})",
-                name, record_type
-            )));
+            return Err(
+                IdentityError::http_status(status, response.headers().clone()).with_context(
+                    format!("DNS-over-HTTPS query for {} ({})", name, record_type),
+                ),
+            );
         }
 
         let json: serde_json::Value = serde_json::from_slice(&response.body())
@@ -687,10 +690,11 @@ impl<C: HttpClient> JacquardResolver<C> {
         let url = Uri::parse(url_str)
             .map_err(|(e, _)| IdentityError::url(e))?
             .to_owned();
-        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
+        let (buf, status, headers) = self.get_json_bytes(url.borrow()).await?;
         Ok(DidDocResponse {
             buffer: buf,
             status,
+            headers,
             requested: Some(owned_did),
         })
     }
@@ -761,7 +765,9 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
                                 .map(|u| u.to_owned())
                                 .map_err(|(e, _)| IdentityError::url(e))
                             {
-                                if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                                if let Ok((buf, status, _headers)) =
+                                    self.get_json_bytes(url.borrow()).await
+                                {
                                     if status.is_success() {
                                         if let Ok(val) =
                                             serde_json::from_slice::<serde_json::Value>(&buf)
@@ -807,7 +813,9 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
                             .map(|u| u.to_owned())
                             .map_err(|(e, _)| e)
                         {
-                            if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                            if let Ok((buf, status, _headers)) =
+                                self.get_json_bytes(url.borrow()).await
+                            {
                                 if status.is_success() {
                                     if let Ok(val) =
                                         serde_json::from_slice::<serde_json::Value>(&buf)
@@ -872,33 +880,36 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
             match step {
                 DidStep::DidWebHttps if s.starts_with("did:web:") => {
                     let url = self.did_web_url(did)?;
-                    if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                    if let Ok((buf, status, headers)) = self.get_json_bytes(url.borrow()).await {
                         resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
+                            headers,
                             requested: Some(owned_did.clone()),
                         });
                         break 'outer;
                     }
                 }
                 DidStep::PlcHttp if s.starts_with("did:plc:") => {
-                    let url_str = match &self.opts.plc_source {
+                    let url = match &self.opts.plc_source {
                         PlcSource::PlcDirectory { base } => {
-                            // this is odd, the join screws up with the plc directory but NOT slingshot
-                            format!("{}{}", base, did.as_str())
+                            Uri::parse(format!("{}{}", base, did.as_str()))
+                                .map(|u| u.to_owned())
+                                .map_err(|(_, _)| {
+                                    IdentityError::unsupported_did_method(did.as_str())
+                                })
                         }
                         PlcSource::Slingshot { base } => {
-                            format!("{}{}", base, did.as_str())
+                            self.slingshot_mini_doc_url(base, did.as_str())
                         }
                     };
-                    if let Ok(url) = Uri::parse(url_str)
-                        .map(|u| u.to_owned())
-                        .map_err(|(_, _)| IdentityError::unsupported_did_method(did.as_str()))
-                    {
-                        if let Ok((buf, status)) = self.get_json_bytes(url.borrow()).await {
+                    if let Ok(url) = url {
+                        if let Ok((buf, status, headers)) = self.get_json_bytes(url.borrow()).await
+                        {
                             resolved_doc = Some(DidDocResponse {
                                 buffer: buf,
                                 status,
+                                headers,
                                 requested: Some(owned_did.clone()),
                             });
                             break 'outer;
@@ -912,6 +923,7 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
                         resolved_doc = Some(DidDocResponse {
                             buffer: Bytes::from(buf),
                             status: StatusCode::OK,
+                            headers: HeaderMap::new(),
                             requested: Some(owned_did.clone()),
                         });
                         break 'outer;
@@ -919,10 +931,11 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
                     // Fallback: if Slingshot configured, return mini-doc response (partial doc)
                     if let PlcSource::Slingshot { base } = &self.opts.plc_source {
                         let url = self.slingshot_mini_doc_url(base, did.as_str())?;
-                        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
+                        let (buf, status, headers) = self.get_json_bytes(url.borrow()).await?;
                         resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
+                            headers,
                             requested: Some(owned_did.clone()),
                         });
                         break 'outer;
@@ -944,7 +957,7 @@ impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
             // Invalidate on error
             #[cfg(feature = "cache")]
             self.invalidate_did_chain(did).await;
-            Err(IdentityError::handle_resolution_exhausted())
+            Err(IdentityError::did_resolution_exhausted())
         }
     }
 }
@@ -1113,7 +1126,7 @@ impl<C: HttpClient + Sync> JacquardResolver<C> {
         enc_id.encode_str::<EncData>(identifier);
         let qs = format!("identifier={enc_id}");
         let url_str = format!(
-            "{}://{}/xrpc/com.bad-example.identity.resolveMiniDoc?{}",
+            "{}://{}/xrpc/blue.microcosm.identity.resolveMiniDoc?{}",
             base.scheme().as_str(),
             base.authority().map(|a| a.as_str()).unwrap_or(""),
             qs
@@ -1155,14 +1168,6 @@ impl<C: HttpClient + Sync> JacquardResolver<C> {
     }
 
     #[cfg(feature = "cache")]
-    async fn invalidate_authority_chain(&self, authority: &str) {
-        if let Some(caches) = &self.caches {
-            let authority = SmolStr::from(authority);
-            cache_impl::invalidate(&caches.authority_to_did, &authority);
-        }
-    }
-
-    #[cfg(feature = "cache")]
     async fn invalidate_lexicon_chain<S: BosStr + Sync>(
         &self,
         nsid: &jacquard_common::types::string::Nsid<S>,
@@ -1193,10 +1198,11 @@ impl<C: HttpClient + Sync> JacquardResolver<C> {
             }
         };
         let url = self.slingshot_mini_doc_url(&base, identifier.as_str())?;
-        let (buf, status) = self.get_json_bytes(url.borrow()).await?;
+        let (buf, status, headers) = self.get_json_bytes(url.borrow()).await?;
         Ok(MiniDocResponse {
             buffer: buf,
             status,
+            headers,
             identifier: SmolStr::from(identifier.as_str()),
         })
     }
@@ -1207,6 +1213,7 @@ impl<C: HttpClient + Sync> JacquardResolver<C> {
 pub struct MiniDocResponse {
     buffer: Bytes,
     status: StatusCode,
+    headers: HeaderMap,
     /// Identifier that was being resolved
     identifier: SmolStr,
 }
@@ -1217,8 +1224,10 @@ impl MiniDocResponse {
         if self.status.is_success() {
             serde_json::from_slice::<MiniDoc<'b>>(&self.buffer).map_err(IdentityError::from)
         } else {
-            Err(IdentityError::http_status(self.status)
-                .with_context(format!("fetching mini-doc for {}", self.identifier)))
+            Err(
+                IdentityError::http_status(self.status, self.headers.clone())
+                    .with_context(format!("fetching mini-doc for {}", self.identifier)),
+            )
         }
     }
 }
@@ -1269,6 +1278,7 @@ pub fn slingshot_resolver_default() -> JacquardResolver<reqwest::Client> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use http::HeaderValue;
 
     #[cfg(feature = "reqwest-client")]
     #[test]
@@ -1301,7 +1311,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             url.as_str(),
-            "https://slingshot.microcosm.blue/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=bad-example.com"
+            "https://slingshot.microcosm.blue/xrpc/blue.microcosm.identity.resolveMiniDoc?identifier=bad-example.com"
         );
     }
 
@@ -1318,6 +1328,7 @@ mod tests {
         let resp = MiniDocResponse {
             buffer: buf,
             status: StatusCode::OK,
+            headers: HeaderMap::new(),
             identifier: SmolStr::new_static("bad-example.com"),
         };
         let doc = resp.parse().expect("parse mini-doc");
@@ -1338,15 +1349,19 @@ mod tests {
   "message": "This record was deleted"
 }"#,
         );
+        let mut headers = HeaderMap::new();
+        headers.insert(http::header::RETRY_AFTER, HeaderValue::from_static("7"));
         let resp = MiniDocResponse {
             buffer: buf,
             status: StatusCode::BAD_REQUEST,
+            headers,
             identifier: SmolStr::new_static("bad-example.com"),
         };
         match resp.parse() {
             Err(e) => match e.kind() {
-                resolver::IdentityErrorKind::HttpStatus(s) => {
-                    assert_eq!(*s, StatusCode::BAD_REQUEST)
+                resolver::IdentityErrorKind::HttpStatus { status, headers } => {
+                    assert_eq!(*status, StatusCode::BAD_REQUEST);
+                    assert_eq!(headers.get(http::header::RETRY_AFTER).unwrap(), "7");
                 }
                 _ => panic!("unexpected error kind: {:?}", e),
             },
@@ -1396,6 +1411,7 @@ mod tests {
         let resp = resolver::DidDocResponse {
             buffer: buf,
             status: StatusCode::OK,
+            headers: HeaderMap::new(),
             requested: None,
         };
         let doc = resp.parse().expect("parse document");

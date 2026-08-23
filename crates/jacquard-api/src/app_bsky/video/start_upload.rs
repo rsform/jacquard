@@ -10,39 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartUpload<S: BosStr = DefaultStr> {
-    ///Advisory, non-authoritative duration used only for early failure; the authoritative probe runs asynchronously after upload.
+    /// Advisory, non-authoritative duration used only for early failure; the authoritative probe runs asynchronously after upload.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_ms: Option<i64>,
-    ///Advisory, non-authoritative height used only for early failure; the authoritative probe runs asynchronously after upload.
+    /// Advisory, non-authoritative height used only for early failure; the authoritative probe runs asynchronously after upload.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    ///Declared MIME type of the video.
+    /// Declared MIME type of the video.
     pub mime_type: S,
-    ///Optional client-provided file name.
+    /// Optional client-provided file name.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    ///Exact byte size of the complete upload-ready video file before it is split into parts.
+    /// Exact byte size of the complete upload-ready video file before it is split into parts.
     pub size_bytes: i64,
-    ///Advisory, non-authoritative width used only for early failure; the authoritative probe runs asynchronously after upload.
+    /// Advisory, non-authoritative width used only for early failure; the authoritative probe runs asynchronously after upload.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StartUploadOutput<S: BosStr = DefaultStr> {
     pub expires_at: Datetime,
     pub job_id: S,
@@ -52,47 +57,42 @@ pub struct StartUploadOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum StartUploadError {
     /// The declared MIME type is not supported.
     #[serde(rename = "UnsupportedContentType")]
-    UnsupportedContentType(Option<SmolStr>),
+    UnsupportedContentType(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The exact file size exceeds the per-file cap or remaining daily byte allowance.
     #[serde(rename = "VideoTooLarge")]
-    VideoTooLarge(Option<SmolStr>),
+    VideoTooLarge(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The advisory declared duration exceeds the limit.
     #[serde(rename = "VideoTooLong")]
-    VideoTooLong(Option<SmolStr>),
+    VideoTooLong(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The advisory declared dimensions have an unsupported aspect ratio.
     #[serde(rename = "BadAspectRatio")]
-    BadAspectRatio(Option<SmolStr>),
+    BadAspectRatio(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The daily video or byte allowance, including active reservations, is exhausted.
     #[serde(rename = "DailyLimitExceeded")]
-    DailyLimitExceeded(Option<SmolStr>),
+    DailyLimitExceeded(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The account has reached its open multipart upload limit.
     #[serde(rename = "TooManyOpenUploads")]
-    TooManyOpenUploads(Option<SmolStr>),
+    TooManyOpenUploads(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The account is not permitted to upload video.
     #[serde(rename = "UploadForbidden")]
-    UploadForbidden(Option<SmolStr>),
+    UploadForbidden(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The service is draining, at capacity, or temporarily unable to create the multipart upload.
     #[serde(rename = "ServiceOverloaded")]
-    ServiceOverloaded(Option<SmolStr>),
+    ServiceOverloaded(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for StartUploadError {
@@ -178,9 +178,8 @@ impl jacquard_common::xrpc::XrpcResp for StartUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartUpload<S> {
     const NSID: &'static str = "app.bsky.video.startUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = StartUploadResponse;
 }
 
@@ -190,16 +189,15 @@ Path: `/xrpc/app.bsky.video.startUpload`. The request payload type is `StartUplo
 pub struct StartUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartUploadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.startUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = StartUpload<S>;
     type Response = StartUploadResponse;
 }
 
 pub mod start_upload_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -244,7 +242,14 @@ pub mod start_upload_state {
 /// Builder for constructing an instance of this type.
 pub struct StartUploadBuilder<St: start_upload_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<i64>, Option<S>, Option<S>, Option<i64>, Option<i64>),
+    _fields: (
+        Option<i64>,
+        Option<i64>,
+        Option<S>,
+        Option<S>,
+        Option<i64>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -393,10 +398,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> StartUpload<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StartUpload<S> {
         StartUpload {
             duration_ms: self._fields.0,
             height: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A single wearing review of a fragrance
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,62 +37,62 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Review<S: BosStr = DefaultStr> {
-    ///Final: Depth and evolution (1-5)
+    /// Final: Depth and evolution (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complexity: Option<i64>,
-    ///Timestamp when the review was created
+    /// Timestamp when the review was created
     pub created_at: Datetime,
-    ///Mid-Wear: How it smells after settling (1-5)
+    /// Mid-Wear: How it smells after settling (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub drydown_rating: Option<i64>,
-    ///Elevation in meters above sea level
+    /// Elevation in meters above sea level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub elevation: Option<i64>,
-    ///Final: How it smells at the end (1-5)
+    /// Final: How it smells at the end (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_rating: Option<i64>,
-    ///Reference to the social.drydown.fragrance record
+    /// Reference to the social.drydown.fragrance record
     pub fragrance: AtUri<S>,
-    ///Final: Total duration (1-5)
+    /// Final: Total duration (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub longevity: Option<i64>,
-    ///Mid-Wear: Scent bubble radius during mid-wear (1-5)
+    /// Mid-Wear: Scent bubble radius during mid-wear (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mid_projection: Option<i64>,
-    ///First Impression: Immediate scent bubble radius (1-5)
+    /// First Impression: Immediate scent bubble radius (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opening_projection: Option<i64>,
-    ///First Impression: How it smells immediately (1-5)
+    /// First Impression: How it smells immediately (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opening_rating: Option<i64>,
-    ///Final: Holistic 'Gut Score' (1-5)
+    /// Final: Holistic 'Gut Score' (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub overall_rating: Option<i64>,
-    ///Mid-Wear: Trail left behind (1-5)
+    /// Mid-Wear: Trail left behind (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sillage: Option<i64>,
-    ///Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
+    /// Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stage1_temp: Option<i64>,
-    ///Timestamp when Stage 2 was completed (for accurate temperature)
+    /// Timestamp when Stage 2 was completed (for accurate temperature)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stage2_completed_at: Option<Datetime>,
-    ///Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
+    /// Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stage2_temp: Option<i64>,
-    ///Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
+    /// Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stage3_temp: Option<i64>,
-    ///Written review (max 255 graphemes)
+    /// Written review (max 255 graphemes)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    ///Daily maximum UV index (0-11+)
+    /// Daily maximum UV index (0-11+)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uv_index: Option<i64>,
-    ///User opted in to weather data collection
+    /// User opted in to weather data collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weather_opt_in: Option<bool>,
-    ///Calculated final score * 1000 (e.g. 4250 = 4.25)
+    /// Calculated final score * 1000 (e.g. 4250 = 4.25)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weighted_score: Option<i64>,
     #[serde(
@@ -372,9 +372,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -386,7 +385,7 @@ where
 
 pub mod review_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -476,26 +475,8 @@ impl ReviewBuilder<review_state::Empty, DefaultStr> {
         ReviewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -508,26 +489,8 @@ impl<S: BosStr> ReviewBuilder<review_state::Empty, S> {
         ReviewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -867,10 +830,10 @@ where
 }
 
 fn lexicon_doc_social_drydown_review() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.drydown.review"),

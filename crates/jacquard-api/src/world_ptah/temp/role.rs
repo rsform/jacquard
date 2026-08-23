@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A stage role vs a performance of that role. The Opening of the Mouth was performed on a type of figure — the Role is the type. The Character instance is the specific statue that gets its mouth opened.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,37 +37,37 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Role<S: BosStr = DefaultStr> {
-    ///Permanent link to the role's creator. Provenance travels.
+    /// Permanent link to the role's creator. Provenance travels.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authorship_record: Option<Did<S>>,
-    ///The AT URI of the single Character record designated as the authoritative expression of this role. When present, this is the canonical instance.
+    /// The AT URI of the single Character record designated as the authoritative expression of this role. When present, this is the canonical instance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_character_reference: Option<AtUri<S>>,
-    ///Governs how the canonicalCharacterReference behaves over time.
+    /// Governs how the canonicalCharacterReference behaves over time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_reference_policy: Option<RoleCanonicalReferencePolicy<S>>,
-    ///The canonical standing of this role within its world.
+    /// The canonical standing of this role within its world.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_status: Option<RoleCanonicalStatus<S>>,
-    ///Timestamp of role creation.
+    /// Timestamp of role creation.
     pub created_at: Datetime,
-    ///Who defined this role in the protocol.
+    /// Who defined this role in the protocol.
     pub creator_did: Did<S>,
-    ///What this role is in the world's context — its narrative function, its archetypal weight.
+    /// What this role is in the world's context — its narrative function, its archetypal weight.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///How instances of this role are governed.
+    /// How instances of this role are governed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub instance_policy: Option<RoleInstancePolicy<S>>,
-    ///What this role is called.
+    /// What this role is called.
     pub name: S,
-    ///If sourceType is publicDomain, the specific source material.
+    /// If sourceType is publicDomain, the specific source material.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_reference: Option<S>,
-    ///The intellectual property origin of this role.
+    /// The intellectual property origin of this role.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_type: Option<RoleSourceType<S>>,
-    ///The AT URI of the world record this role exists in.
+    /// The AT URI of the world record this role exists in.
     pub world_reference: AtUri<S>,
     #[serde(
         flatten,
@@ -129,8 +129,7 @@ impl<S: BosStr> Serialize for RoleCanonicalReferencePolicy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for RoleCanonicalReferencePolicy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RoleCanonicalReferencePolicy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -155,12 +154,8 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             RoleCanonicalReferencePolicy::Fixed => RoleCanonicalReferencePolicy::Fixed,
-            RoleCanonicalReferencePolicy::Updatable => {
-                RoleCanonicalReferencePolicy::Updatable
-            }
-            RoleCanonicalReferencePolicy::Community => {
-                RoleCanonicalReferencePolicy::Community
-            }
+            RoleCanonicalReferencePolicy::Updatable => RoleCanonicalReferencePolicy::Updatable,
+            RoleCanonicalReferencePolicy::Community => RoleCanonicalReferencePolicy::Community,
             RoleCanonicalReferencePolicy::Other(v) => {
                 RoleCanonicalReferencePolicy::Other(v.into_static())
             }
@@ -181,30 +176,18 @@ pub enum RoleCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> RoleCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => {
-                "world.ptah.temp.defs#canonicalStatusOfficial"
-            }
-            Self::CanonicalStatusCommunity => {
-                "world.ptah.temp.defs#canonicalStatusCommunity"
-            }
-            Self::CanonicalStatusApocryphal => {
-                "world.ptah.temp.defs#canonicalStatusApocryphal"
-            }
+            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
+            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
+            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => {
-                Self::CanonicalStatusOfficial
-            }
-            "world.ptah.temp.defs#canonicalStatusCommunity" => {
-                Self::CanonicalStatusCommunity
-            }
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
-                Self::CanonicalStatusApocryphal
-            }
+            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
+            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
             _ => Self::Other(s),
         }
     }
@@ -425,9 +408,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             RoleSourceType::SourceTypeOriginalIp => RoleSourceType::SourceTypeOriginalIp,
-            RoleSourceType::SourceTypePublicDomain => {
-                RoleSourceType::SourceTypePublicDomain
-            }
+            RoleSourceType::SourceTypePublicDomain => RoleSourceType::SourceTypePublicDomain,
             RoleSourceType::Other(v) => RoleSourceType::Other(v.into_static()),
         }
     }
@@ -567,9 +548,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -581,7 +561,7 @@ where
 
 pub mod role_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -693,18 +673,7 @@ impl RoleBuilder<role_state::Empty, DefaultStr> {
         RoleBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -717,18 +686,7 @@ impl<S: BosStr> RoleBuilder<role_state::Empty, S> {
         RoleBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -750,18 +708,12 @@ impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
 
 impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `canonicalCharacterReference` field (optional)
-    pub fn canonical_character_reference(
-        mut self,
-        value: impl Into<Option<AtUri<S>>>,
-    ) -> Self {
+    pub fn canonical_character_reference(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `canonicalCharacterReference` field to an Option value (optional)
-    pub fn maybe_canonical_character_reference(
-        mut self,
-        value: Option<AtUri<S>>,
-    ) -> Self {
+    pub fn maybe_canonical_character_reference(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -788,18 +740,12 @@ impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
 
 impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
-    pub fn canonical_status(
-        mut self,
-        value: impl Into<Option<RoleCanonicalStatus<S>>>,
-    ) -> Self {
+    pub fn canonical_status(mut self, value: impl Into<Option<RoleCanonicalStatus<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(
-        mut self,
-        value: Option<RoleCanonicalStatus<S>>,
-    ) -> Self {
+    pub fn maybe_canonical_status(mut self, value: Option<RoleCanonicalStatus<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -858,18 +804,12 @@ impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
 
 impl<St: role_state::State, S: BosStr> RoleBuilder<St, S> {
     /// Set the `instancePolicy` field (optional)
-    pub fn instance_policy(
-        mut self,
-        value: impl Into<Option<RoleInstancePolicy<S>>>,
-    ) -> Self {
+    pub fn instance_policy(mut self, value: impl Into<Option<RoleInstancePolicy<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `instancePolicy` field to an Option value (optional)
-    pub fn maybe_instance_policy(
-        mut self,
-        value: Option<RoleInstancePolicy<S>>,
-    ) -> Self {
+    pub fn maybe_instance_policy(mut self, value: Option<RoleInstancePolicy<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -881,10 +821,7 @@ where
     St::Name: role_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> RoleBuilder<role_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> RoleBuilder<role_state::SetName<St>, S> {
         self._fields.8 = Option::Some(value.into());
         RoleBuilder {
             _state: PhantomData,
@@ -986,10 +923,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_role() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.role"),

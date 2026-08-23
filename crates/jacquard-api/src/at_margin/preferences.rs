@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,22 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::at_margin::preferences;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::at_margin::preferences;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LabelPreference<S: BosStr = DefaultStr> {
-    ///The label identifier (e.g. sexual, violence, spam).
+    /// The label identifier (e.g. sexual, violence, spam).
     pub label: S,
-    ///DID of the labeler service.
+    /// DID of the labeler service.
     pub labeler_did: S,
-    ///How to handle content with this label: hide, warn, or ignore.
+    /// How to handle content with this label: hide, warn, or ignore.
     pub visibility: LabelPreferenceVisibility<S>,
     #[serde(
         flatten,
@@ -98,8 +101,7 @@ impl<S: BosStr> Serialize for LabelPreferenceVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for LabelPreferenceVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LabelPreferenceVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -133,11 +135,13 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LabelerSubscription<S: BosStr = DefaultStr> {
-    ///DID of the labeler service.
+    /// DID of the labeler service.
     pub did: S,
     #[serde(
         flatten,
@@ -159,16 +163,16 @@ pub struct LabelerSubscription<S: BosStr = DefaultStr> {
 )]
 pub struct Preferences<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///If true, do not show the confirmation modal when opening external links.
+    /// If true, do not show the confirmation modal when opening external links.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_external_link_warning: Option<bool>,
-    ///List of hostnames to skip the external link warning modal for.
+    /// List of hostnames to skip the external link warning modal for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_link_skipped_hostnames: Option<Vec<S>>,
-    ///Per-label visibility preferences for subscribed labelers.
+    /// Per-label visibility preferences for subscribed labelers.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label_preferences: Option<Vec<preferences::LabelPreference<S>>>,
-    ///List of labeler services the user subscribes to for content moderation.
+    /// List of labeler services the user subscribes to for content moderation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscribed_labelers: Option<Vec<preferences::LabelerSubscription<S>>>,
     #[serde(
@@ -280,9 +284,7 @@ impl<S: BosStr> LexiconSchema for Preferences<S> {
                 #[allow(unused_comparisons)]
                 if <str>::len(value.as_ref()) > 255usize {
                     return Err(ConstraintError::MaxLength {
-                        path: ValidationPath::from_field(
-                            "external_link_skipped_hostnames",
-                        ),
+                        path: ValidationPath::from_field("external_link_skipped_hostnames"),
                         max: 255usize,
                         actual: <str>::len(value.as_ref()),
                     });
@@ -320,17 +322,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.margin.preferences"),
@@ -339,44 +340,38 @@ fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("labelPreference"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("labelerDid"),
-                            SmolStr::new_static("label"),
-                            SmolStr::new_static("visibility")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("labelerDid"),
+                        SmolStr::new_static("label"),
+                        SmolStr::new_static("visibility"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("label"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The label identifier (e.g. sexual, violence, spam).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The label identifier (e.g. sexual, violence, spam).",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("labelerDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the labeler service."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the labeler service.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("visibility"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "How to handle content with this label: hide, warn, or ignore.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "How to handle content with this label: hide, warn, or ignore.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -395,9 +390,9 @@ fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the labeler service."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the labeler service.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -501,9 +496,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -514,9 +508,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -528,7 +521,7 @@ where
 
 pub mod preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -628,10 +621,7 @@ where
 
 impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `disableExternalLinkWarning` field (optional)
-    pub fn disable_external_link_warning(
-        mut self,
-        value: impl Into<Option<bool>>,
-    ) -> Self {
+    pub fn disable_external_link_warning(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -644,18 +634,12 @@ impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
 
 impl<St: preferences_state::State, S: BosStr> PreferencesBuilder<St, S> {
     /// Set the `externalLinkSkippedHostnames` field (optional)
-    pub fn external_link_skipped_hostnames(
-        mut self,
-        value: impl Into<Option<Vec<S>>>,
-    ) -> Self {
+    pub fn external_link_skipped_hostnames(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `externalLinkSkippedHostnames` field to an Option value (optional)
-    pub fn maybe_external_link_skipped_hostnames(
-        mut self,
-        value: Option<Vec<S>>,
-    ) -> Self {
+    pub fn maybe_external_link_skipped_hostnames(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -716,10 +700,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Preferences<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preferences<S> {
         Preferences {
             created_at: self._fields.0.unwrap(),
             disable_external_link_warning: self._fields.1,

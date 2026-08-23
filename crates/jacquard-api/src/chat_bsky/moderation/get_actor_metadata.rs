@@ -21,20 +21,25 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::chat_bsky::moderation::get_actor_metadata;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::moderation::get_actor_metadata;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorMetadata<S: BosStr = DefaultStr> {
     pub actor: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorMetadataOutput<S: BosStr = DefaultStr> {
     pub all: get_actor_metadata::Metadata<S>,
     pub day: get_actor_metadata::Metadata<S>,
@@ -43,9 +48,11 @@ pub struct GetActorMetadataOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Metadata<S: BosStr = DefaultStr> {
     pub convos: i64,
     pub convos_started: i64,
@@ -105,7 +112,7 @@ impl<S: BosStr> LexiconSchema for Metadata<S> {
 
 pub mod get_actor_metadata_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -136,10 +143,7 @@ pub mod get_actor_metadata_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorMetadataBuilder<
-    St: get_actor_metadata_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetActorMetadataBuilder<St: get_actor_metadata_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -147,10 +151,7 @@ pub struct GetActorMetadataBuilder<
 
 impl GetActorMetadata<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorMetadataBuilder<
-        get_actor_metadata_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetActorMetadataBuilder<get_actor_metadata_state::Empty, DefaultStr> {
         GetActorMetadataBuilder::new()
     }
 }
@@ -223,15 +224,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod metadata_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -453,10 +453,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.moderation.getActorMetadata"),
@@ -465,38 +465,34 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("actor")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("actor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("actor")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("actor"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("metadata"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("messagesSent"),
-                            SmolStr::new_static("messagesReceived"),
-                            SmolStr::new_static("convos"),
-                            SmolStr::new_static("convosStarted")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("messagesSent"),
+                        SmolStr::new_static("messagesReceived"),
+                        SmolStr::new_static("convos"),
+                        SmolStr::new_static("convosStarted"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

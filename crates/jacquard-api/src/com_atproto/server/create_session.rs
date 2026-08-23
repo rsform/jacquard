@@ -10,31 +10,36 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSession<S: BosStr = DefaultStr> {
-    ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
+    /// When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_takendown: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_factor_token: Option<S>,
-    ///Handle or other identifier supported by the server for the authenticating user.
+    /// Handle or other identifier supported by the server for the authenticating user.
     pub identifier: S,
     pub password: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateSessionOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,7 +55,7 @@ pub struct CreateSessionOutput<S: BosStr = DefaultStr> {
     pub email_confirmed: Option<bool>,
     pub handle: Handle<S>,
     pub refresh_jwt: S,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<CreateSessionOutputStatus<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -108,8 +113,7 @@ impl<S: BosStr> Serialize for CreateSessionOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for CreateSessionOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -135,9 +139,7 @@ where
         match self {
             CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
             CreateSessionOutputStatus::Suspended => CreateSessionOutputStatus::Suspended,
-            CreateSessionOutputStatus::Deactivated => {
-                CreateSessionOutputStatus::Deactivated
-            }
+            CreateSessionOutputStatus::Deactivated => CreateSessionOutputStatus::Deactivated,
             CreateSessionOutputStatus::Other(v) => {
                 CreateSessionOutputStatus::Other(v.into_static())
             }
@@ -145,27 +147,22 @@ where
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CreateSessionError {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(Option<SmolStr>),
+    AccountTakedown(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     #[serde(rename = "AuthFactorTokenRequired")]
-    AuthFactorTokenRequired(Option<SmolStr>),
+    AuthFactorTokenRequired(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CreateSessionError {
@@ -209,9 +206,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateSession<S> {
     const NSID: &'static str = "com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateSessionResponse;
 }
 
@@ -221,9 +217,8 @@ Path: `/xrpc/com.atproto.server.createSession`. The request payload type is `Cre
 pub struct CreateSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateSession<S>;
     type Response = CreateSessionResponse;
 }

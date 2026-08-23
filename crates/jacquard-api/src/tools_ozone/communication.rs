@@ -11,18 +11,17 @@ pub mod delete_template;
 pub mod list_templates;
 pub mod update_template;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime, Language};
+use jacquard_common::types::string::{Datetime, Did, Language};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,24 +29,27 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TemplateView<S: BosStr = DefaultStr> {
-    ///Subject of the message, used in emails.
+    /// Subject of the message, used in emails.
     pub content_markdown: S,
     pub created_at: Datetime,
     pub disabled: bool,
     pub id: S,
-    ///Message language.
+    /// Message language.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<Language>,
-    ///DID of the user who last updated the template.
+    /// DID of the user who last updated the template.
     pub last_updated_by: Did<S>,
-    ///Name of the template.
+    /// Name of the template.
     pub name: S,
-    ///Content of the template, can contain markdown and variable placeholders.
+    /// Content of the template, can contain markdown and variable placeholders.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<S>,
     pub updated_at: Datetime,
@@ -82,15 +84,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod template_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -461,10 +462,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TemplateView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TemplateView<S> {
         TemplateView {
             content_markdown: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -481,10 +479,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_communication_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.communication.defs"),

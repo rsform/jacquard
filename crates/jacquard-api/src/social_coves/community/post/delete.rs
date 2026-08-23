@@ -10,53 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Delete<S: BosStr = DefaultStr> {
-    ///AT-URI of the post to delete
+    /// AT-URI of the post to delete
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DeleteError {
     /// Post not found
     #[serde(rename = "PostNotFound")]
-    PostNotFound(Option<SmolStr>),
+    PostNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// User is not authorized to delete this post
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<SmolStr>),
+    NotAuthorized(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DeleteError {
@@ -100,9 +100,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Delete<S> {
     const NSID: &'static str = "social.coves.community.post.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteResponse;
 }
 
@@ -112,16 +111,15 @@ Path: `/xrpc/social.coves.community.post.delete`. The request payload type is `D
 pub struct DeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
     const PATH: &'static str = "/xrpc/social.coves.community.post.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Delete<S>;
     type Response = DeleteResponse;
 }
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,10 +198,7 @@ where
     St::Uri: delete_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> DeleteBuilder<delete_state::SetUri<St>, S> {
+    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> DeleteBuilder<delete_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,

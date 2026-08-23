@@ -808,9 +808,9 @@ pub fn jkt(key: &Key) -> Result<SmolStr> {
         x.map(|b| URL_SAFE_NO_PAD.encode(b)).unwrap_or_default(),
         y.map(|b| URL_SAFE_NO_PAD.encode(b)).unwrap_or_default(),
     );
-    Ok(SmolStr::from(
-        URL_SAFE_NO_PAD.encode(sha2_legacy::Sha256::digest(thumbprint_input.as_bytes())),
-    ))
+    Ok(SmolStr::from(URL_SAFE_NO_PAD.encode(
+        sha2_legacy::Sha256::digest(thumbprint_input.as_bytes()),
+    )))
 }
 
 /// Build a compact ES256 DPoP proof with an embedded public JWK.

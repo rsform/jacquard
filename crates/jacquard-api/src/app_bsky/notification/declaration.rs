@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of the user's choices related to notifications that can be produced by them.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,7 +37,7 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Declaration<S: BosStr = DefaultStr> {
-    ///A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
+    /// A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
     pub allow_subscriptions: DeclarationAllowSubscriptions<S>,
     #[serde(
         flatten,
@@ -99,8 +99,7 @@ impl<S: BosStr> Serialize for DeclarationAllowSubscriptions<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for DeclarationAllowSubscriptions<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DeclarationAllowSubscriptions<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -124,12 +123,8 @@ where
     type Output = DeclarationAllowSubscriptions<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            DeclarationAllowSubscriptions::Followers => {
-                DeclarationAllowSubscriptions::Followers
-            }
-            DeclarationAllowSubscriptions::Mutuals => {
-                DeclarationAllowSubscriptions::Mutuals
-            }
+            DeclarationAllowSubscriptions::Followers => DeclarationAllowSubscriptions::Followers,
+            DeclarationAllowSubscriptions::Mutuals => DeclarationAllowSubscriptions::Mutuals,
             DeclarationAllowSubscriptions::None => DeclarationAllowSubscriptions::None,
             DeclarationAllowSubscriptions::Other(v) => {
                 DeclarationAllowSubscriptions::Other(v.into_static())
@@ -204,9 +199,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -218,7 +212,7 @@ where
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -323,10 +317,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Declaration<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
         Declaration {
             allow_subscriptions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -335,10 +326,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_notification_declaration() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.notification.declaration"),

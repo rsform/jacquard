@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RefreshCachesOutput<S: BosStr = DefaultStr> {
     pub refreshed: Vec<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -43,14 +46,10 @@ impl jacquard_common::xrpc::XrpcResp for RefreshCachesResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RefreshCaches {
     const NSID: &'static str = "games.gamesgamesgamesgames.refreshCaches";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RefreshCachesResponse;
-    fn encode_body(
-        &self,
-        _buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
         Ok(())
     }
 }
@@ -61,9 +60,8 @@ Path: `/xrpc/games.gamesgamesgamesgames.refreshCaches`. The request payload type
 pub struct RefreshCachesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshCachesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.refreshCaches";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RefreshCaches;
     type Response = RefreshCachesResponse;
 }

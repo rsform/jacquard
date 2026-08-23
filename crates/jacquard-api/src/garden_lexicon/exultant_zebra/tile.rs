@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Nsid, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Nsid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,25 +25,28 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::garden_lexicon::exultant_zebra::masl::Masl;
 use crate::garden_lexicon::exultant_zebra::masl::Resource;
 use crate::garden_lexicon::exultant_zebra::tile;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Declares the AT Protocol interactions a tile performs. Methods listed here gate which XRPC calls the tile is allowed to attempt (the user must still grant per-method consent). Collections and services are informational metadata for display and auditing.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Interactions<S: BosStr = DefaultStr> {
-    ///Repository collection NSIDs this tile reads from or writes to.
+    /// Repository collection NSIDs this tile reads from or writes to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<Nsid<S>>>,
-    ///XRPC method NSIDs this tile may call. When present, the tile runtime restricts XRPC calls to only these methods. When absent, all server-allowed methods may be called (with user consent).
+    /// XRPC method NSIDs this tile may call. When present, the tile runtime restricts XRPC calls to only these methods. When absent, all server-allowed methods may be called (with user consent).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub methods: Option<Vec<S>>,
-    ///AT Protocol service proxy targets this tile interacts with, identified by DID and service endpoint fragment.
+    /// AT Protocol service proxy targets this tile interacts with, identified by DID and service endpoint fragment.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub services: Option<Vec<S>>,
     #[serde(
@@ -65,29 +68,29 @@ pub struct Interactions<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Tile<S: BosStr = DefaultStr> {
-    ///Declared aspect ratio for tile rendering.
+    /// Declared aspect ratio for tile rendering.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aspect_ratio: Option<TileAspectRatio<S>>,
-    ///The tile content, either a single resource or a bundle.
+    /// The tile content, either a single resource or a bundle.
     pub content: TileContent<S>,
-    ///Optional rich text description of the tile.
+    /// Optional rich text description of the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Rich text facets for the description (links, mentions, hashtags).
+    /// Rich text facets for the description (links, mentions, hashtags).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
-    ///Optional icon image for the tile.
+    /// Optional icon image for the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<BlobRef<S>>,
-    ///Declaration of the XRPC methods, collections, and services this tile interacts with.
+    /// Declaration of the XRPC methods, collections, and services this tile interacts with.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub interactions: Option<tile::Interactions<S>>,
-    ///Optional loading screen image for the tile.
+    /// Optional loading screen image for the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loading_image: Option<BlobRef<S>>,
-    ///The name of the tile.
+    /// The name of the tile.
     pub name: S,
-    ///Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
+    /// Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub params: Option<Vec<tile::Param<S>>>,
     #[serde(
@@ -190,7 +193,6 @@ where
     }
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -215,20 +217,23 @@ pub struct TileGetRecordOutput<S: BosStr = DefaultStr> {
 /// Declares an input parameter for a tile, similar to XRPC query parameters.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Param<S: BosStr = DefaultStr> {
-    ///Default value for this parameter, encoded as a string.
+    /// Default value for this parameter, encoded as a string.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<S>,
-    ///Human-readable description of this parameter.
+    /// Human-readable description of this parameter.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Parameter name, used as a URL search param key. Must not start with an underscore.
+    /// Parameter name, used as a URL search param key. Must not start with an underscore.
     pub name: S,
-    ///Whether this parameter must be provided before loading the tile.
+    /// Whether this parameter must be provided before loading the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
-    ///Parameter value type.
+    /// Parameter value type.
     pub r#type: ParamType<S>,
     #[serde(
         flatten,
@@ -407,25 +412,20 @@ impl<S: BosStr> LexiconSchema for Tile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -447,25 +447,20 @@ impl<S: BosStr> LexiconSchema for Tile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("loading_image"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -518,17 +513,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.tile"),
@@ -792,9 +786,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -806,7 +799,7 @@ where
 
 pub mod tile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -974,10 +967,7 @@ impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
 
 impl<St: tile_state::State, S: BosStr> TileBuilder<St, S> {
     /// Set the `interactions` field (optional)
-    pub fn interactions(
-        mut self,
-        value: impl Into<Option<tile::Interactions<S>>>,
-    ) -> Self {
+    pub fn interactions(mut self, value: impl Into<Option<tile::Interactions<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1007,10 +997,7 @@ where
     St::Name: tile_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> TileBuilder<tile_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> TileBuilder<tile_state::SetName<St>, S> {
         self._fields.7 = Option::Some(value.into());
         TileBuilder {
             _state: PhantomData,
@@ -1078,8 +1065,7 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

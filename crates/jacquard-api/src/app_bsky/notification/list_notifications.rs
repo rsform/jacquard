@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 use crate::app_bsky::graph::StarterPackViewBasic;
-use crate::com_atproto::label::Label;
 use crate::app_bsky::notification::list_notifications;
+use crate::com_atproto::label::Label;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,9 +49,11 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub seen_at: Option<Datetime>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -61,9 +66,11 @@ pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Notification<S: BosStr = DefaultStr> {
     pub author: ProfileView<S>,
     pub cid: Cid<S>,
@@ -71,12 +78,12 @@ pub struct Notification<S: BosStr = DefaultStr> {
     pub is_read: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<Vec<Label<S>>>,
-    ///The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
+    /// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
     pub reason: NotificationReason<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason_subject: Option<AtUri<S>>,
     pub record: Data<S>,
-    ///The starter pack associated with this notification. Present when the notification is for a follow originating from a starter pack.
+    /// The starter pack associated with this notification. Present when the notification is for a follow originating from a starter pack.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starter_pack: Option<StarterPackViewBasic<S>>,
     pub uri: AtUri<S>,
@@ -200,9 +207,7 @@ where
             NotificationReason::Mention => NotificationReason::Mention,
             NotificationReason::Reply => NotificationReason::Reply,
             NotificationReason::Quote => NotificationReason::Quote,
-            NotificationReason::StarterpackJoined => {
-                NotificationReason::StarterpackJoined
-            }
+            NotificationReason::StarterpackJoined => NotificationReason::StarterpackJoined,
             NotificationReason::Verified => NotificationReason::Verified,
             NotificationReason::Unverified => NotificationReason::Unverified,
             NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
@@ -263,7 +268,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -281,21 +286,21 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<
-    St: list_notifications_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ListNotificationsBuilder<St: list_notifications_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<bool>, Option<Vec<S>>, Option<Datetime>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<bool>,
+        Option<Vec<S>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ListNotifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListNotificationsBuilder<
-        list_notifications_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
         ListNotificationsBuilder::new()
     }
 }
@@ -417,15 +422,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -753,10 +757,7 @@ where
 
 impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `starterPack` field (optional)
-    pub fn starter_pack(
-        mut self,
-        value: impl Into<Option<StarterPackViewBasic<S>>>,
-    ) -> Self {
+    pub fn starter_pack(mut self, value: impl Into<Option<StarterPackViewBasic<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -814,10 +815,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Notification<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
         Notification {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -835,10 +833,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_notification_listNotifications() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.notification.listNotifications"),

@@ -10,57 +10,57 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImportTimestamps<S: BosStr = DefaultStr> {
-    ///Server-local path to the plain (uncompressed) import CSV, resolved within the configured import directory. May be relative to that directory or an absolute path inside it.
+    /// Server-local path to the plain (uncompressed) import CSV, resolved within the configured import directory. May be relative to that directory or an absolute path inside it.
     pub path: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImportTimestampsOutput<S: BosStr = DefaultStr> {
-    ///Opaque job id. Poll getImportStatus with this id to observe progress and the terminal result.
+    /// Opaque job id. Poll getImportStatus with this id to observe progress and the terminal result.
     pub job: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ImportTimestampsError {
     /// Another import job is already running; only one runs at a time.
     #[serde(rename = "ImportInProgress")]
-    ImportInProgress(Option<SmolStr>),
+    ImportInProgress(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Timestamp import requires the server to be in steady state with the live writer running.
     #[serde(rename = "ImportNotReady")]
-    ImportNotReady(Option<SmolStr>),
+    ImportNotReady(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// The path is empty, escapes the import directory, does not exist, or is not a regular file.
     #[serde(rename = "InvalidPath")]
-    InvalidPath(Option<SmolStr>),
+    InvalidPath(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ImportTimestampsError {
@@ -111,9 +111,8 @@ impl jacquard_common::xrpc::XrpcResp for ImportTimestampsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ImportTimestamps<S> {
     const NSID: &'static str = "network.bsky.jetstream.importTimestamps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ImportTimestampsResponse;
 }
 
@@ -123,9 +122,8 @@ Path: `/xrpc/network.bsky.jetstream.importTimestamps`. The request payload type 
 pub struct ImportTimestampsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportTimestampsRequest {
     const PATH: &'static str = "/xrpc/network.bsky.jetstream.importTimestamps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ImportTimestamps<S>;
     type Response = ImportTimestampsResponse;
 }

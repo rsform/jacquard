@@ -8,14 +8,14 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::feed::FeedViewPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::social_coves::feed::FeedViewPost;
+use serde::{Deserialize, Serialize};
 /// Sort order for timeline feed
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -189,16 +189,16 @@ where
             GetTimelineTimeframe::Month => GetTimelineTimeframe::Month,
             GetTimelineTimeframe::Year => GetTimelineTimeframe::Year,
             GetTimelineTimeframe::All => GetTimelineTimeframe::All,
-            GetTimelineTimeframe::Other(v) => {
-                GetTimelineTimeframe::Other(v.into_static())
-            }
+            GetTimelineTimeframe::Other(v) => GetTimelineTimeframe::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTimeline<S: BosStr = DefaultStr> {
     /// (max length: 500)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -217,9 +217,11 @@ pub struct GetTimeline<S: BosStr = DefaultStr> {
     pub timeframe: Option<GetTimelineTimeframe<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTimelineOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -260,21 +262,19 @@ fn _default_limit() -> Option<i64> {
     Some(15i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetTimelineSort<S>,
-> {
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetTimelineSort<S>> {
     Some(<GetTimelineSort<S>>::from_value(S::from_static("hot")))
 }
 
-fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetTimelineTimeframe<S>,
-> {
+fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetTimelineTimeframe<S>> {
     Some(<GetTimelineTimeframe<S>>::from_value(S::from_static("day")))
 }
 
 pub mod get_timeline_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -380,10 +380,7 @@ impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
 
 impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
     /// Set the `timeframe` field (optional)
-    pub fn timeframe(
-        mut self,
-        value: impl Into<Option<GetTimelineTimeframe<S>>>,
-    ) -> Self {
+    pub fn timeframe(mut self, value: impl Into<Option<GetTimelineTimeframe<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }

@@ -8,16 +8,16 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_coves::community::comment::ThreadViewComment;
+use crate::social_coves::community::post::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::social_coves::community::comment::ThreadViewComment;
-use crate::social_coves::community::post::PostView;
+use serde::{Deserialize, Serialize};
 /// Sort order: hot (trending), top (highest score), new (most recent)
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -191,16 +191,16 @@ where
             GetCommentsTimeframe::Month => GetCommentsTimeframe::Month,
             GetCommentsTimeframe::Year => GetCommentsTimeframe::Year,
             GetCommentsTimeframe::All => GetCommentsTimeframe::All,
-            GetCommentsTimeframe::Other(v) => {
-                GetCommentsTimeframe::Other(v.into_static())
-            }
+            GetCommentsTimeframe::Other(v) => GetCommentsTimeframe::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetComments<S: BosStr = DefaultStr> {
     /// (max length: 500)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -225,47 +225,44 @@ pub struct GetComments<S: BosStr = DefaultStr> {
     pub timeframe: Option<GetCommentsTimeframe<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetCommentsOutput<S: BosStr = DefaultStr> {
-    ///Top-level comments with nested replies up to requested depth
+    /// Top-level comments with nested replies up to requested depth
     pub comments: Vec<ThreadViewComment<S>>,
-    ///Pagination cursor for fetching next page of top-level comments
+    /// Pagination cursor for fetching next page of top-level comments
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///The post these comments belong to
+    /// The post these comments belong to
     pub post: PostView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetCommentsError {
     /// Post not found
     #[serde(rename = "NotFound")]
-    NotFound(Option<SmolStr>),
+    NotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// No comment with the given parentRkey exists within the post
     #[serde(rename = "ParentNotFound")]
-    ParentNotFound(Option<SmolStr>),
+    ParentNotFound(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Invalid parameters (malformed URI, invalid sort/timeframe combination, etc.)
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<SmolStr>),
+    InvalidRequest(#[serde(skip_serializing_if = "Option::is_none")] Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetCommentsError {
@@ -339,15 +336,14 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
-    GetCommentsSort<S>,
-> {
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>()
+-> Option<GetCommentsSort<S>> {
     Some(<GetCommentsSort<S>>::from_value(S::from_static("hot")))
 }
 
 pub mod get_comments_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -514,10 +510,7 @@ impl<St: get_comments_state::State, S: BosStr> GetCommentsBuilder<St, S> {
 
 impl<St: get_comments_state::State, S: BosStr> GetCommentsBuilder<St, S> {
     /// Set the `timeframe` field (optional)
-    pub fn timeframe(
-        mut self,
-        value: impl Into<Option<GetCommentsTimeframe<S>>>,
-    ) -> Self {
+    pub fn timeframe(mut self, value: impl Into<Option<GetCommentsTimeframe<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }

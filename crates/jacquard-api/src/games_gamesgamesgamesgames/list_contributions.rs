@@ -8,15 +8,15 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::games_gamesgamesgamesgames::get_contribution::ContributionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::string::{AtUri, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::get_contribution::ContributionView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListContributionsStatus<S: BosStr = DefaultStr> {
@@ -97,19 +97,17 @@ where
             ListContributionsStatus::Pending => ListContributionsStatus::Pending,
             ListContributionsStatus::Approved => ListContributionsStatus::Approved,
             ListContributionsStatus::Denied => ListContributionsStatus::Denied,
-            ListContributionsStatus::NeedsRevision => {
-                ListContributionsStatus::NeedsRevision
-            }
-            ListContributionsStatus::Other(v) => {
-                ListContributionsStatus::Other(v.into_static())
-            }
+            ListContributionsStatus::NeedsRevision => ListContributionsStatus::NeedsRevision,
+            ListContributionsStatus::Other(v) => ListContributionsStatus::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListContributions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contributor: Option<Did<S>>,
@@ -125,9 +123,11 @@ pub struct ListContributions<S: BosStr = DefaultStr> {
     pub subject: Option<AtUri<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListContributionsOutput<S: BosStr = DefaultStr> {
     pub contributions: Vec<ContributionView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -170,7 +170,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_contributions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -188,10 +188,7 @@ pub mod list_contributions_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListContributionsBuilder<
-    St: list_contributions_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ListContributionsBuilder<St: list_contributions_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -205,10 +202,7 @@ pub struct ListContributionsBuilder<
 
 impl ListContributions<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListContributionsBuilder<
-        list_contributions_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ListContributionsBuilder<list_contributions_state::Empty, DefaultStr> {
         ListContributionsBuilder::new()
     }
 }
@@ -283,10 +277,7 @@ impl<St: list_contributions_state::State, S: BosStr> ListContributionsBuilder<St
 
 impl<St: list_contributions_state::State, S: BosStr> ListContributionsBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<ListContributionsStatus<S>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ListContributionsStatus<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }

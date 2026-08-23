@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A saved venue bookmark
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -39,29 +39,29 @@ use crate::community_lexicon::location::geo::Geo;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Item<S: BosStr = DefaultStr> {
-    ///Structured address using community lexicon
+    /// Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address_details: Option<Address<S>>,
-    ///Timestamp when the bookmark was created
+    /// Timestamp when the bookmark was created
     pub created_at: Datetime,
-    ///Reference to a bookmark folder
+    /// Reference to a bookmark folder
     #[serde(skip_serializing_if = "Option::is_none")]
     pub folder_uri: Option<AtUri<S>>,
-    ///Structured location using community lexicon
+    /// Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<Geo<S>>,
-    ///User notes about the bookmark
+    /// User notes about the bookmark
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<S>,
-    ///Human-readable address
+    /// Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_address: Option<S>,
-    ///Category classification
+    /// Category classification
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_category: Option<S>,
-    ///Display name of the venue
+    /// Display name of the venue
     pub venue_name: S,
-    ///URI identifier for the venue (typically OSM URI)
+    /// URI identifier for the venue (typically OSM URI)
     pub venue_uri: S,
     #[serde(
         flatten,
@@ -200,9 +200,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -214,7 +213,7 @@ where
 
 pub mod item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,10 +444,7 @@ where
     St::VenueUri: item_state::IsUnset,
 {
     /// Set the `venueUri` field (required)
-    pub fn venue_uri(
-        mut self,
-        value: impl Into<S>,
-    ) -> ItemBuilder<item_state::SetVenueUri<St>, S> {
+    pub fn venue_uri(mut self, value: impl Into<S>) -> ItemBuilder<item_state::SetVenueUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
@@ -498,10 +494,10 @@ where
 }
 
 fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.beaconbits.bookmark.item"),
@@ -513,33 +509,27 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A saved venue bookmark")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("venueUri"),
-                                SmolStr::new_static("venueName"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("venueUri"),
+                            SmolStr::new_static("venueName"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("addressDetails"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "community.lexicon.location.address",
-                                    ),
+                                    r#ref: CowStr::new_static("community.lexicon.location.address"),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when the bookmark was created",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the bookmark was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -547,9 +537,9 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("folderUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Reference to a bookmark folder"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Reference to a bookmark folder",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -564,9 +554,9 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("notes"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("User notes about the bookmark"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "User notes about the bookmark",
+                                    )),
                                     max_graphemes: Some(280usize),
                                     ..Default::default()
                                 }),
@@ -574,9 +564,7 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("venueAddress"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Human-readable address"),
-                                    ),
+                                    description: Some(CowStr::new_static("Human-readable address")),
                                     max_graphemes: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -584,9 +572,9 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("venueCategory"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Category classification"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Category classification",
+                                    )),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -594,9 +582,9 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("venueName"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Display name of the venue"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name of the venue",
+                                    )),
                                     max_graphemes: Some(128usize),
                                     ..Default::default()
                                 }),
@@ -604,11 +592,9 @@ fn lexicon_doc_app_beaconbits_bookmark_item() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("venueUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "URI identifier for the venue (typically OSM URI)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "URI identifier for the venue (typically OSM URI)",
+                                    )),
                                     max_graphemes: Some(512usize),
                                     ..Default::default()
                                 }),

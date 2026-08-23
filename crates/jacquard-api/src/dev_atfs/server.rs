@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -36,15 +36,15 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Server<S: BosStr = DefaultStr> {
-    ///The complete upload allowlist: atproto accounts permitted to call uploadFile/uploadBlob and pinFile. Required, and the owner is NOT implicitly included — an operator who wants to upload to their own instance must list themselves like any other account. DIDs only, never handles: an entry then survives a handle change, and a reverse index over accounts can answer 'which atfs instances can this person use' without resolving anything first.
+    /// The complete upload allowlist: atproto accounts permitted to call uploadFile/uploadBlob and pinFile. Required, and the owner is NOT implicitly included — an operator who wants to upload to their own instance must list themselves like any other account. DIDs only, never handles: an entry then survives a handle change, and a reverse index over accounts can answer 'which atfs instances can this person use' without resolving anything first.
     pub accounts: Vec<Did<S>>,
-    ///Other atfs instances this one mirrors, each named by the at-uri of that instance's own dev.atfs.server record (at://{their-owner}/dev.atfs.server/{their-peer-id}). Identity rather than a URL, so a followed instance can move without breaking the follow: the follower resolves this record to learn where to poll (its bare-domain did:web serviceDid, derived the same way as above) and whose name to hold the mirrored claims under (that same serviceDid, or an identity derived from its peer ID when it declares none). The follower periodically walks the followed instance's dev.atfs.repo.listFiles, pins whatever is new, and releases whatever has been absent from two consecutive listings. Following is unilateral and needs no consent: listFiles is public and every pinned cid is already a DHT provider record, so an opt-in would be unenforceable. Only directly-claimed content is exported by listFiles, so following an instance never transitively mirrors what *it* follows — follow each origin you want. Removing an entry releases every claim that instance's mirror held here, and the content is deleted once nothing else claims it.
+    /// Other atfs instances this one mirrors, each named by the at-uri of that instance's own dev.atfs.server record (at://{their-owner}/dev.atfs.server/{their-peer-id}). Identity rather than a URL, so a followed instance can move without breaking the follow: the follower resolves this record to learn where to poll (its bare-domain did:web serviceDid, derived the same way as above) and whose name to hold the mirrored claims under (that same serviceDid, or an identity derived from its peer ID when it declares none). The follower periodically walks the followed instance's dev.atfs.repo.listFiles, pins whatever is new, and releases whatever has been absent from two consecutive listings. Following is unilateral and needs no consent: listFiles is public and every pinned cid is already a DHT provider record, so an opt-in would be unenforceable. Only directly-claimed content is exported by listFiles, so following an instance never transitively mirrors what *it* follows — follow each origin you want. Removing an entry releases every claim that instance's mirror held here, and the content is deleted once nothing else claims it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follows: Option<Vec<AtUri<S>>>,
-    ///An operator-declared ceiling on the request bodies this instance's ingress will actually let through, in bytes. atfs cannot discover this on its own — it never sees its own ingress, only what a fronting proxy or tunnel lets past — so this is one of three sources describeServer combines with the lowest winning, alongside the ATFS_MAX_REQUEST_BODY env var and headers sniffed off arriving requests (e.g. Cloudflare's CF-Ray, read as at least its Free/Pro plan figure). Set this when those under- or over-report — for example a Cloudflare zone on a paid plan above the Free/Pro figure sniffing assumes.
+    /// An operator-declared ceiling on the request bodies this instance's ingress will actually let through, in bytes. atfs cannot discover this on its own — it never sees its own ingress, only what a fronting proxy or tunnel lets past — so this is one of three sources describeServer combines with the lowest winning, alongside the ATFS_MAX_REQUEST_BODY env var and headers sniffed off arriving requests (e.g. Cloudflare's CF-Ray, read as at least its Free/Pro plan figure). Set this when those under- or over-report — for example a Cloudflare zone on a paid plan above the Free/Pro figure sniffing assumes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_body_cap: Option<i64>,
-    ///This instance's own identity and address. It's the `aud` uploaders must address in their inter-service auth JWTs, and — only when it's a bare-domain did:web (exactly one segment after `did:web:`, so no path and no port suffix: `did:web:atfs.example.com`, never `did:web:atfs.example.com:user:alice` or an encoded-port form) — it also doubles as this instance's single HTTPS base URL, and atfs serves its own DID document at that domain's /.well-known/did.json. Uploads stay disabled until this is a bare-domain did:web and accounts names at least one account.
+    /// This instance's own identity and address. It's the `aud` uploaders must address in their inter-service auth JWTs, and — only when it's a bare-domain did:web (exactly one segment after `did:web:`, so no path and no port suffix: `did:web:atfs.example.com`, never `did:web:atfs.example.com:user:alice` or an encoded-port form) — it also doubles as this instance's single HTTPS base URL, and atfs serves its own DID document at that domain's /.well-known/did.json. Uploads stay disabled until this is a bare-domain did:web and accounts names at least one account.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub service_did: Option<Did<S>>,
     #[serde(
@@ -131,9 +131,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -145,7 +144,7 @@ where
 
 pub mod server_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,7 +177,12 @@ pub mod server_state {
 /// Builder for constructing an instance of this type.
 pub struct ServerBuilder<St: server_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<Did<S>>>, Option<Vec<AtUri<S>>>, Option<i64>, Option<Did<S>>),
+    _fields: (
+        Option<Vec<Did<S>>>,
+        Option<Vec<AtUri<S>>>,
+        Option<i64>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -304,10 +308,10 @@ where
 }
 
 fn lexicon_doc_dev_atfs_server() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.atfs.server"),

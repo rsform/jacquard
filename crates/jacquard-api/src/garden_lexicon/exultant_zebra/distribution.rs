@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,21 +25,24 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::garden_lexicon::exultant_zebra::distribution;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::garden_lexicon::exultant_zebra::distribution;
+use serde::{Deserialize, Serialize};
 /// A downloadable artifact within a distribution.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Artifact<S: BosStr = DefaultStr> {
-    ///An optional description of this artifact.
+    /// An optional description of this artifact.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The downloadable binary.
+    /// The downloadable binary.
     pub download: BlobRef<S>,
-    ///Optional tags describing this artifact, e.g. 'aarch64', 'apple-darwin', 'linux'.
+    /// Optional tags describing this artifact, e.g. 'aarch64', 'apple-darwin', 'linux'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
     #[serde(
@@ -61,12 +64,12 @@ pub struct Artifact<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Distribution<S: BosStr = DefaultStr> {
-    ///The list of downloadable artifacts for this distribution.
+    /// The list of downloadable artifacts for this distribution.
     pub artifacts: Vec<distribution::Artifact<S>>,
-    ///An optional description of this distribution.
+    /// An optional description of this distribution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///The version of this distribution, e.g. '0.14.0'.
+    /// The version of this distribution, e.g. '0.14.0'.
     pub version: S,
     #[serde(
         flatten,
@@ -110,19 +113,16 @@ impl<S: BosStr> LexiconSchema for Artifact<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("download"),
@@ -185,15 +185,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod artifact_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,10 +336,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.distribution"),
@@ -395,28 +394,22 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A distribution of an application."),
-                    ),
+                    description: Some(CowStr::new_static("A distribution of an application.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("version"),
-                                SmolStr::new_static("artifacts")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("version"),
+                            SmolStr::new_static("artifacts"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("artifacts"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The list of downloadable artifacts for this distribution.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The list of downloadable artifacts for this distribution.",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#artifact"),
                                         ..Default::default()
@@ -427,22 +420,18 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> LexiconDoc<'stati
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "An optional description of this distribution.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "An optional description of this distribution.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("version"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The version of this distribution, e.g. '0.14.0'.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The version of this distribution, e.g. '0.14.0'.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
@@ -466,9 +455,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -480,7 +468,7 @@ where
 
 pub mod distribution_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -632,10 +620,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Distribution<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Distribution<S> {
         Distribution {
             artifacts: self._fields.0.unwrap(),
             description: self._fields.1,

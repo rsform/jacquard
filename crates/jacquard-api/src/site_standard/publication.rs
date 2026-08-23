@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::label::SelfLabels;
+use crate::site_standard::publication;
+use crate::site_standard::theme::basic::Basic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::label::SelfLabels;
-use crate::site_standard::theme::basic::Basic;
-use crate::site_standard::publication;
+use serde::{Deserialize, Serialize};
 /// A publication record representing a blog, website, or content platform. Publications serve as containers for documents and define the overall branding and settings.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -41,24 +41,24 @@ use crate::site_standard::publication;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Publication<S: BosStr = DefaultStr> {
-    ///Simplified publication theme for tools and apps to utilize when displaying content.
+    /// Simplified publication theme for tools and apps to utilize when displaying content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub basic_theme: Option<Basic<S>>,
-    ///Brief description of the publication.
+    /// Brief description of the publication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    ///Square image to identify the publication. Should be at least 256x256.
+    /// Square image to identify the publication. Should be at least 256x256.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<BlobRef<S>>,
-    ///Self-label values for this publication. Effectively content warnings.
+    /// Self-label values for this publication. Effectively content warnings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    ///Name of the publication.
+    /// Name of the publication.
     pub name: S,
-    ///Object containing platform specific preferences (with a few shared properties).
+    /// Object containing platform specific preferences (with a few shared properties).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preferences: Option<publication::Preferences<S>>,
-    ///Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.
+    /// Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.
     pub url: UriValue<S>,
     #[serde(
         flatten,
@@ -80,11 +80,13 @@ pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Publication<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Preferences<S: BosStr = DefaultStr> {
-    ///Boolean which decides whether the publication should appear in discovery feeds.  Defaults to `true`.
+    /// Boolean which decides whether the publication should appear in discovery feeds.  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_in_discover")]
     pub show_in_discover: Option<bool>,
@@ -179,19 +181,16 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -251,9 +250,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -265,7 +263,7 @@ where
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -431,18 +429,12 @@ where
 
 impl<St: publication_state::State, S: BosStr> PublicationBuilder<St, S> {
     /// Set the `preferences` field (optional)
-    pub fn preferences(
-        mut self,
-        value: impl Into<Option<publication::Preferences<S>>>,
-    ) -> Self {
+    pub fn preferences(mut self, value: impl Into<Option<publication::Preferences<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
-    pub fn maybe_preferences(
-        mut self,
-        value: Option<publication::Preferences<S>>,
-    ) -> Self {
+    pub fn maybe_preferences(mut self, value: Option<publication::Preferences<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -487,10 +479,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Publication<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
         Publication {
             basic_theme: self._fields.0,
             description: self._fields.1,
@@ -505,10 +494,10 @@ where
 }
 
 fn lexicon_doc_site_standard_publication() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("site.standard.publication"),
@@ -633,9 +622,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 

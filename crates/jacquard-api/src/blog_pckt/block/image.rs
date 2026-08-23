@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,21 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blog_pckt::block::image;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blog_pckt::block::image;
+use serde::{Deserialize, Serialize};
 /// Image aspect ratio represented as width and height dimensions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
-    ///Height component of aspect ratio
+    /// Height component of aspect ratio
     pub height: i64,
-    ///Width component of aspect ratio
+    /// Width component of aspect ratio
     pub width: i64,
     #[serde(
         flatten,
@@ -46,23 +49,26 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// Image attributes
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageAttrs<S: BosStr = DefaultStr> {
-    ///Horizontal alignment of the image within its container
+    /// Horizontal alignment of the image within its container
     #[serde(skip_serializing_if = "Option::is_none")]
     pub align: Option<ImageAttrsAlign<S>>,
-    ///Alternative text description for accessibility and screen readers
+    /// Alternative text description for accessibility and screen readers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
-    ///Image aspect ratio for proper layout before loading
+    /// Image aspect ratio for proper layout before loading
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aspect_ratio: Option<image::AspectRatio<S>>,
-    ///AT Protocol blob reference (10MB max). Used when image is uploaded to PDS.
+    /// AT Protocol blob reference (10MB max). Used when image is uploaded to PDS.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
-    ///Image source URL or blob reference (blob:CID format for AT Protocol blobs)
+    /// Image source URL or blob reference (blob:CID format for AT Protocol blobs)
     pub src: S,
-    ///Optional image title displayed on hover
+    /// Optional image title displayed on hover
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
     #[serde(
@@ -157,11 +163,13 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Image<S: BosStr = DefaultStr> {
-    ///Image attributes
+    /// Image attributes
     pub attrs: image::ImageAttrs<S>,
     #[serde(
         flatten,
@@ -256,19 +264,16 @@ impl<S: BosStr> LexiconSchema for ImageAttrs<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -337,15 +342,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -483,10 +487,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AspectRatio<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -496,10 +497,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_image() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.image"),
@@ -508,14 +509,13 @@ fn lexicon_doc_blog_pckt_block_image() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Image aspect ratio represented as width and height dimensions",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Image aspect ratio represented as width and height dimensions",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -643,9 +643,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
@@ -656,15 +655,14 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 pub mod image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

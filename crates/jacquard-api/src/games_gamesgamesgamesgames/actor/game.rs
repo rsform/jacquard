@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,24 +24,27 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::games_gamesgamesgamesgames::Signature;
 use crate::games_gamesgamesgamesgames::actor::game;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Reference to a game, either by AT URI or external platform ID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GameRef<S: BosStr = DefaultStr> {
-    ///External platform's ID for the game.
+    /// External platform's ID for the game.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<S>,
-    ///External platform for ID lookup.
+    /// External platform for ID lookup.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<S>,
-    ///AT URI of the game record.
+    /// AT URI of the game record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
     #[serde(
@@ -64,11 +67,11 @@ pub struct GameRef<S: BosStr = DefaultStr> {
 )]
 pub struct Game<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
-    ///Reference to the game record.
+    /// Reference to the game record.
     pub game: game::GameRef<S>,
-    ///The platform where ownership was verified.
+    /// The platform where ownership was verified.
     pub platform: GamePlatform<S>,
-    ///Attestation signatures proving ownership was verified. Can be inline signatures or strongRefs to remote proof records.
+    /// Attestation signatures proving ownership was verified. Can be inline signatures or strongRefs to remote proof records.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signatures: Option<Vec<GameSignaturesItem<S>>>,
     #[serde(
@@ -183,7 +186,6 @@ where
     }
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -275,17 +277,16 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_actor_game() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.actor.game"),
@@ -294,38 +295,34 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_game() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Reference to a game, either by AT URI or external platform ID.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Reference to a game, either by AT URI or external platform ID.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("externalId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("External platform's ID for the game."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "External platform's ID for the game.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("External platform for ID lookup."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "External platform for ID lookup.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("AT URI of the game record."),
-                                ),
+                                description: Some(CowStr::new_static("AT URI of the game record.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -418,9 +415,8 @@ where
     S: BosStr + serde::Deserialize<'de>,
     D: serde::Deserializer<'de>,
 {
-    let mut data = <Option<
-        BTreeMap<SmolStr, Data<S>>,
-    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    let mut data =
+        <Option<BTreeMap<SmolStr, Data<S>>> as serde::Deserialize<'de>>::deserialize(deserializer)?;
     if let Some(extra_data) = &mut data {
         extra_data.remove("$type");
         if extra_data.is_empty() {
@@ -432,7 +428,7 @@ where
 
 pub mod game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -595,18 +591,12 @@ where
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `signatures` field (optional)
-    pub fn signatures(
-        mut self,
-        value: impl Into<Option<Vec<GameSignaturesItem<S>>>>,
-    ) -> Self {
+    pub fn signatures(mut self, value: impl Into<Option<Vec<GameSignaturesItem<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `signatures` field to an Option value (optional)
-    pub fn maybe_signatures(
-        mut self,
-        value: Option<Vec<GameSignaturesItem<S>>>,
-    ) -> Self {
+    pub fn maybe_signatures(mut self, value: Option<Vec<GameSignaturesItem<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
