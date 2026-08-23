@@ -29,7 +29,7 @@ pub const ATP_CID_BASE: multibase::Base = multibase::Base::Base32Lower;
 /// to check without parsing.
 ///
 /// Byte deserialization (CBOR) parses immediately since the data is already in binary form.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub enum Cid<S: Bos<str> = DefaultStr> {
     /// Parsed IPLD CID with cached string representation.
     /// The cached string is always SmolStr regardless of `S`.
@@ -57,6 +57,20 @@ pub enum Error {
     #[error("converting from a string slice")]
     #[cfg_attr(feature = "std", diagnostic(code(jacquard::cid::str_conversion)))]
     Conversion,
+}
+
+impl<S: Bos<str> + AsRef<str>> PartialEq for Cid<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> Eq for Cid<S> {}
+
+impl<S: Bos<str> + AsRef<str>> core::hash::Hash for Cid<S> {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        core::hash::Hash::hash(self.as_str(), state);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -376,9 +390,23 @@ impl<S: Bos<str> + AsRef<str>> Deref for Cid<S> {
 /// Wraps a `Cid` and handles format-specific serialization:
 /// - JSON: `{"$link": "cid_string"}`
 /// - CBOR: raw CID bytes
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 #[repr(transparent)]
 pub struct CidLink<S: Bos<str> = DefaultStr>(pub Cid<S>);
+
+impl<S: Bos<str> + AsRef<str>> PartialEq for CidLink<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> Eq for CidLink<S> {}
+
+impl<S: Bos<str> + AsRef<str>> core::hash::Hash for CidLink<S> {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        core::hash::Hash::hash(&self.0, state);
+    }
+}
 
 impl<S: Bos<str> + AsRef<str>> CidLink<S> {
     /// Get the CID as a string slice.
@@ -669,6 +697,22 @@ impl<S: Bos<str> + AsRef<str>> Deref for CidLink<S> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn equality_and_hash_are_representation_independent() {
+        let string_form: Cid<crate::DefaultStr> = Cid::Str(TEST_CID.into());
+        let parsed_form: Cid<crate::DefaultStr> = Cid::Ipld {
+            cid: IpldCid::try_from(TEST_CID).unwrap(),
+            s: TEST_CID.into(),
+        };
+        assert_eq!(string_form, parsed_form);
+        let mut set = std::collections::HashSet::new();
+        assert!(set.insert(string_form));
+        assert!(
+            !set.insert(parsed_form),
+            "hash must agree across representations"
+        );
+    }
 
     const TEST_CID: &str = "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha";
 
